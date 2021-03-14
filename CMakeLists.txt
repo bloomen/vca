@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(vca)
 
+add_subdirectory(third-party/gcl)
+
 find_package(Threads)
 
 if (MSVC)
@@ -12,8 +14,6 @@ else()
     endif()
     set(CMAKE_LINKER_FLAGS "${CMAKE_LINKER_FLAGS} ${CMAKE_THREAD_LIBS_INIT}")
 endif()
-
-add_subdirectory(third-party/gcl)
 
 include_directories(
     third-party/gcl/src
