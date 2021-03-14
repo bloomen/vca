@@ -1,0 +1,3 @@
+[submodule "third-party/gcl"]
+	path = third-party/gcl
+	url = git@github.com:bloomen/gcl.git
