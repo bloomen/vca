@@ -1,5 +1,5 @@
 add_executable(vca_desktop 
-    src/main.cpp
+    src/desktop.cpp
 )
 
 include_directories(

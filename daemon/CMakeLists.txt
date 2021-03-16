@@ -1,5 +1,5 @@
 add_executable(vca_daemon
-    src/main.cpp
+    src/daemon.cpp
 )
 
 include_directories(
