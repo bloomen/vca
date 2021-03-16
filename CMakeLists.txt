@@ -2,9 +2,11 @@ cmake_minimum_required(VERSION 3.0)
 project(vca)
 
 add_subdirectory(third_party/gcl)
+add_subdirectory(third_party/googletest)
 
 include_directories(
     third_party/gcl/src
+    third_party/googletest/googletest/include
 )
 
 if (MSVC)

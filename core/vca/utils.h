@@ -24,3 +24,12 @@ const auto ignore_op = [](auto&&...) {};
 #define VCA_DEFAULT_MOVE(class_name)                                           \
     class_name(class_name&&) = default;                                        \
     class_name& operator=(class_name&&) = default;
+
+#ifndef VCA_ASSERT
+#ifdef NDEBUG
+#define VCA_ASSERT(x)
+#else
+#include <cassert>
+#define VCA_ASSERT(x) assert(x)
+#endif
+#endif
