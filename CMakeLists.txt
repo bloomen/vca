@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(vca)
 
-add_subdirectory(third_party/gcl)
-add_subdirectory(third_party/googletest)
+add_subdirectory(third_party/gcl EXCLUDE_FROM_ALL)
+add_subdirectory(third_party/googletest EXCLUDE_FROM_ALL)
 
 include_directories(
     third_party/gcl/src
