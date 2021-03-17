@@ -196,6 +196,12 @@ public:
         return std::holds_alternative<value_type>(m_result);
     }
 
+    bool
+    bad() const
+    {
+        return !ok();
+    }
+
     const error_type&
     error_view() const
     {
@@ -299,6 +305,12 @@ public:
     ok() const
     {
         return std::holds_alternative<std::monostate>(m_result);
+    }
+
+    bool
+    bad() const
+    {
+        return !ok();
     }
 
     const error_type&
