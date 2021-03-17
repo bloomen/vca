@@ -32,7 +32,7 @@
 namespace vca
 {
 
-const auto ignore_op = [](auto&&...) {};
+constexpr auto ignore_op = [](auto&&...) {};
 
 template <typename Derived, typename Base>
 VCA_NODISCARD Derived*

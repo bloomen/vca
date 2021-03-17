@@ -2,6 +2,12 @@
 
 #include <vca/utils.h>
 
+TEST(utils, ignore_op)
+{
+    vca::ignore_op();
+    vca::ignore_op(1.3, 42);
+}
+
 namespace
 {
 
