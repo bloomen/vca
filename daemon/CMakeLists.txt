@@ -7,6 +7,7 @@ include_directories(
 )
 
 target_link_libraries(vca_daemon
+    efsw
     gcl
     vca_core
 )
