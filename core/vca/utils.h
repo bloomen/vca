@@ -1,11 +1,15 @@
 #pragma once
 
-namespace vca
-{
+#include <type_traits>
 
-const auto ignore_op = [](auto&&...) {};
-
-} // namespace vca
+#ifndef VCA_ASSERT
+#ifdef NDEBUG
+#define VCA_ASSERT(x)
+#else
+#include <cassert>
+#define VCA_ASSERT(x) assert(x)
+#endif
+#endif
 
 #define VCA_NODISCARD [[nodiscard]]
 
@@ -25,11 +29,18 @@ const auto ignore_op = [](auto&&...) {};
     class_name(class_name&&) = default;                                        \
     class_name& operator=(class_name&&) = default;
 
-#ifndef VCA_ASSERT
-#ifdef NDEBUG
-#define VCA_ASSERT(x)
-#else
-#include <cassert>
-#define VCA_ASSERT(x) assert(x)
-#endif
-#endif
+namespace vca
+{
+
+const auto ignore_op = [](auto&&...) {};
+
+template <typename Derived, typename Base>
+VCA_NODISCARD Derived*
+downcast(Base* const base)
+{
+    static_assert(std::is_base_of_v<Base, Derived>);
+    VCA_ASSERT(dynamic_cast<Derived*>(base) == base);
+    return static_cast<Derived*>(base);
+}
+
+} // namespace vca

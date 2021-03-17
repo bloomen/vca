@@ -59,7 +59,7 @@ custom_fail_func_void()
 
 } // namespace
 
-TEST(Utility, Result_Error_defaultConstructor)
+TEST(result, Result_Error_defaultConstructor)
 {
     Error error;
     ASSERT_TRUE(error.message().empty());
@@ -67,7 +67,7 @@ TEST(Utility, Result_Error_defaultConstructor)
     ASSERT_EQ("Error", error.repr());
 }
 
-TEST(Utility, Result_Error_constructedFromLValueString)
+TEST(result, Result_Error_constructedFromLValueString)
 {
     const std::string msg = "msg";
     Error error{msg};
@@ -76,7 +76,7 @@ TEST(Utility, Result_Error_constructedFromLValueString)
     ASSERT_EQ("Error: msg", error.repr());
 }
 
-TEST(Utility, Result_Error_constructedFromLValueStringAndCode)
+TEST(result, Result_Error_constructedFromLValueStringAndCode)
 {
     const std::string msg = "msg";
     Error error{42, msg};
@@ -85,7 +85,7 @@ TEST(Utility, Result_Error_constructedFromLValueStringAndCode)
     ASSERT_EQ("Error: [42] msg", error.repr());
 }
 
-TEST(Utility, Result_Error_constructedFromRValueString)
+TEST(result, Result_Error_constructedFromRValueString)
 {
     std::string msg = "msg";
     Error error{std::move(msg)};
@@ -94,7 +94,7 @@ TEST(Utility, Result_Error_constructedFromRValueString)
     ASSERT_EQ("Error: msg", error.repr());
 }
 
-TEST(Utility, Result_Error_constructedFromRValueStringAndCode)
+TEST(result, Result_Error_constructedFromRValueStringAndCode)
 {
     std::string msg = "msg";
     Error error{42, std::move(msg)};
@@ -103,7 +103,7 @@ TEST(Utility, Result_Error_constructedFromRValueStringAndCode)
     ASSERT_EQ("Error: [42] msg", error.repr());
 }
 
-TEST(Utility, Result_Error_constructedFromCString)
+TEST(result, Result_Error_constructedFromCString)
 {
     Error error{"msg"};
     ASSERT_EQ("msg", error.message());
@@ -111,7 +111,7 @@ TEST(Utility, Result_Error_constructedFromCString)
     ASSERT_EQ("Error: msg", error.repr());
 }
 
-TEST(Utility, Result_Error_constructedFromCStringAndCode)
+TEST(result, Result_Error_constructedFromCStringAndCode)
 {
     Error error{42, "msg"};
     ASSERT_EQ("msg", error.message());
@@ -119,7 +119,7 @@ TEST(Utility, Result_Error_constructedFromCStringAndCode)
     ASSERT_EQ("Error: [42] msg", error.repr());
 }
 
-TEST(Utility, Result_Error_constructedFromCode)
+TEST(result, Result_Error_constructedFromCode)
 {
     Error error{42};
     ASSERT_EQ("", error.message());
@@ -127,7 +127,7 @@ TEST(Utility, Result_Error_constructedFromCode)
     ASSERT_EQ("Error: [42]", error.repr());
 }
 
-TEST(Utility, Result_Error_copyConstructor)
+TEST(result, Result_Error_copyConstructor)
 {
     const Error error0{42, "msg"};
     Error error{error0};
@@ -136,7 +136,7 @@ TEST(Utility, Result_Error_copyConstructor)
     ASSERT_EQ("Error: [42] msg", error.repr());
 }
 
-TEST(Utility, Result_Error_copyAssignment)
+TEST(result, Result_Error_copyAssignment)
 {
     const Error error0{42, "msg"};
     Error error{43, "msg2"};
@@ -146,7 +146,7 @@ TEST(Utility, Result_Error_copyAssignment)
     ASSERT_EQ("Error: [42] msg", error.repr());
 }
 
-TEST(Utility, Result_Error_moveConstructor)
+TEST(result, Result_Error_moveConstructor)
 {
     Error error0{42, "msg"};
     Error error{std::move(error0)};
@@ -155,7 +155,7 @@ TEST(Utility, Result_Error_moveConstructor)
     ASSERT_EQ("Error: [42] msg", error.repr());
 }
 
-TEST(Utility, Result_Error_moveAssignment)
+TEST(result, Result_Error_moveAssignment)
 {
     Error error0{42, "msg"};
     Error error{43, "msg2"};
@@ -165,7 +165,7 @@ TEST(Utility, Result_Error_moveAssignment)
     ASSERT_EQ("Error: [42] msg", error.repr());
 }
 
-TEST(Utility, Result_Error_outputStreamOperator_fromLValue)
+TEST(result, Result_Error_outputStreamOperator_fromLValue)
 {
     Error error{42, "msg"};
     std::ostringstream os;
@@ -173,27 +173,27 @@ TEST(Utility, Result_Error_outputStreamOperator_fromLValue)
     ASSERT_EQ("Error: [42] msg", os.str());
 }
 
-TEST(Utility, Result_Error_outputStreamOperator_fromRValue)
+TEST(result, Result_Error_outputStreamOperator_fromRValue)
 {
     std::ostringstream os;
     os << Error{42, "msg"};
     ASSERT_EQ("Error: [42] msg", os.str());
 }
 
-TEST(Utility, Result_Error_appendToMessage_fromLValue)
+TEST(result, Result_Error_appendToMessage_fromLValue)
 {
     Error e{42, "msg"};
     e << " foo " << 43;
     ASSERT_EQ("Error: [42] msg foo 43", e.repr());
 }
 
-TEST(Utility, Result_Error_appendToMessage_fromRValue)
+TEST(result, Result_Error_appendToMessage_fromRValue)
 {
     const auto e = Error{42, "msg"} << " foo " << 43;
     ASSERT_EQ("Error: [42] msg foo 43", e.repr());
 }
 
-TEST(Utility, Result_CustomErr_constructFromLValue)
+TEST(result, Result_CustomErr_constructFromLValue)
 {
     const auto value = 42;
     CustomErr<int> e1{value};
@@ -202,7 +202,7 @@ TEST(Utility, Result_CustomErr_constructFromLValue)
     ASSERT_EQ(42, e2.get());
 }
 
-TEST(Utility, Result_CustomErr_constructFromRValue)
+TEST(result, Result_CustomErr_constructFromRValue)
 {
     CustomErr<int> e1{42};
     ASSERT_EQ(42, e1.get());
@@ -210,7 +210,7 @@ TEST(Utility, Result_CustomErr_constructFromRValue)
     ASSERT_EQ(42, e2.get());
 }
 
-TEST(Utility, Result_copyConstructor)
+TEST(result, Result_copyConstructor)
 {
     const Result<int> res1 = 42;
     const Result<int> res2{res1};
@@ -228,7 +228,7 @@ TEST(Utility, Result_copyConstructor)
     ASSERT_EQ(res3.error_view().repr(), res4.error_view().repr());
 }
 
-TEST(Utility, Result_copyAssignment_toSame)
+TEST(result, Result_copyAssignment_toSame)
 {
     const Result<int> res1 = 42;
     Result<int> res2 = 43;
@@ -244,7 +244,7 @@ TEST(Utility, Result_copyAssignment_toSame)
     ASSERT_EQ(res3.error_view().repr(), res4.error_view().repr());
 }
 
-TEST(Utility, Result_copyAssignment_toDifferent)
+TEST(result, Result_copyAssignment_toDifferent)
 {
     const Result<int> res1 = 42;
     Result<int> res2 = Error{-1};
@@ -260,7 +260,7 @@ TEST(Utility, Result_copyAssignment_toDifferent)
     ASSERT_EQ(res3.error_view().repr(), res4.error_view().repr());
 }
 
-TEST(Utility, Result_moveConstructor)
+TEST(result, Result_moveConstructor)
 {
     Result<int> res1 = 42;
     const Result<int> res2{std::move(res1)};
@@ -272,7 +272,7 @@ TEST(Utility, Result_moveConstructor)
     ASSERT_EQ(-1, res4.error_view().code());
 }
 
-TEST(Utility, Result_moveAssignment_toSame)
+TEST(result, Result_moveAssignment_toSame)
 {
     Result<int> res1 = 42;
     Result<int> res2 = 43;
@@ -286,7 +286,7 @@ TEST(Utility, Result_moveAssignment_toSame)
     ASSERT_EQ(-1, res4.error().code());
 }
 
-TEST(Utility, Result_moveAssignment_toDifferent)
+TEST(result, Result_moveAssignment_toDifferent)
 {
     Result<int> res1 = 42;
     Result<int> res2 = Error{-1};
@@ -300,7 +300,7 @@ TEST(Utility, Result_moveAssignment_toDifferent)
     ASSERT_EQ(-1, res4.error().code());
 }
 
-TEST(Utility, Result_value_error)
+TEST(result, Result_value_error)
 {
     auto res1 = success_func();
     ASSERT_TRUE(res1.ok());
@@ -310,7 +310,7 @@ TEST(Utility, Result_value_error)
     ASSERT_EQ("rough day", res2.error().message());
 }
 
-TEST(Utility, Result_value_error_custom)
+TEST(result, Result_value_error_custom)
 {
     auto res1 = custom_success_func();
     ASSERT_TRUE(res1.ok());
@@ -320,7 +320,7 @@ TEST(Utility, Result_value_error_custom)
     ASSERT_EQ(1, res2.error().get());
 }
 
-TEST(Utility, Result_value_error_customWithNonTrivialType)
+TEST(result, Result_value_error_customWithNonTrivialType)
 {
     Result<int, CustomErr<std::string>> res1{42};
     ASSERT_TRUE(res1.ok());
@@ -330,7 +330,7 @@ TEST(Utility, Result_value_error_customWithNonTrivialType)
     ASSERT_EQ("fail", res2.error().get());
 }
 
-TEST(Utility, Result_unwrap)
+TEST(result, Result_unwrap)
 {
     auto data = success_func().unwrap();
     ASSERT_EQ(13.3, data);
@@ -343,7 +343,7 @@ TEST(Utility, Result_unwrap)
     ASSERT_THROW(res2.unwrap_view(), vca::ResultError);
 }
 
-TEST(Utility, Result_unwrap_custom)
+TEST(result, Result_unwrap_custom)
 {
     auto data = custom_success_func().unwrap();
     ASSERT_EQ(13.3, data);
@@ -356,7 +356,7 @@ TEST(Utility, Result_unwrap_custom)
     ASSERT_THROW(res2.unwrap_view(), vca::ResultError);
 }
 
-TEST(Utility, Result_match_success)
+TEST(result, Result_match_success)
 {
     int success_calls = 0;
     success_func().match(
@@ -381,7 +381,7 @@ TEST(Utility, Result_match_success)
     ASSERT_EQ(3, success_calls);
 }
 
-TEST(Utility, Result_match_success_custom)
+TEST(result, Result_match_success_custom)
 {
     int success_calls = 0;
     custom_success_func().match(
@@ -406,7 +406,7 @@ TEST(Utility, Result_match_success_custom)
     ASSERT_EQ(3, success_calls);
 }
 
-TEST(Utility, Result_match_error)
+TEST(result, Result_match_error)
 {
     int fail_calls = 0;
     fail_func().match([](double&&) { FAIL(); },
@@ -428,7 +428,7 @@ TEST(Utility, Result_match_error)
     ASSERT_EQ(3, fail_calls);
 }
 
-TEST(Utility, Result_match_error_custom)
+TEST(result, Result_match_error_custom)
 {
     int fail_calls = 0;
     custom_fail_func().match([](double&&) { FAIL(); },
@@ -450,7 +450,7 @@ TEST(Utility, Result_match_error_custom)
     ASSERT_EQ(3, fail_calls);
 }
 
-TEST(Utility, Result_void_value_error)
+TEST(result, Result_void_value_error)
 {
     auto res1 = success_func_void();
     ASSERT_TRUE(res1.ok());
@@ -459,7 +459,7 @@ TEST(Utility, Result_void_value_error)
     ASSERT_EQ("rough day again", res2.error().message());
 }
 
-TEST(Utility, Result_void_value_error_custom)
+TEST(result, Result_void_value_error_custom)
 {
     auto res1 = custom_success_func_void();
     ASSERT_TRUE(res1.ok());
@@ -468,19 +468,19 @@ TEST(Utility, Result_void_value_error_custom)
     ASSERT_EQ(2, res2.error().get());
 }
 
-TEST(Utility, Result_void_unwrap)
+TEST(result, Result_void_unwrap)
 {
     success_func_void().unwrap();
     ASSERT_THROW(fail_func_void().unwrap(), vca::ResultError);
 }
 
-TEST(Utility, Result_void_unwrap_custom)
+TEST(result, Result_void_unwrap_custom)
 {
     custom_success_func_void().unwrap();
     ASSERT_THROW(custom_fail_func_void().unwrap(), vca::ResultError);
 }
 
-TEST(Utility, Result_void_match_success)
+TEST(result, Result_void_match_success)
 {
     int success_calls = 0;
     success_func_void().match([&success_calls]() { ++success_calls; },
@@ -492,7 +492,7 @@ TEST(Utility, Result_void_match_success)
     ASSERT_EQ(3, success_calls);
 }
 
-TEST(Utility, Result_void_match_success_custom)
+TEST(result, Result_void_match_success_custom)
 {
     int success_calls = 0;
     custom_success_func_void().match([&success_calls]() { ++success_calls; },
@@ -504,7 +504,7 @@ TEST(Utility, Result_void_match_success_custom)
     ASSERT_EQ(3, success_calls);
 }
 
-TEST(Utility, Result_void_match_error)
+TEST(result, Result_void_match_error)
 {
     int fail_calls = 0;
     fail_func_void().match([]() { FAIL(); },
@@ -516,7 +516,7 @@ TEST(Utility, Result_void_match_error)
     ASSERT_EQ(3, fail_calls);
 }
 
-TEST(Utility, Result_void_match_error_custom)
+TEST(result, Result_void_match_error_custom)
 {
     int fail_calls = 0;
     custom_fail_func_void().match([]() { FAIL(); },
@@ -547,14 +547,14 @@ take_result_fail()
 
 } // namespace
 
-TEST(Utility, Result_TakeResult_success)
+TEST(result, Result_TakeResult_success)
 {
     auto res = take_result_success();
     ASSERT_TRUE(res.ok());
     ASSERT_EQ(13.3, res.value());
 }
 
-TEST(Utility, Result_TakeResult_fail)
+TEST(result, Result_TakeResult_fail)
 {
     auto res = take_result_fail();
     ASSERT_TRUE(!res.ok());
@@ -580,14 +580,14 @@ take_error_fail()
 
 } // namespace
 
-TEST(Utility, Result_TakeError_success)
+TEST(result, Result_TakeError_success)
 {
     auto res = take_error_success();
     ASSERT_TRUE(res.ok());
     ASSERT_EQ(42, res.value());
 }
 
-TEST(Utility, Result_TakeError_fail)
+TEST(result, Result_TakeError_fail)
 {
     auto res = take_error_fail();
     ASSERT_TRUE(!res.ok());
@@ -613,13 +613,13 @@ test_condition_msg(const int x)
 
 } // namespace
 
-TEST(Utility, Result_TestCondition)
+TEST(result, Result_TestCondition)
 {
     ASSERT_TRUE(test_condition(1).ok());
     ASSERT_TRUE(test_condition(-1).bad());
 }
 
-TEST(Utility, Result_TestConditionMsg)
+TEST(result, Result_TestConditionMsg)
 {
     ASSERT_TRUE(test_condition_msg(1).ok());
     ASSERT_TRUE(test_condition_msg(-1).bad());
