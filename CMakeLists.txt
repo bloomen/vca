@@ -11,7 +11,7 @@ add_subdirectory(third_party/readerwriterqueue)
 include_directories(
     third_party/concurrentqueue
     third_party/efsw/include
-    third_party/gcl/src
+    third_party/gcl/include
     third_party/googletest/googletest/include
     third_party/json/single_include
     third_party/readerwriterqueue
