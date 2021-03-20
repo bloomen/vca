@@ -50,7 +50,7 @@ AllowShortLoopsOnASingleLine: false
 
 # If true, always break after function definition return types.
 # More truthfully called ‘break before the identifier following the type in a function definition’. PenaltyReturnTypeOnItsOwnLine becomes irrelevant.
-AlwaysBreakAfterDefinitionReturnType: true
+AlwaysBreakAfterReturnType: All
 
 # If true, always break before multiline string literals.
 AlwaysBreakBeforeMultilineStrings: false

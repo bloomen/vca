@@ -2,8 +2,6 @@
 
 #include <efsw/efsw.hpp>
 
-#include <vca/result.h>
-
 int
 main()
 {

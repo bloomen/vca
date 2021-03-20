@@ -1,12 +1,10 @@
 add_library(vca_core
-    vca/result.h
-    vca/result.cpp
     vca/utils.h
+    vca/utils.cpp
 )
 
 add_executable(vca_core_test
     test/core_test.cpp
-    test/result_test.cpp
     test/utils_test.cpp
 )
 

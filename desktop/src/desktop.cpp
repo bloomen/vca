@@ -1,6 +1,5 @@
 #include <gcl.h>
 #include <iostream>
-#include <vca/result.h>
 
 int
 main()

@@ -33,3 +33,8 @@ TEST(utils, downcast_happy_path)
     std::unique_ptr<Base> x = std::make_unique<Derived>();
     ASSERT_EQ(x.get(), vca::downcast<Derived>(x.get()));
 }
+
+TEST(utils, vca_check)
+{
+    ASSERT_THROW(VCA_CHECK(false), vca::VcaError);
+}
