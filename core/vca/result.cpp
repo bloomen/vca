@@ -4,9 +4,9 @@ namespace vca
 {
 
 std::ostream&
-operator<<(std::ostream& os, const Error& e)
+operator<<(std::ostream& os, const Error<ErrInfo>& e)
 {
-    os << e.repr();
+    os << e.get().repr();
     return os;
 }
 

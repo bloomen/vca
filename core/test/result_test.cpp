@@ -2,71 +2,73 @@
 
 #include <vca/result.h>
 
-using vca::CustomErr;
+using vca::ErrInfo;
 using vca::Error;
+using vca::error;
 using vca::Result;
 
 namespace
 {
 
-Result<double>
-success_func()
-{
-    return 13.3;
-}
+// Result<double>
+// success_func()
+//{
+//    return 13.3;
+//}
 
-Result<void>
-success_func_void()
-{
-    return {};
-}
+// Result<void>
+// success_func_void()
+//{
+//    return {};
+//}
 
-Result<double, int>
-custom_success_func()
-{
-    return 13.3;
-}
+// Result<double, int>
+// custom_success_func()
+//{
+//    return 13.3;
+//}
 
-Result<void, int>
-custom_success_func_void()
-{
-    return {};
-}
+// Result<void, int>
+// custom_success_func_void()
+//{
+//    return {};
+//}
 
-Result<double>
-fail_func()
-{
-    return Error{"rough day"};
-}
+// Result<double>
+// fail_func()
+//{
+//    return error() << "rough day";
+//}
 
-Result<void>
-fail_func_void()
-{
-    return Error{"rough day again"};
-}
+// Result<void>
+// fail_func_void()
+//{
+//    return error() << "rough day again";
+//}
 
-Result<double, int>
-custom_fail_func()
-{
-    return CustomErr{1};
-}
+// Result<double, int>
+// custom_fail_func()
+//{
+//    return error(1);
+//}
 
-Result<void, int>
-custom_fail_func_void()
-{
-    return CustomErr{2};
-}
+// Result<void, int>
+// custom_fail_func_void()
+//{
+//    return error(2);
+//}
 
 } // namespace
 
 TEST(result, Result_Error_defaultConstructor)
 {
-    Error error;
-    ASSERT_TRUE(error.message().empty());
-    ASSERT_EQ(Error::CODE_UNSET, error.code());
-    ASSERT_EQ("Error", error.repr());
+    auto err = error();
+    ASSERT_TRUE(err.get().message().empty());
+    ASSERT_EQ(ErrInfo::CODE_UNSET, err.get().code());
+    ASSERT_EQ("ErrInfo", err.get().repr());
 }
 
+/*
 TEST(result, Result_Error_constructedFromLValueString)
 {
     const std::string msg = "msg";
@@ -624,3 +626,4 @@ TEST(result, Result_TestConditionMsg)
     ASSERT_TRUE(test_condition_msg(1).ok());
     ASSERT_TRUE(test_condition_msg(-1).bad());
 }
+*/
