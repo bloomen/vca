@@ -9,7 +9,7 @@ add_executable(vca_core_test
 )
 
 target_include_directories(vca_core_test
-    PUBLIC ${PROJECT_SOURCE_DIR}/core
+    PRIVATE ${PROJECT_SOURCE_DIR}/core
 )
 
 target_link_libraries(vca_core_test
