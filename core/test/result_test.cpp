@@ -48,13 +48,13 @@ fail_func_void()
 Result<double, CustomErr<int>>
 custom_fail_func()
 {
-    return CustomErr<int>{1};
+    return CustomErr{1};
 }
 
 Result<void, CustomErr<int>>
 custom_fail_func_void()
 {
-    return CustomErr<int>{2};
+    return CustomErr{2};
 }
 
 } // namespace

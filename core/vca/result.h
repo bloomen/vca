@@ -205,24 +205,28 @@ public:
     const error_type&
     error_view() const
     {
+        VCA_ASSERT(bad());
         return std::get<error_type>(m_result);
     }
 
     error_type&&
     error()
     {
+        VCA_ASSERT(bad());
         return std::get<error_type>(std::move(m_result));
     }
 
     const value_type&
     value_view() const
     {
+        VCA_ASSERT(ok());
         return std::get<value_type>(m_result);
     }
 
     value_type&&
     value()
     {
+        VCA_ASSERT(ok());
         return std::get<value_type>(std::move(m_result));
     }
 
@@ -316,12 +320,14 @@ public:
     const error_type&
     error_view() const
     {
+        VCA_ASSERT(bad());
         return std::get<error_type>(m_result);
     }
 
     error_type&&
     error()
     {
+        VCA_ASSERT(bad());
         return std::get<error_type>(std::move(m_result));
     }
 
@@ -381,16 +387,16 @@ private:
 // Use this macro when an error should be forwarded up the call stack.
 #define TAKE_VALUE(owner, expr)                                                \
     CHECK_RESULT(expr);                                                        \
-    owner = FS_PRIVATE_RESULT_JOIN(tmp__result__, __LINE__).value()
+    owner = VCA_SYMBOL_JOIN(tmp__result__, __LINE__).value()
 
 // Convenience macro to make error handling more ergonomic.
 // Returns an error object if `expr` returns a failed result, otherwise
 // continues execution as normal.
 // Use this macro when an error should be forwarded up the call stack.
 #define CHECK_RESULT(expr)                                                     \
-    auto&& FS_PRIVATE_RESULT_JOIN(tmp__result__, __LINE__) = expr;             \
-    if (FS_PRIVATE_RESULT_JOIN(tmp__result__, __LINE__).bad())                 \
-    return FS_PRIVATE_RESULT_JOIN(tmp__result__, __LINE__).error()
+    auto&& VCA_SYMBOL_JOIN(tmp__result__, __LINE__) = expr;                    \
+    if (VCA_SYMBOL_JOIN(tmp__result__, __LINE__).bad())                        \
+    return VCA_SYMBOL_JOIN(tmp__result__, __LINE__).error()
 
 // Tests if `condition` is true and returns an `Error` object if not.
 // A custom message can be appended using the << operator following the macro
@@ -399,20 +405,6 @@ private:
     if (!(condition))                                                          \
         return vca::Error                                                      \
         {                                                                      \
-            FS_PRIVATE_RESULT_LOCATION + ": Test failed: '" + #condition +     \
+            VCA_SOURCE_LOCATION.repr() + ": Test failed: '" + #condition +     \
                 "' "                                                           \
         }
-
-// Private macro - not to be used directly by a client. Joins two symbols to a
-// single symbol
-#define FS_PRIVATE_RESULT_JOIN(symbol1, symbol2)                               \
-    FS_PRIVATE_RESULT_DO_JOIN(symbol1, symbol2)
-#define FS_PRIVATE_RESULT_DO_JOIN(symbol1, symbol2) symbol1##symbol2
-
-// Private macro - not to be used directly by a client. Provides the location of
-// the macro as a string
-#define FS_PRIVATE_RESULT_LOCATION                                             \
-    std::string{__FILE__} + ":" + std::to_string(__LINE__) + ":" + std::string \
-    {                                                                          \
-        __func__                                                               \
-    }
