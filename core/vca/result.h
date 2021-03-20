@@ -114,64 +114,168 @@ std::ostream& operator<<(std::ostream& os, const Error& e);
 
 // Represents a custom error that can carry any type, e.g. a user-defined enum
 template <typename ObjectType>
-class CustomErr
+struct CustomErr
 {
-public:
     using object_type = ObjectType;
 
-    static_assert(!std::is_convertible<object_type, Error>::value,
-                  "ObjectType cannot be convertible to Error");
-
-    explicit CustomErr(const object_type& obj)
-        : _obj{obj}
+    CustomErr(const object_type& obj)
+        : obj{obj}
     {
     }
-    explicit CustomErr(object_type&& obj)
-        : _obj{std::move(obj)}
+    CustomErr(object_type&& obj)
+        : obj{std::move(obj)}
     {
     }
 
-    const object_type&
-    get() const
-    {
-        return _obj;
-    }
-
-    object_type&
-    get()
-    {
-        return _obj;
-    }
-
-    std::string
-    repr() const
-    {
-        return "CustomErr";
-    }
-
-private:
-    object_type _obj;
+    object_type obj;
 };
 
-class ResultError : public std::runtime_error
+class ResultException : public std::runtime_error
 {
 public:
-    explicit ResultError(const std::string& message)
+    explicit ResultException(const std::string& message)
         : std::runtime_error{message}
     {
     }
 };
 
+template <typename ValueType, typename ErrorType = Error>
+class VCA_NODISCARD Result;
+
 // Allows you to store a ValueType in the success case and an ErrorType in the
 // failure case. `Result` can be constructed from either ValueType or ErrorType.
-template <typename ValueType, typename ErrorType = Error>
+template <typename ValueType, typename ErrorType>
 class VCA_NODISCARD Result
 {
 public:
     using value_type = ValueType;
     using error_type = ErrorType;
 
-    static_assert(!std::is_same_v<value_type, Error>, "Value cannot be Error");
+    static_assert(!std::is_same_v<value_type, CustomErr<error_type>>,
+                  "ValueType cannot be ErrorType");
+
+    Result(const value_type& value)
+        : m_result{value}
+    {
+    }
+    Result(value_type&& value)
+        : m_result{std::move(value)}
+    {
+    }
+    Result(const CustomErr<error_type>& error)
+        : m_result{error.obj}
+    {
+    }
+    Result(CustomErr<error_type>&& error)
+        : m_result{std::move(error.obj)}
+    {
+    }
+
+    bool
+    ok() const
+    {
+        return std::holds_alternative<value_type>(m_result);
+    }
+
+    bool
+    bad() const
+    {
+        return !ok();
+    }
+
+    const error_type&
+    error_view() const
+    {
+        VCA_ASSERT(bad());
+        return std::get<error_type>(m_result);
+    }
+
+    error_type&&
+    error()
+    {
+        VCA_ASSERT(bad());
+        return std::get<error_type>(std::move(m_result));
+    }
+
+    const value_type&
+    value_view() const
+    {
+        VCA_ASSERT(ok());
+        return std::get<value_type>(m_result);
+    }
+
+    value_type&&
+    value()
+    {
+        VCA_ASSERT(ok());
+        return std::get<value_type>(std::move(m_result));
+    }
+
+    template <typename ValueFunctor, typename ErrorFunctor>
+    void
+    match_view(ValueFunctor&& value_functor,
+               ErrorFunctor&& error_functor) const&
+    {
+        if (ok())
+        {
+            std::forward<ValueFunctor>(value_functor)(value_view());
+        }
+        else
+        {
+            std::forward<ErrorFunctor>(error_functor)(error_view());
+        }
+    }
+
+    template <typename ValueFunctor, typename ErrorFunctor>
+    void
+    match(ValueFunctor&& value_functor, ErrorFunctor&& error_functor)
+    {
+        if (ok())
+        {
+            std::forward<ValueFunctor>(value_functor)(value());
+        }
+        else
+        {
+            std::forward<ErrorFunctor>(error_functor)(error());
+        }
+    }
+
+    const value_type&
+    unwrap_view() const
+    {
+        check_ok();
+        return value_view();
+    }
+
+    value_type&&
+    unwrap()
+    {
+        check_ok();
+        return value();
+    }
+
+private:
+    void
+    check_ok() const
+    {
+        if (!ok())
+        {
+            throw ResultException{"ResultException: CustomErr"};
+        }
+    }
+
+    std::variant<value_type, error_type> m_result;
+};
+
+template <typename ValueType>
+class VCA_NODISCARD Result<ValueType, Error>
+{
+public:
+    using value_type = ValueType;
+    using error_type = Error;
+
+    static_assert(!std::is_same_v<value_type, error_type>,
+                  "ValueType cannot be ErrorType");
 
     Result(const value_type& value)
         : m_result{value}
@@ -279,7 +383,7 @@ private:
     {
         if (!ok())
         {
-            throw ResultError{"Result: " + error_view().repr()};
+            throw ResultException{"ResultException: " + error_view().repr()};
         }
     }
 
@@ -291,6 +395,99 @@ class VCA_NODISCARD Result<void, ErrorType>
 {
 public:
     using error_type = ErrorType;
+
+    Result()
+        : m_result{std::monostate{}}
+    {
+    }
+    Result(const CustomErr<error_type>& error)
+        : m_result{error.obj}
+    {
+    }
+    Result(CustomErr<error_type>&& error)
+        : m_result{std::move(error.obj)}
+    {
+    }
+
+    bool
+    ok() const
+    {
+        return std::holds_alternative<std::monostate>(m_result);
+    }
+
+    bool
+    bad() const
+    {
+        return !ok();
+    }
+
+    const error_type&
+    error_view() const
+    {
+        VCA_ASSERT(bad());
+        return std::get<error_type>(m_result);
+    }
+
+    error_type&&
+    error()
+    {
+        VCA_ASSERT(bad());
+        return std::get<error_type>(std::move(m_result));
+    }
+
+    template <typename ValueFunctor, typename ErrorFunctor>
+    void
+    match_view(ValueFunctor&& value_functor,
+               ErrorFunctor&& error_functor) const&
+    {
+        if (ok())
+        {
+            std::forward<ValueFunctor>(value_functor)();
+        }
+        else
+        {
+            std::forward<ErrorFunctor>(error_functor)(error_view());
+        }
+    }
+
+    template <typename ValueFunctor, typename ErrorFunctor>
+    void
+    match(ValueFunctor&& value_functor, ErrorFunctor&& error_functor)
+    {
+        if (ok())
+        {
+            std::forward<ValueFunctor>(value_functor)();
+        }
+        else
+        {
+            std::forward<ErrorFunctor>(error_functor)(error());
+        }
+    }
+
+    void
+    unwrap()
+    {
+        check_ok();
+    }
+
+private:
+    void
+    check_ok() const
+    {
+        if (!ok())
+        {
+            throw ResultException{"ResultException: CustomErr"};
+        }
+    }
+
+    std::variant<std::monostate, error_type> m_result;
+};
+
+template <>
+class VCA_NODISCARD Result<void, Error>
+{
+public:
+    using error_type = Error;
 
     Result()
         : m_result{std::monostate{}}
@@ -372,7 +569,7 @@ private:
     {
         if (!ok())
         {
-            throw ResultError{"Result: " + error_view().repr()};
+            throw ResultException{"ResultException: " + error_view().repr()};
         }
     }
 

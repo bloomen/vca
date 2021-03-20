@@ -21,13 +21,13 @@ success_func_void()
     return {};
 }
 
-Result<double, CustomErr<int>>
+Result<double, int>
 custom_success_func()
 {
     return 13.3;
 }
 
-Result<void, CustomErr<int>>
+Result<void, int>
 custom_success_func_void()
 {
     return {};
@@ -45,13 +45,13 @@ fail_func_void()
     return Error{"rough day again"};
 }
 
-Result<double, CustomErr<int>>
+Result<double, int>
 custom_fail_func()
 {
     return CustomErr{1};
 }
 
-Result<void, CustomErr<int>>
+Result<void, int>
 custom_fail_func_void()
 {
     return CustomErr{2};
@@ -197,17 +197,17 @@ TEST(result, Result_CustomErr_constructFromLValue)
 {
     const auto value = 42;
     CustomErr<int> e1{value};
-    ASSERT_EQ(42, e1.get());
+    ASSERT_EQ(42, e1.obj);
     const CustomErr<int> e2{value};
-    ASSERT_EQ(42, e2.get());
+    ASSERT_EQ(42, e2.obj);
 }
 
 TEST(result, Result_CustomErr_constructFromRValue)
 {
     CustomErr<int> e1{42};
-    ASSERT_EQ(42, e1.get());
+    ASSERT_EQ(42, e1.obj);
     const CustomErr<int> e2{42};
-    ASSERT_EQ(42, e2.get());
+    ASSERT_EQ(42, e2.obj);
 }
 
 TEST(result, Result_copyConstructor)
@@ -317,17 +317,17 @@ TEST(result, Result_value_error_custom)
     ASSERT_EQ(13.3, res1.value());
     auto res2 = custom_fail_func();
     ASSERT_TRUE(!res2.ok());
-    ASSERT_EQ(1, res2.error().get());
+    ASSERT_EQ(1, res2.error());
 }
 
 TEST(result, Result_value_error_customWithNonTrivialType)
 {
-    Result<int, CustomErr<std::string>> res1{42};
+    Result<int, std::string> res1{42};
     ASSERT_TRUE(res1.ok());
     ASSERT_EQ(42, res1.value());
-    Result<int, CustomErr<std::string>> res2{CustomErr<std::string>{"fail"}};
+    Result<int, std::string> res2{CustomErr<std::string>{"fail"}};
     ASSERT_TRUE(!res2.ok());
-    ASSERT_EQ("fail", res2.error().get());
+    ASSERT_EQ("fail", res2.error());
 }
 
 TEST(result, Result_unwrap)
@@ -338,9 +338,9 @@ TEST(result, Result_unwrap)
     auto d = res.unwrap_view();
     ASSERT_EQ(13.3, d);
     ASSERT_EQ(13.3, res.unwrap());
-    ASSERT_THROW(fail_func().unwrap(), vca::ResultError);
+    ASSERT_THROW(fail_func().unwrap(), vca::ResultException);
     auto res2 = fail_func();
-    ASSERT_THROW(res2.unwrap_view(), vca::ResultError);
+    ASSERT_THROW(res2.unwrap_view(), vca::ResultException);
 }
 
 TEST(result, Result_unwrap_custom)
@@ -351,9 +351,9 @@ TEST(result, Result_unwrap_custom)
     auto d = res.unwrap_view();
     ASSERT_EQ(13.3, d);
     ASSERT_EQ(13.3, res.unwrap());
-    ASSERT_THROW(custom_fail_func().unwrap(), vca::ResultError);
+    ASSERT_THROW(custom_fail_func().unwrap(), vca::ResultException);
     auto res2 = custom_fail_func();
-    ASSERT_THROW(res2.unwrap_view(), vca::ResultError);
+    ASSERT_THROW(res2.unwrap_view(), vca::ResultException);
 }
 
 TEST(result, Result_match_success)
@@ -434,18 +434,18 @@ TEST(result, Result_match_error_custom)
     custom_fail_func().match([](double&&) { FAIL(); },
                              [&fail_calls](auto&& e) {
                                  ++fail_calls;
-                                 ASSERT_EQ(1, e.get());
+                                 ASSERT_EQ(1, e);
                              });
     auto res = custom_fail_func();
     res.match_view([](const double&) { FAIL(); },
                    [&fail_calls](const auto& e) {
                        ++fail_calls;
-                       ASSERT_EQ(1, e.get());
+                       ASSERT_EQ(1, e);
                    });
     res.match([](const double&) { FAIL(); },
               [&fail_calls](auto&& e) {
                   ++fail_calls;
-                  ASSERT_EQ(1, e.get());
+                  ASSERT_EQ(1, e);
               });
     ASSERT_EQ(3, fail_calls);
 }
@@ -465,19 +465,19 @@ TEST(result, Result_void_value_error_custom)
     ASSERT_TRUE(res1.ok());
     auto res2 = custom_fail_func_void();
     ASSERT_TRUE(!res2.ok());
-    ASSERT_EQ(2, res2.error().get());
+    ASSERT_EQ(2, res2.error());
 }
 
 TEST(result, Result_void_unwrap)
 {
     success_func_void().unwrap();
-    ASSERT_THROW(fail_func_void().unwrap(), vca::ResultError);
+    ASSERT_THROW(fail_func_void().unwrap(), vca::ResultException);
 }
 
 TEST(result, Result_void_unwrap_custom)
 {
     custom_success_func_void().unwrap();
-    ASSERT_THROW(custom_fail_func_void().unwrap(), vca::ResultError);
+    ASSERT_THROW(custom_fail_func_void().unwrap(), vca::ResultException);
 }
 
 TEST(result, Result_void_match_success)
