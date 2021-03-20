@@ -1,12 +1,15 @@
 cmake_minimum_required(VERSION 3.0)
 project(vca)
 
+set(BUILD_SHARED_LIBS "FALSE")
+
 add_subdirectory(third_party/concurrentqueue)
 add_subdirectory(third_party/efsw)
 add_subdirectory(third_party/gcl)
 add_subdirectory(third_party/googletest)
 add_subdirectory(third_party/json)
 add_subdirectory(third_party/readerwriterqueue)
+add_subdirectory(third_party/spdlog)
 
 include_directories(
     third_party/concurrentqueue
