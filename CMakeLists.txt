@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.0)
 project(vca)
 
 set(BUILD_SHARED_LIBS "FALSE")
+set(SQLITECPP_RUN_CPPLINT "OFF")
+set(SQLITE_ENABLE_COLUMN_METADATA "1")
 
 add_subdirectory(third_party/concurrentqueue)
 add_subdirectory(third_party/efsw)
@@ -10,6 +12,7 @@ add_subdirectory(third_party/googletest)
 add_subdirectory(third_party/json)
 add_subdirectory(third_party/readerwriterqueue)
 add_subdirectory(third_party/spdlog)
+add_subdirectory(third_party/SQLiteCpp)
 
 include_directories(
     third_party/concurrentqueue
@@ -19,6 +22,7 @@ include_directories(
     third_party/json/single_include
     third_party/readerwriterqueue
     third_party/spdlog/include
+    third_party/SQLiteCpp/include
 )
 
 if (MSVC)

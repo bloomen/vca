@@ -9,5 +9,7 @@ include_directories(
 target_link_libraries(vca_daemon
     efsw
     gcl
+    SQLiteCpp
+    sqlite3
     vca_core
 )
