@@ -1,4 +1,5 @@
 add_library(vca_core
+    vca/filesystem.h
     vca/utils.h
     vca/utils.cpp
 )

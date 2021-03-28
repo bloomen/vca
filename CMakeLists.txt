@@ -3,7 +3,7 @@ project(vca)
 
 set(BUILD_SHARED_LIBS "FALSE")
 set(SQLITECPP_RUN_CPPLINT "OFF")
-set(SQLITE_ENABLE_COLUMN_METADATA "1")
+set(SQLITE_ENABLE_COLUMN_METADATA)
 
 add_subdirectory(third_party/concurrentqueue)
 add_subdirectory(third_party/efsw)
