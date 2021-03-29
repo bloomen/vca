@@ -4,145 +4,8 @@
 
 #include <vca/filesystem.h>
 #include <vca/logging.h>
+#include <vca/sqlite_userdb.h>
 #include <vca/utils.h>
-
-#include <SQLiteCpp/SQLiteCpp.h>
-#include <SQLiteCpp/VariadicBind.h>
-#include <efsw/efsw.hpp>
-
-struct FileContents
-{
-    std::vector<std::string> words;
-};
-
-class UserDb
-{
-public:
-    virtual ~UserDb() = default;
-
-    virtual const fs::path&
-    path() const = 0;
-
-    virtual void
-    truncate() = 0;
-
-    virtual void
-    update_file(const fs::path& path, const FileContents& contents) = 0;
-
-    virtual void
-    remove_file(const fs::path& path) = 0;
-
-    virtual std::vector<fs::path>
-    search(const FileContents& contents) = 0;
-};
-
-class SqliteUserDb : public UserDb
-{
-public:
-    explicit SqliteUserDb(fs::path path)
-        : m_path{std::move(path)}
-        , m_db{m_path.u8string(), SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE}
-    {
-        m_db.exec("PRAGMA foreign_keys = ON");
-        SQLite::Transaction transaction{m_db};
-        m_db.exec("CREATE TABLE IF NOT EXISTS files (id INTEGER PRIMARY KEY "
-                  "AUTOINCREMENT, path TEXT NOT NULL UNIQUE, ext TEXT)");
-        m_db.exec("CREATE TABLE IF NOT EXISTS words (id INTEGER PRIMARY KEY "
-                  "AUTOINCREMENT, files_id INTEGER NOT NULL, word TEXT NOT "
-                  "NULL, FOREIGN KEY (files_id) REFERENCES files (id) ON "
-                  "DELETE CASCADE)");
-        transaction.commit();
-    }
-
-    void
-    truncate() override
-    {
-        SQLite::Transaction transaction{m_db};
-        m_db.exec("DELETE FROM files");
-        transaction.commit();
-    }
-
-    void
-    update_file(const fs::path& path, const FileContents& contents) override
-    {
-        SQLite::Transaction transaction{m_db};
-        SQLite::Statement del_stm{m_db, "DELETE FROM files WHERE path = ?"};
-        SQLite::bind(del_stm, path.u8string());
-        del_stm.exec();
-        SQLite::Statement ins_stm{
-            m_db, "INSERT INTO files (path, ext) VALUES (?, ?)"};
-        SQLite::bind(ins_stm, path.u8string(), path.extension().u8string());
-        ins_stm.exec();
-        SQLite::Statement query_stm{m_db,
-                                    "SELECT last_insert_rowid() FROM files"};
-        int files_id = -1;
-        if (query_stm.executeStep())
-        {
-            files_id = query_stm.getColumn(0).getInt();
-        }
-        VCA_CHECK(files_id > -1);
-        for (const auto& word : contents.words)
-        {
-            SQLite::Statement ins_word_stm{
-                m_db, "INSERT INTO words (files_id, word) VALUES (?, ?)"};
-            SQLite::bind(ins_word_stm, files_id, word);
-            ins_word_stm.exec();
-        }
-        transaction.commit();
-    }
-
-    void
-    remove_file(const fs::path& path) override
-    {
-        SQLite::Transaction transaction{m_db};
-        SQLite::Statement del_stm{m_db, "DELETE FROM files WHERE path = ?"};
-        SQLite::bind(del_stm, path.u8string());
-        del_stm.exec();
-        transaction.commit();
-    }
-
-    std::vector<fs::path>
-    search(const FileContents& contents) override
-    {
-        SQLite::Transaction transaction{m_db};
-        std::set<int> files_ids;
-        for (const auto& word : contents.words)
-        {
-            SQLite::Statement query_stm{
-                m_db, "SELECT files_id FROM words WHERE word LIKE ?"};
-            SQLite::bind(query_stm, word);
-            while (query_stm.executeStep())
-            {
-                const int files_id = query_stm.getColumn(0).getInt();
-                files_ids.insert(files_id);
-            }
-        }
-        std::vector<fs::path> paths;
-        for (const auto files_id : files_ids)
-        {
-            SQLite::Statement query_stm{m_db,
-                                        "SELECT path FROM files WHERE id = ?"};
-            SQLite::bind(query_stm, files_id);
-            if (query_stm.executeStep())
-            {
-                const auto path = query_stm.getColumn(0).getText();
-                paths.emplace_back(fs::u8path(path));
-            }
-        }
-        transaction.commit();
-        return paths;
-    }
-
-    const fs::path&
-    path() const override
-    {
-        return m_path;
-    }
-
-private:
-    fs::path m_path;
-    SQLite::Database m_db;
-};
 
 int
 main(const int argc, char** argv)
@@ -163,7 +26,18 @@ main(const int argc, char** argv)
 
         VCA_INFO << "Starting vca_daemon";
 
-        SqliteUserDb user_db{work_dir / "user.db"};
+        vca::SqliteUserDb user_db{work_dir / "user.db"};
+
+        user_db.update_file("/foo/bar.txt", {{"guan", "christian"}});
+        user_db.update_file("/foo/assi.doc", {{"dani", "peter", "guan"}});
+        user_db.update_file("/foo/spinner.pdf", {{"basti", "peter", "dani"}});
+
+        const auto paths = user_db.search({{"guan", "christian"}});
+
+        for (const auto& p : paths)
+        {
+            std::cout << p << std::endl;
+        }
 
         return EXIT_SUCCESS;
     }

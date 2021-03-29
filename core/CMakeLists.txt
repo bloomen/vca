@@ -2,8 +2,17 @@ add_library(vca_core
     vca/filesystem.h
     vca/logging.h
     vca/logging.cpp
+    vca/sqlite_userdb.h
+    vca/sqlite_userdb.cpp
+    vca/userdb.h
     vca/utils.h
     vca/utils.cpp
+)
+
+target_link_libraries(vca_core PUBLIC
+    spdlog
+    sqlite3
+    SQLiteCpp
 )
 
 add_executable(vca_core_test
