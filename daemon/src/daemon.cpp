@@ -3,12 +3,12 @@
 #include <vector>
 
 #include <vca/filesystem.h>
+#include <vca/logging.h>
 #include <vca/utils.h>
-
-#include <efsw/efsw.hpp>
 
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <SQLiteCpp/VariadicBind.h>
+#include <efsw/efsw.hpp>
 
 struct FileContents
 {
@@ -150,30 +150,53 @@ main(const int argc, char** argv)
     if (argc != 2)
     {
         std::cerr << "Usage: ./vca_daemon <work_dir>" << std::endl;
+        return EXIT_FAILURE;
     }
-    const auto work_dir = fs::u8path(argv[1]);
 
-    SqliteUserDb user_db{work_dir / "user.db"};
-
-    user_db.update_file("/foo/bar.txt", {{"guan", "christian"}});
-    user_db.update_file("/foo/assi.doc", {{"dani", "peter", "guan"}});
-    user_db.update_file("/foo/spinner.pdf", {{"basti", "peter", "dani"}});
-
-    const auto paths = user_db.search({{"guan", "christian"}});
-
-    for (const auto& p : paths)
+    try
     {
-        std::cout << p << std::endl;
+        const auto work_dir = fs::u8path(argv[1]);
+        fs::create_directories(work_dir);
+
+        vca::init_logging(work_dir / "logs" / "vca_daemon.log");
+        vca::set_log_level(vca::Logger::Level::Debug);
+
+        VCA_INFO << "Starting vca_daemon";
+
+        SqliteUserDb user_db{work_dir / "user.db"};
+
+        return EXIT_SUCCESS;
     }
-
-    user_db.truncate();
-
-    const auto paths2 = user_db.search({{"guan", "christian"}});
-
-    for (const auto& p : paths2)
+    catch (const std::exception& e)
     {
-        std::cout << p << std::endl;
+        VCA_ERROR << "Exception: " << e.what();
+        return EXIT_FAILURE;
     }
+    catch (...)
+    {
+        VCA_ERROR << "Unknown exception";
+        return EXIT_FAILURE;
+    }
+
+    //    user_db.update_file("/foo/bar.txt", {{"guan", "christian"}});
+    //    user_db.update_file("/foo/assi.doc", {{"dani", "peter", "guan"}});
+    //    user_db.update_file("/foo/spinner.pdf", {{"basti", "peter", "dani"}});
+
+    //    const auto paths = user_db.search({{"guan", "christian"}});
+
+    //    for (const auto& p : paths)
+    //    {
+    //        std::cout << p << std::endl;
+    //    }
+
+    //    user_db.truncate();
+
+    //    const auto paths2 = user_db.search({{"guan", "christian"}});
+
+    //    for (const auto& p : paths2)
+    //    {
+    //        std::cout << p << std::endl;
+    //    }
 
     //    // Inherits from the abstract listener class, and implements the the file
     //    // action handler
