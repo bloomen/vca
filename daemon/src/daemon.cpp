@@ -8,6 +8,8 @@
 #include <vca/sqlite_userdb.h>
 #include <vca/utils.h>
 
+#include "scan.h"
+
 int
 main(const int argc, char** argv)
 {
@@ -33,6 +35,8 @@ main(const int argc, char** argv)
         VCA_INFO << "User root dir: " << user_config.root_dir();
 
         vca::SqliteUserDb user_db{work_dir / "user.db"};
+
+        vca::scan(app_config, user_config, user_db);
 
         return EXIT_SUCCESS;
     }

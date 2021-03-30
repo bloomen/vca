@@ -1,5 +1,7 @@
 add_executable(vca_daemon
     src/daemon.cpp
+    src/scan.h
+    src/scan.cpp
 )
 
 include_directories(
