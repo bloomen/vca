@@ -1,5 +1,6 @@
 #include "sqlite_userdb.h"
 
+#include <mutex>
 #include <set>
 
 #include <SQLiteCpp/SQLiteCpp.h>
@@ -18,6 +19,7 @@ struct SqliteUserDb::Impl
              SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE}
     {
     }
+    std::mutex mutex;
     fs::path path;
     SQLite::Database db;
 };
@@ -43,6 +45,7 @@ SqliteUserDb::~SqliteUserDb() = default;
 void
 SqliteUserDb::truncate()
 {
+    std::lock_guard<std::mutex> lock{m_impl->mutex};
     SQLite::Transaction transaction{m_impl->db};
     m_impl->db.exec("DELETE FROM files");
     transaction.commit();
@@ -51,6 +54,7 @@ SqliteUserDb::truncate()
 void
 SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 {
+    std::lock_guard<std::mutex> lock{m_impl->mutex};
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement del_stm{m_impl->db, "DELETE FROM files WHERE path = ?"};
     SQLite::bind(del_stm, path.u8string());
@@ -80,6 +84,7 @@ SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 void
 SqliteUserDb::remove_file(const fs::path& path)
 {
+    std::lock_guard<std::mutex> lock{m_impl->mutex};
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement del_stm{m_impl->db, "DELETE FROM files WHERE path = ?"};
     SQLite::bind(del_stm, path.u8string());
@@ -90,6 +95,7 @@ SqliteUserDb::remove_file(const fs::path& path)
 std::vector<fs::path>
 SqliteUserDb::search(const FileContents& contents)
 {
+    std::lock_guard<std::mutex> lock{m_impl->mutex};
     SQLite::Transaction transaction{m_impl->db};
     std::set<int> files_ids;
     for (const auto& word : contents.words)
