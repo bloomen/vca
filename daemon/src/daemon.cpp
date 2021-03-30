@@ -2,6 +2,7 @@
 #include <set>
 #include <vector>
 
+#include <vca/config.h>
 #include <vca/filesystem.h>
 #include <vca/logging.h>
 #include <vca/sqlite_userdb.h>
@@ -26,18 +27,12 @@ main(const int argc, char** argv)
 
         VCA_INFO << "Starting vca_daemon";
 
+        vca::AppConfig app_config;
+
+        vca::UserConfig user_config{work_dir / "user.json"};
+        VCA_INFO << "User root dir: " << user_config.root_dir();
+
         vca::SqliteUserDb user_db{work_dir / "user.db"};
-
-        user_db.update_file("/foo/bar.txt", {{"guan", "christian"}});
-        user_db.update_file("/foo/assi.doc", {{"dani", "peter", "guan"}});
-        user_db.update_file("/foo/spinner.pdf", {{"basti", "peter", "dani"}});
-
-        const auto paths = user_db.search({{"guan", "christian"}});
-
-        for (const auto& p : paths)
-        {
-            std::cout << p << std::endl;
-        }
 
         return EXIT_SUCCESS;
     }

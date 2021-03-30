@@ -1,4 +1,6 @@
 add_library(vca_core
+    vca/config.h
+    vca/config.cpp
     vca/filesystem.h
     vca/logging.h
     vca/logging.cpp
@@ -10,6 +12,7 @@ add_library(vca_core
 )
 
 target_link_libraries(vca_core PUBLIC
+    nlohmann_json
     spdlog
     sqlite3
     SQLiteCpp
