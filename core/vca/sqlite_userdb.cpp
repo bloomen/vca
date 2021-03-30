@@ -6,6 +6,7 @@
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <SQLiteCpp/VariadicBind.h>
 
+#include "logging.h"
 #include "utils.h"
 
 namespace vca
@@ -54,6 +55,7 @@ SqliteUserDb::truncate()
 void
 SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 {
+    VCA_DEBUG << __func__ << ": " << path;
     std::lock_guard<std::mutex> lock{m_impl->mutex};
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement del_stm{m_impl->db, "DELETE FROM files WHERE path = ?"};
@@ -84,11 +86,25 @@ SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 void
 SqliteUserDb::remove_file(const fs::path& path)
 {
+    VCA_DEBUG << __func__ << ": " << path;
     std::lock_guard<std::mutex> lock{m_impl->mutex};
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement del_stm{m_impl->db, "DELETE FROM files WHERE path = ?"};
     SQLite::bind(del_stm, path.u8string());
     del_stm.exec();
+    transaction.commit();
+}
+
+void
+SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
+{
+    VCA_DEBUG << __func__ << ": " << old_path << " - " << path;
+    std::lock_guard<std::mutex> lock{m_impl->mutex};
+    SQLite::Transaction transaction{m_impl->db};
+    SQLite::Statement up_stm{m_impl->db,
+                             "UPDATE files SET path = ? WHERE path = ?"};
+    SQLite::bind(up_stm, path.u8string(), old_path.u8string());
+    up_stm.exec();
     transaction.commit();
 }
 

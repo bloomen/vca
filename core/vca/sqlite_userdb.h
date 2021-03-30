@@ -30,6 +30,9 @@ public:
     void
     remove_file(const fs::path& path) override;
 
+    void
+    move_file(const fs::path& old_path, const fs::path& path) override;
+
     std::vector<fs::path>
     search(const FileContents& contents) override;
 

@@ -30,6 +30,9 @@ public:
     virtual void
     remove_file(const fs::path& path) = 0;
 
+    virtual void
+    move_file(const fs::path& old_path, const fs::path& path) = 0;
+
     virtual std::vector<fs::path>
     search(const FileContents& contents) = 0;
 };

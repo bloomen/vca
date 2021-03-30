@@ -2,6 +2,8 @@
 #include <set>
 #include <vector>
 
+#include <gcl.h>
+
 #include <vca/config.h>
 #include <vca/filesystem.h>
 #include <vca/logging.h>
@@ -32,16 +34,25 @@ main(const int argc, char** argv)
 
         vca::AppConfig app_config;
 
+        gcl::Async async{std::thread::hardware_concurrency()};
+
         vca::UserConfig user_config{work_dir / "user.json"};
         VCA_INFO << "User root dir: " << user_config.root_dir();
 
         vca::SqliteUserDb user_db{work_dir / "user.db"};
 
-        vca::scan(app_config, user_config, user_db);
-
         vca::FileWatcher file_watcher{app_config, user_config, user_db};
-        VCA_INFO << "Started vca_daemon";
-        file_watcher.run();
+
+        auto scan_task = gcl::task([&] {
+            vca::scan(app_config, user_config, user_db);
+            VCA_INFO << "Scanning finished";
+        });
+
+        auto file_watcher_task = gcl::task([&] { file_watcher.run(); });
+
+        auto final_task = gcl::when(scan_task, file_watcher_task);
+        final_task.schedule_all(async);
+        final_task.wait();
 
         return EXIT_SUCCESS;
     }
