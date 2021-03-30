@@ -26,6 +26,9 @@ public:
     const std::set<std::string>&
     extensions() const;
 
+    bool
+    matches_ext(const fs::path& path) const;
+
 private:
     std::set<std::string> m_extensions = {".txt"};
 };

@@ -1,5 +1,7 @@
 #include "config.h"
 
+#include <algorithm>
+#include <cctype>
 #include <fstream>
 
 #include <nlohmann/json.hpp>
@@ -31,6 +33,17 @@ const std::set<std::string>&
 AppConfig::extensions() const
 {
     return m_extensions;
+}
+
+bool
+AppConfig::matches_ext(const fs::path& path) const
+{
+    auto ext = path.extension().u8string();
+    // TODO: Does this work with UTF-8?
+    std::transform(ext.begin(), ext.end(), ext.begin(), [](unsigned char c) {
+        return std::tolower(c);
+    });
+    return m_extensions.count(ext) > 0;
 }
 
 } // namespace vca
