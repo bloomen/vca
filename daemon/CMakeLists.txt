@@ -1,5 +1,7 @@
 add_executable(vca_daemon
     src/daemon.cpp
+    src/file_watcher.h
+    src/file_watcher.cpp
     src/scan.h
     src/scan.cpp
 )

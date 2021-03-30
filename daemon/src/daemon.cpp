@@ -8,6 +8,7 @@
 #include <vca/sqlite_userdb.h>
 #include <vca/utils.h>
 
+#include "file_watcher.h"
 #include "scan.h"
 
 int
@@ -37,6 +38,10 @@ main(const int argc, char** argv)
         vca::SqliteUserDb user_db{work_dir / "user.db"};
 
         vca::scan(app_config, user_config, user_db);
+
+        vca::FileWatcher file_watcher{app_config, user_config, user_db};
+        VCA_INFO << "Started vca_daemon";
+        file_watcher.run();
 
         return EXIT_SUCCESS;
     }
