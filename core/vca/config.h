@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 
+#include "file_lock.h"
 #include "filesystem.h"
 
 namespace vca
@@ -17,6 +18,7 @@ public:
     root_dir() const;
 
 private:
+    FileLock m_file_lock;
     fs::path m_root_dir;
 };
 

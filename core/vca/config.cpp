@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <cctype>
 #include <fstream>
+#include <mutex>
 
 #include <nlohmann/json.hpp>
 
@@ -14,12 +15,16 @@ namespace vca
 {
 
 UserConfig::UserConfig(const fs::path& path)
+    : m_file_lock{path}
 {
-    std::ifstream file{path};
-    VCA_CHECK(file);
     json j;
-    file >> j;
-    VCA_CHECK(!file.bad());
+    {
+        std::lock_guard<FileLock> file_lock{m_file_lock};
+        std::ifstream file{path};
+        VCA_CHECK(file);
+        file >> j;
+        VCA_CHECK(!file.bad());
+    }
     m_root_dir = fs::u8path(j["root_dir"].get<std::string>());
 }
 
