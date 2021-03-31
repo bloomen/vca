@@ -1,6 +1,8 @@
 add_library(vca_core
     vca/config.h
     vca/config.cpp
+    vca/file_lock.h
+    vca/file_lock.cpp
     vca/filesystem.h
     vca/logging.h
     vca/logging.cpp
