@@ -6,6 +6,7 @@ add_library(vca_core
     vca/filesystem.h
     vca/logging.h
     vca/logging.cpp
+    vca/platform.h
     vca/sqlite_userdb.h
     vca/sqlite_userdb.cpp
     vca/time.h

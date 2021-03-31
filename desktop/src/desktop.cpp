@@ -64,7 +64,7 @@ main(int argc, char** argv)
     }
     catch (const std::exception& e)
     {
-        VCA_ERROR << "Exception: " << e.what();
+        VCA_EXCEPTION(e) << e.what();
         return EXIT_FAILURE;
     }
     catch (...)

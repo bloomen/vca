@@ -92,3 +92,6 @@ is_log_level_active(Logger::Level level);
         {                                                                      \
             vca::Logger::Level::Error, __FILE__, __LINE__                      \
         }
+
+#define VCA_EXCEPTION(e)                                                       \
+    VCA_ERROR << "Exception: " << vca::demangle_type(typeid(e).name()) << ": "

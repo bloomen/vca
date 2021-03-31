@@ -44,6 +44,9 @@ downcast(Base* const base)
     return static_cast<Derived*>(base);
 }
 
+std::string
+demangle_type(const char* type_name);
+
 class VcaError : public std::runtime_error
 {
 public:

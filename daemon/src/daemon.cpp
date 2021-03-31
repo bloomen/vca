@@ -72,12 +72,11 @@ main(const int argc, char** argv)
         auto final_task = gcl::when(scan_task, file_watcher_task);
         final_task.schedule_all(async);
         final_task.wait();
-
         return EXIT_SUCCESS;
     }
     catch (const std::exception& e)
     {
-        VCA_ERROR << "Exception: " << e.what();
+        VCA_EXCEPTION(e) << e.what();
         return EXIT_FAILURE;
     }
     catch (...)
