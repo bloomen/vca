@@ -13,12 +13,28 @@
 namespace vca
 {
 
+namespace
+{
+
+int
+toSQLiteOpenType(const UserDb::OpenType open_type)
+{
+    switch (open_type)
+    {
+    case UserDb::OpenType::read_only:
+        return SQLite::OPEN_READONLY;
+    case UserDb::OpenType::read_write:
+        return SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE;
+    }
+}
+
+} // namespace
+
 struct SqliteUserDb::Impl
 {
-    explicit Impl(fs::path path)
+    explicit Impl(fs::path path, const UserDb::OpenType open_type)
         : path{std::move(path)}
-        , db{this->path.u8string(),
-             SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE}
+        , db{this->path.u8string(), toSQLiteOpenType(open_type)}
         , file_lock{this->path}
     {
     }
@@ -28,11 +44,19 @@ struct SqliteUserDb::Impl
     FileLock file_lock;
 };
 
-SqliteUserDb::SqliteUserDb(fs::path path)
-    : m_impl{std::make_unique<Impl>(std::move(path))}
+SqliteUserDb::SqliteUserDb(fs::path path, const OpenType open_type)
+    : m_impl{std::make_unique<Impl>(std::move(path), open_type)}
 {
-    std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     m_impl->db.exec("PRAGMA foreign_keys = ON");
+}
+
+SqliteUserDb::~SqliteUserDb() = default;
+
+void
+SqliteUserDb::create()
+{
+    std::lock_guard<std::mutex> lock{m_impl->mutex};
+    std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
     m_impl->db.exec("DROP TABLE IF EXISTS files");
     m_impl->db.exec("CREATE TABLE files (id INTEGER PRIMARY KEY "
@@ -42,18 +66,6 @@ SqliteUserDb::SqliteUserDb(fs::path path)
                     "AUTOINCREMENT, files_id INTEGER NOT NULL, word TEXT NOT "
                     "NULL, FOREIGN KEY (files_id) REFERENCES files (id) ON "
                     "DELETE CASCADE)");
-    transaction.commit();
-}
-
-SqliteUserDb::~SqliteUserDb() = default;
-
-void
-SqliteUserDb::truncate()
-{
-    std::lock_guard<std::mutex> lock{m_impl->mutex};
-    std::lock_guard<FileLock> file_lock{m_impl->file_lock};
-    SQLite::Transaction transaction{m_impl->db};
-    m_impl->db.exec("DELETE FROM files");
     transaction.commit();
 }
 
@@ -121,7 +133,6 @@ SqliteUserDb::search(const FileContents& contents)
 {
     std::lock_guard<std::mutex> lock{m_impl->mutex};
     std::lock_guard<FileLock> file_lock{m_impl->file_lock};
-    SQLite::Transaction transaction{m_impl->db};
     std::set<int> files_ids;
     for (const auto& word : contents.words)
     {
@@ -146,7 +157,6 @@ SqliteUserDb::search(const FileContents& contents)
             paths.emplace_back(fs::u8path(path));
         }
     }
-    transaction.commit();
     return paths;
 }
 

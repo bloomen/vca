@@ -16,13 +16,19 @@ struct FileContents
 class UserDb
 {
 public:
+    enum class OpenType
+    {
+        read_only,
+        read_write,
+    };
+
     virtual ~UserDb() = default;
 
     virtual const fs::path&
     path() const = 0;
 
     virtual void
-    truncate() = 0;
+    create() = 0;
 
     virtual void
     update_file(const fs::path& path, const FileContents& contents) = 0;

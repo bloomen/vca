@@ -55,7 +55,9 @@ main(const int argc, char** argv)
         vca::UserConfig user_config{work_dir / "user.json"};
         VCA_INFO << "User root dir: " << user_config.root_dir();
 
-        vca::SqliteUserDb user_db{work_dir / "user.db"};
+        vca::SqliteUserDb user_db{work_dir / "user.db",
+                                  vca::UserDb::OpenType::read_write};
+        user_db.create();
 
         vca::FileWatcher file_watcher{app_config, user_config, user_db};
         g_file_watcher = &file_watcher;

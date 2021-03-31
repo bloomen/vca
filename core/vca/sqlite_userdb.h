@@ -11,7 +11,7 @@ namespace vca
 class SqliteUserDb : public UserDb
 {
 public:
-    explicit SqliteUserDb(fs::path path);
+    explicit SqliteUserDb(fs::path path, OpenType open_type);
 
     VCA_DELETE_COPY(SqliteUserDb)
     VCA_DEFAULT_MOVE(SqliteUserDb)
@@ -22,7 +22,7 @@ public:
     path() const override;
 
     void
-    truncate() override;
+    create() override;
 
     void
     update_file(const fs::path& path, const FileContents& contents) override;
