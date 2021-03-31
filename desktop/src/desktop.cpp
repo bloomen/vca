@@ -20,7 +20,7 @@ sigint_handler(int)
 }
 
 int
-main(int argc, char** argv)
+main(const int argc, char** argv)
 {
     std::signal(SIGINT, sigint_handler);
 

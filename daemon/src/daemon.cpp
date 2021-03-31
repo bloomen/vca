@@ -72,6 +72,7 @@ main(const int argc, char** argv)
         auto final_task = gcl::when(scan_task, file_watcher_task);
         final_task.schedule_all(async);
         final_task.wait();
+
         return EXIT_SUCCESS;
     }
     catch (const std::exception& e)
