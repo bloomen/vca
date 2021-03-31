@@ -21,11 +21,12 @@ toSQLiteOpenType(const UserDb::OpenType open_type)
 {
     switch (open_type)
     {
-    case UserDb::OpenType::read_only:
+    case UserDb::OpenType::ReadOnly:
         return SQLite::OPEN_READONLY;
-    case UserDb::OpenType::read_write:
+    case UserDb::OpenType::ReadWrite:
         return SQLite::OPEN_READWRITE | SQLite::OPEN_CREATE;
     }
+    return SQLite::OPEN_READONLY;
 }
 
 } // namespace

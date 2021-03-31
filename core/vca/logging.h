@@ -47,7 +47,7 @@ private:
 };
 
 void
-init_logging(const fs::path& filename);
+init_logging(const fs::path& filename = {});
 
 void
 set_log_level(Logger::Level level);

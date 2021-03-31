@@ -55,12 +55,15 @@ Logger::~Logger()
 void
 init_logging(const fs::path& filename)
 {
-    fs::create_directories(filename.parent_path());
+    spdlog::set_level(spdlog::level::debug);
     spdlog::set_pattern("%l [%Y:%m:%dT%H:%M:%S.%f] [%t] %v");
     spdlog::stdout_logger_mt("console_logger");
-    spdlog::rotating_logger_mt(
-        "file_logger", filename.u8string(), 1048576 * 5, 3);
-    spdlog::set_level(spdlog::level::debug);
+    if (!filename.empty())
+    {
+        fs::create_directories(filename.parent_path());
+        spdlog::rotating_logger_mt(
+            "file_logger", filename.u8string(), 1048576 * 5, 3);
+    }
 }
 
 void

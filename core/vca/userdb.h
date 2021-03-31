@@ -18,8 +18,8 @@ class UserDb
 public:
     enum class OpenType
     {
-        read_only,
-        read_write,
+        ReadOnly,
+        ReadWrite,
     };
 
     virtual ~UserDb() = default;
