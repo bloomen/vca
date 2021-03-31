@@ -17,21 +17,23 @@ log_message(const char* const logger_name,
             const Logger::Level level,
             const std::string& message)
 {
-    auto logger = spdlog::get(logger_name);
-    switch (level)
+    if (auto logger = spdlog::get(logger_name))
     {
-    case Logger::Level::Debug:
-        logger->debug(message);
-        break;
-    case Logger::Level::Info:
-        logger->info(message);
-        break;
-    case Logger::Level::Warn:
-        logger->warn(message);
-        break;
-    case Logger::Level::Error:
-        logger->error(message);
-        break;
+        switch (level)
+        {
+        case Logger::Level::Debug:
+            logger->debug(message);
+            break;
+        case Logger::Level::Info:
+            logger->info(message);
+            break;
+        case Logger::Level::Warn:
+            logger->warn(message);
+            break;
+        case Logger::Level::Error:
+            logger->error(message);
+            break;
+        }
     }
 }
 
