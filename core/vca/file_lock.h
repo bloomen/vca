@@ -11,7 +11,7 @@ namespace vca
 class FileLock
 {
 public:
-    explicit FileLock(fs::path file);
+    explicit FileLock(const fs::path& file);
 
     VCA_DELETE_COPY(FileLock)
     VCA_DEFAULT_MOVE(FileLock)
