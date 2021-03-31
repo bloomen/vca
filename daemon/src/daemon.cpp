@@ -11,6 +11,8 @@
 #include <vca/sqlite_userdb.h>
 #include <vca/utils.h>
 
+#include "default_tokenizer.h"
+#include "file_processor.h"
 #include "file_watcher.h"
 #include "scan.h"
 
@@ -59,11 +61,15 @@ main(const int argc, char** argv)
                                   vca::UserDb::OpenType::ReadWrite};
         user_db.create();
 
-        vca::FileWatcher file_watcher{app_config, user_config, user_db};
+        vca::FileProcessor file_processor;
+        file_processor.add_tokenizer(std::make_unique<vca::DefaultTokenizer>());
+
+        vca::FileWatcher file_watcher{
+            app_config, user_config, user_db, file_processor};
         g_file_watcher = &file_watcher;
 
         auto scan_task = gcl::task([&] {
-            vca::scan(app_config, user_config, user_db);
+            vca::scan(app_config, user_config, user_db, file_processor);
             VCA_INFO << "Scanning finished";
         });
 

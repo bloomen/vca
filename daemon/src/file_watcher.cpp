@@ -12,10 +12,12 @@ struct FileWatcher::Impl : public efsw::FileWatchListener
 {
     Impl(const AppConfig& app_config,
          const UserConfig& user_config,
-         UserDb& user_db)
+         UserDb& user_db,
+         const FileProcessor& file_processor)
         : app_config{app_config}
         , user_config{user_config}
         , user_db{user_db}
+        , file_processor{file_processor}
     {
         watch = file_watcher.addWatch(
             user_config.root_dir().u8string(), this, true);
@@ -36,8 +38,8 @@ struct FileWatcher::Impl : public efsw::FileWatchListener
         {
             if (app_config.matches_ext(path))
             {
-                const vca::FileContents contents{
-                    {path.filename().stem().string()}};
+                vca::FileContents contents;
+                contents.words = file_processor.process(path);
                 user_db.update_file(path, contents);
             }
             break;
@@ -74,6 +76,7 @@ struct FileWatcher::Impl : public efsw::FileWatchListener
     const AppConfig& app_config;
     const UserConfig& user_config;
     UserDb& user_db;
+    const FileProcessor& file_processor;
     bool done{false};
     std::mutex mutex;
     std::condition_variable cv;
@@ -83,8 +86,12 @@ struct FileWatcher::Impl : public efsw::FileWatchListener
 
 FileWatcher::FileWatcher(const AppConfig& app_config,
                          const UserConfig& user_config,
-                         UserDb& user_db)
-    : m_impl{std::make_unique<Impl>(app_config, user_config, user_db)}
+                         UserDb& user_db,
+                         const FileProcessor& file_processor)
+    : m_impl{std::make_unique<Impl>(app_config,
+                                    user_config,
+                                    user_db,
+                                    file_processor)}
 {
 }
 
