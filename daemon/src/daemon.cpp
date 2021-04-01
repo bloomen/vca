@@ -1,9 +1,8 @@
 #include <fstream>
 #include <iostream>
 #include <set>
+#include <thread>
 #include <vector>
-
-#include <gcl.h>
 
 #include <vca/config.h>
 #include <vca/filesystem.h>
@@ -13,8 +12,8 @@
 
 #include "default_tokenizer.h"
 #include "file_processor.h"
+#include "file_scanner.h"
 #include "file_watcher.h"
-#include "scan.h"
 
 int
 main(const int argc, char** argv)
@@ -39,8 +38,6 @@ main(const int argc, char** argv)
 
         vca::AppConfig app_config;
 
-        gcl::Async async{std::thread::hardware_concurrency()};
-
         vca::UserConfig user_config{work_dir / "user.json"};
         VCA_INFO << "User root dir: " << user_config.root_dir();
 
@@ -54,25 +51,13 @@ main(const int argc, char** argv)
         vca::FileWatcher file_watcher{
             app_config, user_config, user_db, file_processor};
 
-        auto scan_task = gcl::task([&] {
-            vca::scan(app_config, user_config, user_db, file_processor);
-            VCA_INFO << "Scanning finished";
-        });
+        vca::FileScanner file_scanner{
+            app_config, user_config, user_db, file_processor};
 
-        auto file_watcher_task = gcl::task([&] { file_watcher.run(); });
-
-        auto daemon_file_task = gcl::task([&] {
-            while (fs::exists(daemon_file))
-            {
-                std::this_thread::sleep_for(std::chrono::milliseconds(300));
-            }
-            file_watcher.stop();
-        });
-
-        auto final_task =
-            gcl::when(scan_task, file_watcher_task, daemon_file_task);
-        final_task.schedule_all(async);
-        final_task.wait();
+        while (fs::exists(daemon_file))
+        {
+            std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        }
 
         VCA_INFO << "Terminating daemon";
         return EXIT_SUCCESS;

@@ -3,10 +3,10 @@ add_executable(vca_daemon
     src/default_tokenizer.h
     src/file_processor.h
     src/file_processor.cpp
+    src/file_scanner.h
+    src/file_scanner.cpp
     src/file_watcher.h
     src/file_watcher.cpp
-    src/scan.h
-    src/scan.cpp
     src/tokenizer.h
 )
 

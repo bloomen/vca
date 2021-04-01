@@ -1,8 +1,5 @@
 #include "file_watcher.h"
 
-#include <condition_variable>
-#include <mutex>
-
 #include <efsw/efsw.hpp>
 
 namespace vca
@@ -21,6 +18,12 @@ struct FileWatcher::Impl : public efsw::FileWatchListener
     {
         watch = file_watcher.addWatch(
             user_config.root_dir().u8string(), this, true);
+        file_watcher.watch();
+    }
+
+    ~Impl()
+    {
+        file_watcher.removeWatch(watch);
     }
 
     void
@@ -77,9 +80,6 @@ struct FileWatcher::Impl : public efsw::FileWatchListener
     const UserConfig& user_config;
     UserDb& user_db;
     const FileProcessor& file_processor;
-    bool done{false};
-    std::mutex mutex;
-    std::condition_variable cv;
     efsw::FileWatcher file_watcher;
     efsw::WatchID watch;
 };
@@ -95,33 +95,6 @@ FileWatcher::FileWatcher(const AppConfig& app_config,
 {
 }
 
-FileWatcher::~FileWatcher()
-{
-    stop();
-}
-
-void
-FileWatcher::stop()
-{
-    {
-        std::lock_guard<std::mutex> lock{m_impl->mutex};
-        if (m_impl->done)
-        {
-            return;
-        }
-    }
-    m_impl->file_watcher.removeWatch(m_impl->watch);
-    std::lock_guard<std::mutex> lock{m_impl->mutex};
-    m_impl->done = true;
-    m_impl->cv.notify_one();
-}
-
-void
-FileWatcher::run()
-{
-    m_impl->file_watcher.watch();
-    std::unique_lock<std::mutex> lock{m_impl->mutex};
-    m_impl->cv.wait(lock, [this] { return m_impl->done; });
-}
+FileWatcher::~FileWatcher() = default;
 
 } // namespace vca

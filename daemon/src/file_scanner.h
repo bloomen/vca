@@ -11,18 +11,18 @@
 namespace vca
 {
 
-class FileWatcher
+class FileScanner
 {
 public:
-    FileWatcher(const AppConfig& app_config,
+    FileScanner(const AppConfig& app_config,
                 const UserConfig& user_config,
                 UserDb& user_db,
                 const FileProcessor& file_processor);
 
-    VCA_DELETE_COPY(FileWatcher)
-    VCA_DEFAULT_MOVE(FileWatcher)
+    VCA_DELETE_COPY(FileScanner)
+    VCA_DEFAULT_MOVE(FileScanner)
 
-    ~FileWatcher();
+    ~FileScanner();
 
 private:
     struct Impl;
