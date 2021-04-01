@@ -17,6 +17,10 @@ public:
     const fs::path&
     root_dir() const;
 
+    // TODO: Implement config changing
+    //    void
+    //    add_changed_callback();
+
 private:
     FileLock m_file_lock;
     fs::path m_root_dir;
