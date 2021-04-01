@@ -33,6 +33,11 @@ main(const int argc, char** argv)
             std::cout << ">>> ";
             std::cin >> input;
 
+            if (input == ".quit")
+            {
+                break;
+            }
+
             std::vector<std::string> words;
             boost::split(words, input, boost::is_any_of(" "));
             const vca::FileContents file_contents{words};
