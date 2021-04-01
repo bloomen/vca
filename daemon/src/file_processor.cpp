@@ -15,7 +15,9 @@ FileProcessor::add_tokenizer(std::unique_ptr<Tokenizer> tokenizer)
 std::vector<std::string>
 FileProcessor::process(const fs::path& file) const
 {
+    // TODO: add check for binary
     const auto filename_stem = file.filename().stem().u8string();
+    const auto filename_ext = file.extension().u8string();
     std::vector<std::string> initial_contents;
     {
         std::ifstream f{file};
@@ -31,7 +33,7 @@ FileProcessor::process(const fs::path& file) const
     }
 
     std::set<std::string> words;
-    const FileData data{filename_stem, initial_contents};
+    const FileData data{filename_stem, filename_ext, initial_contents};
     for (const auto& tokenizer : m_tokenizers)
     {
         auto tokens = tokenizer->extract(data);

@@ -9,6 +9,7 @@ namespace vca
 struct FileData
 {
     const std::string& filename_stem;
+    const std::string& filename_ext;
     const std::vector<std::string>& initial_contents;
 };
 
