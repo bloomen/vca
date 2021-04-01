@@ -1,4 +1,4 @@
-#include <csignal>
+#include <fstream>
 #include <iostream>
 #include <set>
 #include <vector>
@@ -16,24 +16,9 @@
 #include "file_watcher.h"
 #include "scan.h"
 
-vca::FileWatcher* g_file_watcher = nullptr;
-
-void
-sigint_handler(int)
-{
-    VCA_INFO << "Caught SIGINT";
-    if (g_file_watcher)
-    {
-        g_file_watcher->stop();
-    }
-    VCA_INFO << "Terminating daemon";
-}
-
 int
 main(const int argc, char** argv)
 {
-    std::signal(SIGINT, sigint_handler);
-
     if (argc != 2)
     {
         std::cerr << "Usage: ./vca_daemon <work_dir>" << std::endl;
@@ -49,6 +34,8 @@ main(const int argc, char** argv)
         vca::set_log_level(vca::Logger::Level::Debug);
 
         VCA_INFO << "Starting vca_daemon";
+        const auto daemon_file = work_dir / "daemon";
+        std::ofstream{daemon_file};
 
         vca::AppConfig app_config;
 
@@ -66,7 +53,6 @@ main(const int argc, char** argv)
 
         vca::FileWatcher file_watcher{
             app_config, user_config, user_db, file_processor};
-        g_file_watcher = &file_watcher;
 
         auto scan_task = gcl::task([&] {
             vca::scan(app_config, user_config, user_db, file_processor);
@@ -75,10 +61,20 @@ main(const int argc, char** argv)
 
         auto file_watcher_task = gcl::task([&] { file_watcher.run(); });
 
-        auto final_task = gcl::when(scan_task, file_watcher_task);
+        auto daemon_file_task = gcl::task([&] {
+            while (fs::exists(daemon_file))
+            {
+                std::this_thread::sleep_for(std::chrono::milliseconds(300));
+            }
+            file_watcher.stop();
+        });
+
+        auto final_task =
+            gcl::when(scan_task, file_watcher_task, daemon_file_task);
         final_task.schedule_all(async);
         final_task.wait();
 
+        VCA_INFO << "Terminating daemon";
         return EXIT_SUCCESS;
     }
     catch (const std::exception& e)

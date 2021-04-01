@@ -1,4 +1,3 @@
-#include <csignal>
 #include <iostream>
 
 #include <boost/algorithm/string.hpp>
@@ -10,20 +9,9 @@
 #include <vca/time.h>
 #include <vca/utils.h>
 
-void
-sigint_handler(int)
-{
-    VCA_DEBUG << "Caught SIGINT";
-    VCA_DEBUG << "Terminating desktop";
-    std::cout << std::endl;
-    std::exit(0);
-}
-
 int
 main(const int argc, char** argv)
 {
-    std::signal(SIGINT, sigint_handler);
-
     if (argc != 2)
     {
         std::cerr << "Usage: ./vca_desktop <work_dir>" << std::endl;
