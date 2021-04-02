@@ -25,3 +25,13 @@
 #ifndef VCA_PLATFORM_WINDOWS
 #define VCA_PLATFORM_UNIX
 #endif
+
+#if defined(_MSC_VER)
+#define VCA_COMPILER_MSVC
+#elif __clang__
+#define VCA_COMPILER_CLANG
+#elif __GNUC__
+#define VCA_COMPILER_GCC
+#else
+#error "Unsupported compiler"
+#endif

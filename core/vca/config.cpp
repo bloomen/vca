@@ -5,8 +5,7 @@
 #include <fstream>
 #include <mutex>
 
-#include <nlohmann/json.hpp>
-
+#include "json.h"
 #include "utils.h"
 
 using json = nlohmann::json;

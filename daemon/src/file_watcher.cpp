@@ -5,7 +5,7 @@
 namespace vca
 {
 
-struct FileWatcher::Impl : public efsw::FileWatchListener
+struct FileWatcher::Impl final : public efsw::FileWatchListener
 {
     Impl(const AppConfig& app_config,
          const UserConfig& user_config,
