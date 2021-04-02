@@ -1,9 +1,23 @@
 cmake_minimum_required(VERSION 3.0)
 project(vca)
 
-set(BUILD_SHARED_LIBS "FALSE")
-set(SQLITECPP_RUN_CPPLINT "FALSE")
+set(BUILD_SHARED_LIBS OFF)
+set(SQLITECPP_RUN_CPPLINT OFF)
 set(SQLITE_ENABLE_COLUMN_METADATA)
+
+if (MSVC)
+    set(CompilerFlags
+        CMAKE_CXX_FLAGS
+        CMAKE_CXX_FLAGS_DEBUG
+        CMAKE_CXX_FLAGS_RELEASE
+        CMAKE_C_FLAGS
+        CMAKE_C_FLAGS_DEBUG
+        CMAKE_C_FLAGS_RELEASE
+     )
+     foreach(CompilerFlag ${CompilerFlags})
+        string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
+     endforeach()
+endif()
 
 add_subdirectory(third_party/concurrentqueue)
 add_subdirectory(third_party/efsw)
@@ -14,7 +28,11 @@ add_subdirectory(third_party/readerwriterqueue)
 add_subdirectory(third_party/spdlog)
 add_subdirectory(third_party/SQLiteCpp)
 
+find_package(Boost 1.71.0 COMPONENTS date_time)
+add_definitions(-DBOOST_ALL_NO_LIB)
+
 include_directories(
+    ${Boost_INCLUDE_DIRS}
     third_party/concurrentqueue
     third_party/efsw/include
     third_party/gcl/include

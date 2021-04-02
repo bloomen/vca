@@ -16,6 +16,7 @@ add_library(vca_core
 )
 
 target_link_libraries(vca_core PUBLIC
+    ${Boost_LIBRARIES}
     nlohmann_json
     spdlog
     sqlite3
