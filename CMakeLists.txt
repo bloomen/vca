@@ -15,6 +15,7 @@ add_subdirectory(third_party/spdlog)
 add_subdirectory(third_party/SQLiteCpp)
 
 include_directories(
+    third_party/boost_header_only
     third_party/concurrentqueue
     third_party/efsw/include
     third_party/gcl/include
