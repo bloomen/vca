@@ -48,21 +48,26 @@ Logger::Logger(const Level level, const char* const file, const int line)
 Logger::~Logger()
 {
     const auto message = m_os.str();
-    log_message("console_logger", m_level, message);
-    log_message("file_logger", m_level, message);
+    log_message("vca_logging_console_logger", m_level, message);
+    log_message("vca_logging_file_logger", m_level, message);
 }
 
 void
 init_logging(const fs::path& filename)
 {
-    spdlog::set_level(spdlog::level::debug);
-    spdlog::set_pattern("%l [%Y:%m:%dT%H:%M:%S.%f] [%t] %v");
-    spdlog::stdout_logger_mt("console_logger");
+    const auto level = spdlog::level::debug;
+    const auto pattern = "%l [%Y:%m:%dT%H:%M:%S.%f] [%t] %v";
+    auto console_logger =
+        spdlog::stdout_logger_mt("vca_logging_console_logger");
+    console_logger->set_level(level);
+    console_logger->set_pattern(pattern);
     if (!filename.empty())
     {
         fs::create_directories(filename.parent_path());
-        spdlog::rotating_logger_mt(
-            "file_logger", filename.u8string(), 1048576 * 5, 3);
+        auto file_logger = spdlog::rotating_logger_mt(
+            "vca_logging_file_logger", filename.u8string(), 1048576 * 5, 3);
+        file_logger->set_level(level);
+        file_logger->set_pattern(pattern);
     }
 }
 
