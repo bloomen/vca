@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.0)
 project(vca)
 
 set(BUILD_SHARED_LIBS "FALSE")
-set(SQLITECPP_RUN_CPPLINT "OFF")
+set(SQLITECPP_RUN_CPPLINT "FALSE")
 set(SQLITE_ENABLE_COLUMN_METADATA)
 
 add_subdirectory(third_party/concurrentqueue)
