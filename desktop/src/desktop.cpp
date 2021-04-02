@@ -2,6 +2,10 @@
 
 #include <boost/algorithm/string.hpp>
 
+#include <spdlog/pattern_formatter.h>
+#include <spdlog/sinks/stdout_sinks.h>
+#include <spdlog/spdlog.h>
+
 #include <vca/config.h>
 #include <vca/filesystem.h>
 #include <vca/logging.h>
@@ -27,29 +31,50 @@ main(const int argc, char** argv)
         vca::SqliteUserDb user_db{work_dir / "user.db",
                                   vca::UserDb::OpenType::ReadOnly};
 
+        auto cmdline = spdlog::stdout_logger_mt("cmdline_logger");
+        cmdline->set_formatter(std::make_unique<spdlog::pattern_formatter>(
+            "%v", spdlog::pattern_time_type::local, ""));
+
         std::string input;
         for (;;)
         {
-            std::cout << ">>> ";
-            std::cin >> input;
+            cmdline->info(">>> ");
+            std::getline(std::cin, input);
+            if (input.empty())
+            {
+                continue;
+            }
 
-            if (input == ".quit")
+            std::vector<std::string> values;
+            boost::split(values, input, boost::is_any_of(" "));
+
+            if (values[0] == "q") // quit
             {
                 break;
             }
-
-            std::vector<std::string> words;
-            boost::split(words, input, boost::is_any_of(" "));
-            const vca::FileContents file_contents{words};
-
-            std::cout << "Searching ..." << std::endl;
-            vca::Timer timer;
-            const auto result = user_db.search(file_contents);
-            std::cout << "Search took: " << timer.us() << " us" << std::endl;
-
-            for (const auto& path : result)
+            else if (values[0] == "s") // search
             {
-                std::cout << path << std::endl;
+                if (values.size() <= 1)
+                {
+                    cmdline->info("Empty search string.\n");
+                    continue;
+                }
+                const vca::FileContents file_contents{
+                    {values.begin() + 1, values.end()}};
+
+                cmdline->info("Searching ...\n");
+                vca::Timer timer;
+                const auto result = user_db.search(file_contents);
+                cmdline->info("Search took: {} us\n", timer.us());
+
+                for (const auto& path : result)
+                {
+                    cmdline->info(path.u8string() + "\n");
+                }
+            }
+            else
+            {
+                cmdline->info("Unknown command.\n");
             }
         }
 
