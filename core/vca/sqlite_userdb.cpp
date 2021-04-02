@@ -139,7 +139,7 @@ SqliteUserDb::search(const FileContents& contents)
     {
         SQLite::Statement query_stm{
             m_impl->db, "SELECT files_id FROM words WHERE word LIKE ?"};
-        SQLite::bind(query_stm, word);
+        SQLite::bind(query_stm, "%" + word + "%");
         while (query_stm.executeStep())
         {
             const int files_id = query_stm.getColumn(0).getInt();
