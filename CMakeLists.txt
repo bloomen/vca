@@ -30,6 +30,7 @@ add_subdirectory(third_party/SQLiteCpp)
 
 find_package(Boost 1.71.0 COMPONENTS date_time)
 add_definitions(-DBOOST_ALL_NO_LIB)
+add_definitions(-DVCA_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 
 include_directories(
     ${Boost_INCLUDE_DIRS}

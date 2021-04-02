@@ -42,7 +42,7 @@ log_message(const char* const logger_name,
 Logger::Logger(const Level level, const char* const file, const int line)
     : m_level{level}
 {
-    m_os << "[" << file << ":" << line << "] ";
+    m_os << "[" << fs::relative(file, VCA_SOURCE_DIR).u8string() << ":" << line << "] ";
 }
 
 Logger::~Logger()
