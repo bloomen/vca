@@ -45,7 +45,7 @@ include_directories(
 )
 
 if (MSVC)
-    add_compile_options(/std:c++17 /W4 /bigobj /EHsc /wd4503 /wd4996 /wd4702 /wd4100 /wd4706)
+    add_compile_options(/std:c++17 /W4 /bigobj /EHsc /wd4503 /wd4996 /wd4702 /wd4100 /wd4706 /wd26812 /wd4373)
 else()
     add_compile_options(-std=c++17 -Wpedantic -Wall -Wextra -Wconversion)
     if (CMAKE_BUILD_TYPE MATCHES DEBUG)
