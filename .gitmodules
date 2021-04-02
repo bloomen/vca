@@ -22,6 +22,3 @@
 [submodule "third_party/SQLiteCpp"]
 	path = third_party/SQLiteCpp
 	url = git@github.com:SRombauts/SQLiteCpp.git
-[submodule "third_party/boost_header_only"]
-	path = third_party/boost_header_only
-	url = git@github.com:bloomen/boost_header_only.git
