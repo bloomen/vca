@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.0)
 project(vca)
 
+set(CMAKE_CXX_STANDARD 17)
+
 set(BUILD_SHARED_LIBS OFF)
 set(SQLITECPP_RUN_CPPLINT OFF)
 set(SQLITE_ENABLE_COLUMN_METADATA)
@@ -45,9 +47,9 @@ include_directories(
 )
 
 if (MSVC)
-    add_compile_options(/std:c++17 /W4 /bigobj /EHsc /wd4503 /wd4996 /wd4702 /wd4100 /wd4706 /wd26812 /wd4373)
+    add_compile_options(/W4 /bigobj /EHsc /wd4503 /wd4996 /wd4702 /wd4100 /wd4706 /wd26812 /wd4373)
 else()
-    add_compile_options(-std=c++17 -Wpedantic -Wall -Wextra -Wconversion)
+    add_compile_options(-Wpedantic -Wall -Wextra -Wconversion)
     if (CMAKE_BUILD_TYPE MATCHES DEBUG)
         add_compile_options(-fsanitize=address)
         add_link_options(-fsanitize=address)
