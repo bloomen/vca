@@ -58,4 +58,3 @@ GitMetadata::Describe()
 }
 
 }  // namespace vca
-
