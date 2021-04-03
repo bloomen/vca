@@ -8,6 +8,7 @@
 
 #include <vca/config.h>
 #include <vca/filesystem.h>
+#include <vca/git.h>
 #include <vca/logging.h>
 #include <vca/sqlite_userdb.h>
 #include <vca/time.h>
@@ -28,12 +29,14 @@ main(const int argc, char** argv)
 
         vca::init_logging();
 
-        vca::SqliteUserDb user_db{work_dir / "user.db",
-                                  vca::UserDb::OpenType::ReadOnly};
-
         auto cmdline = spdlog::stdout_logger_mt("cmdline_logger");
         cmdline->set_formatter(std::make_unique<spdlog::pattern_formatter>(
             "%v", spdlog::pattern_time_type::local, ""));
+
+        cmdline->info("Git revision: {}\n", vca::GitMetadata::Describe());
+
+        vca::SqliteUserDb user_db{work_dir / "user.db",
+                                  vca::UserDb::OpenType::ReadOnly};
 
         std::string input;
         for (;;)
