@@ -38,6 +38,7 @@ struct SqliteUserDb::Impl
         , db{this->path.u8string(), toSQLiteOpenType(open_type)}
         , file_lock{this->path}
     {
+        VCA_CHECK(db.getHandle());
     }
     std::mutex mutex;
     fs::path path;

@@ -21,7 +21,7 @@ UserConfig::UserConfig(const fs::path& path)
         std::lock_guard<FileLock> file_lock{m_file_lock};
         std::ifstream file{path};
         VCA_CHECK(file);
-        file >> j;
+        j = json::parse(file);
         VCA_CHECK(!file.bad());
     }
     m_root_dir = fs::u8path(j["root_dir"].get<std::string>());
