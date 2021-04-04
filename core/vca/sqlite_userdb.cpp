@@ -159,6 +159,10 @@ SqliteUserDb::search(const FileContents& contents)
     std::set<int> files_ids;
     for (const auto& word : contents.words)
     {
+        if (word.empty())
+        {
+            continue;
+        }
         SQLite::Statement query_stm{
             m_impl->db, "SELECT files_id FROM words WHERE word LIKE ?"};
         SQLite::bind(query_stm, "%" + word + "%");

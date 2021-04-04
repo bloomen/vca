@@ -39,6 +39,7 @@ main(const int, char**)
             {
                 continue;
             }
+            boost::trim(input);
 
             std::vector<std::string> values;
             boost::split(values, input, boost::is_any_of(" "));
@@ -66,9 +67,6 @@ main(const int, char**)
                 {
                     cmdline->info(path.u8string() + "\n");
                 }
-            }
-            else if (values[0] == "c") // config
-            {
             }
             else
             {

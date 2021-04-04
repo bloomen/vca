@@ -27,6 +27,7 @@ main(const int, char**)
         vca::set_log_level(vca::Logger::Level::Debug);
 
         VCA_INFO << "Starting vca_daemon";
+        VCA_INFO << "work_dir: " << work_dir;
         const auto daemon_file = work_dir / "daemon";
         std::ofstream{daemon_file};
 
