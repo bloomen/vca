@@ -4,6 +4,7 @@ add_library(vca_core
     vca/file_lock.h
     vca/file_lock.cpp
     vca/filesystem.h
+    vca/filesystem.cpp
     vca/logging.h
     vca/logging.cpp
     vca/platform.h
@@ -18,6 +19,7 @@ add_library(vca_core
 target_link_libraries(vca_core PUBLIC
     ${Boost_LIBRARIES}
     nlohmann_json
+    platform_folders
     spdlog
     sqlite3
     SQLiteCpp

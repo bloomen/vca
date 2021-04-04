@@ -16,17 +16,11 @@
 #include "file_watcher.h"
 
 int
-main(const int argc, char** argv)
+main(const int, char**)
 {
-    if (argc != 2)
-    {
-        std::cerr << "Usage: ./vca_daemon <work_dir>" << std::endl;
-        return EXIT_FAILURE;
-    }
-
     try
     {
-        const auto work_dir = fs::u8path(argv[1]);
+        const auto work_dir = vca::user_config_dir() / "vca";
         fs::create_directories(work_dir);
 
         vca::init_logging(work_dir / "logs" / "vca_daemon.log");

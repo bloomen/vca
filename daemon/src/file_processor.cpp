@@ -22,7 +22,7 @@ FileProcessor::process(const fs::path& file) const
     {
         std::ifstream f{file};
         std::string line;
-        const size_t max_line_count = 1000;
+        const size_t max_line_count = 100;
         for (size_t i = 0; i < max_line_count && std::getline(f, line); ++i)
         {
             if (!line.empty())

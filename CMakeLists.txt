@@ -5,6 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(BUILD_SHARED_LIBS OFF)
 set(SQLITECPP_RUN_CPPLINT OFF)
+set(BUILD_TESTING OFF)
 set(SQLITE_ENABLE_COLUMN_METADATA)
 
 if (MSVC)
@@ -26,6 +27,7 @@ add_subdirectory(third_party/efsw)
 add_subdirectory(third_party/gcl)
 add_subdirectory(third_party/googletest)
 add_subdirectory(third_party/nlohmann_json)
+add_subdirectory(third_party/PlatformFolders)
 add_subdirectory(third_party/readerwriterqueue)
 add_subdirectory(third_party/spdlog)
 add_subdirectory(third_party/SQLiteCpp)
@@ -41,6 +43,7 @@ include_directories(
     third_party/gcl/include
     third_party/googletest/googletest/include
     third_party/nlohmann_json/single_include
+    third_party/PlatformFolders
     third_party/readerwriterqueue
     third_party/spdlog/include
     third_party/SQLiteCpp/include

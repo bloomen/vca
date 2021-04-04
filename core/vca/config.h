@@ -22,6 +22,12 @@ public:
     //    add_changed_callback();
 
 private:
+    void
+    read(const fs::path& path);
+
+    void
+    write(const fs::path& path) const;
+
     FileLock m_file_lock;
     fs::path m_root_dir;
 };
