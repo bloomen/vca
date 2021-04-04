@@ -22,6 +22,3 @@
 [submodule "third_party/SQLiteCpp"]
 	path = third_party/SQLiteCpp
 	url = git@github.com:SRombauts/SQLiteCpp.git
-[submodule "third_party/cmake-git-version-tracking"]
-	path = third_party/cmake-git-version-tracking
-	url = git@github.com:andrew-hardin/cmake-git-version-tracking.git
