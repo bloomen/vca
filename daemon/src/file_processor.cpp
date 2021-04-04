@@ -15,7 +15,6 @@ FileProcessor::add_tokenizer(std::unique_ptr<Tokenizer> tokenizer)
 std::vector<std::string>
 FileProcessor::process(const fs::path& file) const
 {
-    // TODO: add check for binary
     const auto filename_stem = file.filename().stem().u8string();
     const auto filename_ext = file.extension().u8string();
     std::vector<std::string> initial_contents;
