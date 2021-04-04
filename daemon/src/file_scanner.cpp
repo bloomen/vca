@@ -4,6 +4,7 @@
 #include <thread>
 
 #include <vca/logging.h>
+#include <vca/time.h>
 
 namespace vca
 {
@@ -54,6 +55,8 @@ struct FileScanner::Impl : public UserConfig::Observer
         }
         try
         {
+            VCA_INFO << "Scanning: " << root_dir;
+            Timer timer;
             for (const auto& p : fs::recursive_directory_iterator{root_dir})
             {
                 if (done)
@@ -68,7 +71,8 @@ struct FileScanner::Impl : public UserConfig::Observer
                     user_db.update_file(path, contents);
                 }
             }
-            VCA_INFO << "Scanning finished";
+            VCA_INFO << "Scanning finished: " << root_dir;
+            VCA_INFO << "Scanning took: " << us_to_s(timer.us()) << " s";
         }
         catch (const std::exception& e)
         {

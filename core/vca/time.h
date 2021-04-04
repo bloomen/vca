@@ -25,4 +25,16 @@ private:
     ClockType::time_point m_start = ClockType::now();
 };
 
+inline double
+us_to_ms(const size_t us)
+{
+    return static_cast<double>(us) / 1000.;
+}
+
+inline double
+us_to_s(const size_t us)
+{
+    return static_cast<double>(us) / 1000000.;
+}
+
 } // namespace vca
