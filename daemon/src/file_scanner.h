@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include <vca/command_queue.h>
 #include <vca/config.h>
 #include <vca/userdb.h>
 #include <vca/utils.h>
@@ -14,7 +15,8 @@ namespace vca
 class FileScanner
 {
 public:
-    FileScanner(const AppConfig& app_config,
+    FileScanner(CommandQueue& commands,
+                const AppConfig& app_config,
                 UserConfig& user_config,
                 UserDb& user_db,
                 const FileProcessor& file_processor);

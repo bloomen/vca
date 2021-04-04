@@ -3,6 +3,7 @@
 #include <set>
 #include <string>
 
+#include "command_queue.h"
 #include "file_lock.h"
 #include "filesystem.h"
 
@@ -20,7 +21,7 @@ public:
         user_config_changed(const UserConfig& user_config) = 0;
     };
 
-    explicit UserConfig(fs::path path);
+    explicit UserConfig(CommandQueue& commands, fs::path path);
 
     VCA_DELETE_COPY(UserConfig)
     VCA_DEFAULT_MOVE(UserConfig)

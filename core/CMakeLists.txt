@@ -8,6 +8,8 @@ add_library(vca_core
     vca/logging.h
     vca/logging.cpp
     vca/platform.h
+    vca/command_queue.h
+    vca/command_queue.cpp
     vca/sqlite_userdb.h
     vca/sqlite_userdb.cpp
     vca/time.h

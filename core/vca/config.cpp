@@ -18,8 +18,9 @@ namespace vca
 
 struct UserConfig::Impl : public efsw::FileWatchListener
 {
-    Impl(UserConfig& user_config, fs::path path)
-        : user_config{user_config}
+    Impl(CommandQueue& commands, UserConfig& user_config, fs::path path)
+        : commands{commands}
+        , user_config{user_config}
         , path{make_path(std::move(path))}
         , file_lock{this->path.parent_path()}
     {
@@ -84,6 +85,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         std::ofstream{path} << j;
     }
 
+    // called from file watcher thread
     void
     handleFileAction(const efsw::WatchID,
                      const std::string&,
@@ -96,46 +98,52 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         case efsw::Actions::Add:
         case efsw::Actions::Modified:
         {
-            if (fs::u8path(filename) != path.filename())
-            {
-                return;
-            }
-            VCA_INFO << "User config modified";
-            std::lock_guard<FileLock> lock{file_lock};
-            read();
-            if (!fs::exists(root_dir))
-            {
-                VCA_ERROR << "root_dir does not exist: " << root_dir;
-                break;
-            }
-            for (auto& observer : observers)
-            {
-                observer->user_config_changed(user_config);
-            }
+            commands.push([this, filename] {
+                if (fs::u8path(filename) != path.filename())
+                {
+                    return;
+                }
+                VCA_INFO << "User config modified";
+                std::lock_guard<FileLock> lock{file_lock};
+                read();
+                if (!fs::exists(root_dir))
+                {
+                    VCA_ERROR << "root_dir does not exist: " << root_dir;
+                    return;
+                }
+                for (auto& observer : observers)
+                {
+                    observer->user_config_changed(user_config);
+                }
+            });
             break;
         }
         case efsw::Actions::Delete:
         {
-            if (fs::u8path(filename) != path.filename())
-            {
-                return;
-            }
-            VCA_INFO << "User config deleted";
-            std::lock_guard<FileLock> lock{file_lock};
-            populate();
-            write();
+            commands.push([this, filename] {
+                if (fs::u8path(filename) != path.filename())
+                {
+                    return;
+                }
+                VCA_INFO << "User config deleted";
+                std::lock_guard<FileLock> lock{file_lock};
+                populate();
+                write();
+            });
             break;
         }
         case efsw::Actions::Moved:
         {
-            if (fs::u8path(old_filename) != path.filename())
-            {
-                return;
-            }
-            VCA_INFO << "User config moved";
-            std::lock_guard<FileLock> lock{file_lock};
-            populate();
-            write();
+            commands.push([this, filename, old_filename] {
+                if (fs::u8path(old_filename) != path.filename())
+                {
+                    return;
+                }
+                VCA_INFO << "User config moved";
+                std::lock_guard<FileLock> lock{file_lock};
+                populate();
+                write();
+            });
             break;
         }
         default:
@@ -143,6 +151,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         }
     }
 
+    CommandQueue& commands;
     UserConfig& user_config;
     fs::path path;
     FileLock file_lock;
@@ -152,8 +161,8 @@ struct UserConfig::Impl : public efsw::FileWatchListener
     efsw::WatchID watch;
 };
 
-UserConfig::UserConfig(fs::path path)
-    : m_impl{std::make_unique<Impl>(*this, std::move(path))}
+UserConfig::UserConfig(CommandQueue& commands, fs::path path)
+    : m_impl{std::make_unique<Impl>(commands, *this, std::move(path))}
 {
 }
 

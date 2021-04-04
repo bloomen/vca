@@ -10,11 +10,13 @@ namespace vca
 struct FileWatcher::Impl final : public efsw::FileWatchListener,
                                  public UserConfig::Observer
 {
-    Impl(const AppConfig& app_config,
+    Impl(CommandQueue& commands,
+         const AppConfig& app_config,
          UserConfig& user_config,
          UserDb& user_db,
          const FileProcessor& file_processor)
-        : app_config{app_config}
+        : commands{commands}
+        , app_config{app_config}
         , user_config{user_config}
         , root_dir{user_config.root_dir()}
         , user_db{user_db}
@@ -51,12 +53,13 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
         }
     }
 
+    // called from file watcher thread
     void
     handleFileAction(const efsw::WatchID,
                      const std::string& dir,
                      const std::string& filename,
                      const efsw::Action action,
-                     const std::string oldFilename = "")
+                     const std::string old_filename = "")
     {
         const auto path = fs::u8path(dir) / fs::u8path(filename);
         switch (action)
@@ -68,7 +71,9 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
             {
                 vca::FileContents contents;
                 contents.words = file_processor.process(path);
-                user_db.update_file(path, contents);
+                commands.push([this, path, contents = std::move(contents)] {
+                    user_db.update_file(path, contents);
+                });
             }
             break;
         }
@@ -76,23 +81,27 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
         {
             if (app_config.matches_ext(path))
             {
-                user_db.remove_file(path);
+                commands.push([this, path] { user_db.remove_file(path); });
             }
             break;
         }
         case efsw::Actions::Moved:
         {
-            const auto old_path = fs::u8path(dir) / fs::u8path(oldFilename);
+            auto old_path = fs::u8path(dir) / fs::u8path(old_filename);
             if (app_config.matches_ext(old_path))
             {
                 if (app_config.matches_ext(path))
                 {
-                    user_db.move_file(old_path, path);
+                    commands.push([this, path, old_path = std::move(old_path)] {
+                        user_db.move_file(old_path, path);
+                    });
                 }
-                else
-                {
+            }
+            else
+            {
+                commands.push([this, old_path = std::move(old_path)] {
                     user_db.remove_file(old_path);
-                }
+                });
             }
             break;
         }
@@ -101,6 +110,7 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
         }
     }
 
+    CommandQueue& commands;
     const AppConfig& app_config;
     UserConfig& user_config;
     fs::path root_dir;
@@ -108,13 +118,15 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
     const FileProcessor& file_processor;
     efsw::FileWatcher file_watcher;
     efsw::WatchID watch;
-};
+}; // namespace vca
 
-FileWatcher::FileWatcher(const AppConfig& app_config,
+FileWatcher::FileWatcher(CommandQueue& commands,
+                         const AppConfig& app_config,
                          UserConfig& user_config,
                          UserDb& user_db,
                          const FileProcessor& file_processor)
-    : m_impl{std::make_unique<Impl>(app_config,
+    : m_impl{std::make_unique<Impl>(commands,
+                                    app_config,
                                     user_config,
                                     user_db,
                                     file_processor)}

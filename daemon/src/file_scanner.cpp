@@ -11,11 +11,13 @@ namespace vca
 
 struct FileScanner::Impl : public UserConfig::Observer
 {
-    Impl(const AppConfig& app_config,
+    Impl(CommandQueue& commands,
+         const AppConfig& app_config,
          UserConfig& user_config,
          UserDb& user_db,
          const FileProcessor& file_processor)
-        : app_config{app_config}
+        : commands{commands}
+        , app_config{app_config}
         , user_config{user_config}
         , root_dir{user_config.root_dir()}
         , user_db{user_db}
@@ -45,16 +47,17 @@ struct FileScanner::Impl : public UserConfig::Observer
         }
     }
 
+    // called from scan thread
     void
     scan()
     {
-        if (!fs::exists(root_dir))
-        {
-            VCA_ERROR << "root_dir does not exist: " << root_dir;
-            return;
-        }
         try
         {
+            if (!fs::exists(root_dir))
+            {
+                VCA_ERROR << "root_dir does not exist: " << root_dir;
+                return;
+            }
             VCA_INFO << "Scanning: " << root_dir;
             Timer timer;
             for (const auto& p : fs::recursive_directory_iterator{root_dir})
@@ -63,12 +66,16 @@ struct FileScanner::Impl : public UserConfig::Observer
                 {
                     break;
                 }
-                const fs::path path = p;
+                auto path = p.path();
                 if (app_config.matches_ext(path))
                 {
                     vca::FileContents contents;
                     contents.words = file_processor.process(path);
-                    user_db.update_file(path, contents);
+                    commands.push([this,
+                                   path = std::move(path),
+                                   contents = std::move(contents)] {
+                        user_db.update_file(path, contents);
+                    });
                 }
             }
             VCA_INFO << "Scanning finished: " << root_dir;
@@ -91,6 +98,7 @@ struct FileScanner::Impl : public UserConfig::Observer
         thread.join();
     }
 
+    CommandQueue& commands;
     const AppConfig& app_config;
     UserConfig& user_config;
     fs::path root_dir;
@@ -98,13 +106,15 @@ struct FileScanner::Impl : public UserConfig::Observer
     const FileProcessor& file_processor;
     std::atomic<bool> done{false};
     std::thread thread;
-};
+}; // namespace vca
 
-FileScanner::FileScanner(const AppConfig& app_config,
+FileScanner::FileScanner(CommandQueue& commands,
+                         const AppConfig& app_config,
                          UserConfig& user_config,
                          UserDb& user_db,
                          const FileProcessor& file_processor)
-    : m_impl{std::make_unique<Impl>(app_config,
+    : m_impl{std::make_unique<Impl>(commands,
+                                    app_config,
                                     user_config,
                                     user_db,
                                     file_processor)}

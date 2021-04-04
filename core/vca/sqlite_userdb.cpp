@@ -48,7 +48,6 @@ struct SqliteUserDb::Impl
         return path;
     }
 
-    std::mutex mutex;
     fs::path path;
     SQLite::Database db;
     FileLock file_lock;
@@ -72,7 +71,6 @@ SqliteUserDb::path() const
 void
 SqliteUserDb::create(const fs::path& root_dir)
 {
-    std::lock_guard<std::mutex> lock{m_impl->mutex};
     if (m_impl->root_dir != root_dir)
     {
         VCA_INFO << "Create user db for: " << root_dir;
@@ -96,7 +94,6 @@ void
 SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 {
     VCA_DEBUG << __func__ << ": " << path;
-    std::lock_guard<std::mutex> lock{m_impl->mutex};
     std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement del_stm{m_impl->db, "DELETE FROM files WHERE path = ?"};
@@ -128,7 +125,6 @@ void
 SqliteUserDb::remove_file(const fs::path& path)
 {
     VCA_DEBUG << __func__ << ": " << path;
-    std::lock_guard<std::mutex> lock{m_impl->mutex};
     std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement del_stm{m_impl->db, "DELETE FROM files WHERE path = ?"};
@@ -141,7 +137,6 @@ void
 SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
 {
     VCA_DEBUG << __func__ << ": " << old_path << " - " << path;
-    std::lock_guard<std::mutex> lock{m_impl->mutex};
     std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement up_stm{m_impl->db,
@@ -154,7 +149,6 @@ SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
 std::vector<fs::path>
 SqliteUserDb::search(const FileContents& contents)
 {
-    std::lock_guard<std::mutex> lock{m_impl->mutex};
     std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     std::set<int> files_ids;
     for (const auto& word : contents.words)

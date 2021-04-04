@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include <vca/command_queue.h>
 #include <vca/config.h>
 #include <vca/userdb.h>
 #include <vca/utils.h>
@@ -14,7 +15,8 @@ namespace vca
 class FileWatcher
 {
 public:
-    FileWatcher(const AppConfig& app_config,
+    FileWatcher(CommandQueue& commands,
+                const AppConfig& app_config,
                 UserConfig& user_config,
                 UserDb& user_db,
                 const FileProcessor& file_processor);

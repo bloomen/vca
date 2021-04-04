@@ -4,6 +4,7 @@
 #include <thread>
 #include <vector>
 
+#include <vca/command_queue.h>
 #include <vca/config.h>
 #include <vca/filesystem.h>
 #include <vca/logging.h>
@@ -28,12 +29,13 @@ main(const int, char**)
 
         VCA_INFO << "Starting vca_daemon";
         VCA_INFO << "work_dir: " << work_dir;
-        const auto daemon_file = work_dir / "daemon";
-        std::ofstream{daemon_file};
+
+        vca::CommandQueue commands;
 
         vca::AppConfig app_config;
 
-        vca::UserConfig user_config{work_dir / "user_config" / "user.json"};
+        vca::UserConfig user_config{commands,
+                                    work_dir / "user_config" / "user.json"};
         VCA_INFO << "User root dir: " << user_config.root_dir();
 
         vca::SqliteUserDb user_db{work_dir / "user_data" / "user.db",
@@ -44,15 +46,12 @@ main(const int, char**)
         file_processor.add_tokenizer(std::make_unique<vca::DefaultTokenizer>());
 
         vca::FileWatcher file_watcher{
-            app_config, user_config, user_db, file_processor};
+            commands, app_config, user_config, user_db, file_processor};
 
         vca::FileScanner file_scanner{
-            app_config, user_config, user_db, file_processor};
+            commands, app_config, user_config, user_db, file_processor};
 
-        while (fs::exists(daemon_file))
-        {
-            std::this_thread::sleep_for(std::chrono::milliseconds(300));
-        }
+        commands.run();
 
         VCA_INFO << "Terminating daemon";
         return EXIT_SUCCESS;
