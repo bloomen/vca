@@ -6,7 +6,6 @@
 
 #include <vca/config.h>
 #include <vca/filesystem.h>
-#include <vca/git.h>
 #include <vca/logging.h>
 #include <vca/sqlite_userdb.h>
 #include <vca/utils.h>
@@ -33,7 +32,6 @@ main(const int argc, char** argv)
         vca::init_logging(work_dir / "logs" / "vca_daemon.log");
         vca::set_log_level(vca::Logger::Level::Debug);
 
-        VCA_INFO << "Git revision: " << vca::GitMetadata::Describe();
         VCA_INFO << "Starting vca_daemon";
         const auto daemon_file = work_dir / "daemon";
         std::ofstream{daemon_file};
