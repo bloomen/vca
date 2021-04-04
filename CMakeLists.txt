@@ -25,7 +25,7 @@ add_subdirectory(third_party/concurrentqueue)
 add_subdirectory(third_party/efsw)
 add_subdirectory(third_party/gcl)
 add_subdirectory(third_party/googletest)
-add_subdirectory(third_party/json)
+add_subdirectory(third_party/nlohmann_json)
 add_subdirectory(third_party/readerwriterqueue)
 add_subdirectory(third_party/spdlog)
 add_subdirectory(third_party/SQLiteCpp)
@@ -40,7 +40,7 @@ include_directories(
     third_party/efsw/include
     third_party/gcl/include
     third_party/googletest/googletest/include
-    third_party/json/single_include
+    third_party/nlohmann_json/single_include
     third_party/readerwriterqueue
     third_party/spdlog/include
     third_party/SQLiteCpp/include
