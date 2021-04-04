@@ -15,7 +15,7 @@ class FileWatcher
 {
 public:
     FileWatcher(const AppConfig& app_config,
-                const UserConfig& user_config,
+                UserConfig& user_config,
                 UserDb& user_db,
                 const FileProcessor& file_processor);
 

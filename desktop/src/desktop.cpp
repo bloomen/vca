@@ -27,7 +27,7 @@ main(const int, char**)
         cmdline->set_formatter(std::make_unique<spdlog::pattern_formatter>(
             "%v", spdlog::pattern_time_type::local, ""));
 
-        vca::SqliteUserDb user_db{work_dir / "user.db",
+        vca::SqliteUserDb user_db{work_dir / "user_data" / "user.db",
                                   vca::UserDb::OpenType::ReadOnly};
 
         std::string input;

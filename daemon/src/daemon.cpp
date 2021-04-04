@@ -32,12 +32,12 @@ main(const int, char**)
 
         vca::AppConfig app_config;
 
-        vca::UserConfig user_config{work_dir / "user.json"};
+        vca::UserConfig user_config{work_dir / "user_config" / "user.json"};
         VCA_INFO << "User root dir: " << user_config.root_dir();
 
-        vca::SqliteUserDb user_db{work_dir / "user.db",
+        vca::SqliteUserDb user_db{work_dir / "user_data" / "user.db",
                                   vca::UserDb::OpenType::ReadWrite};
-        user_db.create();
+        user_db.create(user_config.root_dir());
 
         vca::FileProcessor file_processor;
         file_processor.add_tokenizer(std::make_unique<vca::DefaultTokenizer>());

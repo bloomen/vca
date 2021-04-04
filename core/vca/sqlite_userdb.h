@@ -22,7 +22,7 @@ public:
     path() const override;
 
     void
-    create() override;
+    create(const fs::path& root_dir) override;
 
     void
     update_file(const fs::path& path, const FileContents& contents) override;

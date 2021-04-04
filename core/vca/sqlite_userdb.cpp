@@ -34,16 +34,25 @@ toSQLiteOpenType(const UserDb::OpenType open_type)
 struct SqliteUserDb::Impl
 {
     explicit Impl(fs::path path, const UserDb::OpenType open_type)
-        : path{std::move(path)}
+        : path{make_path(std::move(path))}
         , db{this->path.u8string(), toSQLiteOpenType(open_type)}
-        , file_lock{this->path}
+        , file_lock{this->path.parent_path()}
     {
         VCA_CHECK(db.getHandle());
     }
+
+    static fs::path
+    make_path(fs::path path)
+    {
+        fs::create_directories(path.parent_path());
+        return path;
+    }
+
     std::mutex mutex;
     fs::path path;
     SQLite::Database db;
     FileLock file_lock;
+    fs::path root_dir;
 };
 
 SqliteUserDb::SqliteUserDb(fs::path path, const OpenType open_type)
@@ -54,21 +63,33 @@ SqliteUserDb::SqliteUserDb(fs::path path, const OpenType open_type)
 
 SqliteUserDb::~SqliteUserDb() = default;
 
+const fs::path&
+SqliteUserDb::path() const
+{
+    return m_impl->path;
+}
+
 void
-SqliteUserDb::create()
+SqliteUserDb::create(const fs::path& root_dir)
 {
     std::lock_guard<std::mutex> lock{m_impl->mutex};
-    std::lock_guard<FileLock> file_lock{m_impl->file_lock};
-    SQLite::Transaction transaction{m_impl->db};
-    m_impl->db.exec("DROP TABLE IF EXISTS files");
-    m_impl->db.exec("CREATE TABLE files (id INTEGER PRIMARY KEY "
-                    "AUTOINCREMENT, path TEXT NOT NULL UNIQUE, ext TEXT)");
-    m_impl->db.exec("DROP TABLE IF EXISTS words");
-    m_impl->db.exec("CREATE TABLE words (id INTEGER PRIMARY KEY "
-                    "AUTOINCREMENT, files_id INTEGER NOT NULL, word TEXT NOT "
-                    "NULL, FOREIGN KEY (files_id) REFERENCES files (id) ON "
-                    "DELETE CASCADE)");
-    transaction.commit();
+    if (m_impl->root_dir != root_dir)
+    {
+        VCA_INFO << "Create user db for: " << root_dir;
+        m_impl->root_dir = root_dir;
+        std::lock_guard<FileLock> file_lock{m_impl->file_lock};
+        SQLite::Transaction transaction{m_impl->db};
+        m_impl->db.exec("DROP TABLE IF EXISTS files");
+        m_impl->db.exec("CREATE TABLE files (id INTEGER PRIMARY KEY "
+                        "AUTOINCREMENT, path TEXT NOT NULL UNIQUE, ext TEXT)");
+        m_impl->db.exec("DROP TABLE IF EXISTS words");
+        m_impl->db.exec(
+            "CREATE TABLE words (id INTEGER PRIMARY KEY "
+            "AUTOINCREMENT, files_id INTEGER NOT NULL, word TEXT NOT "
+            "NULL, FOREIGN KEY (files_id) REFERENCES files (id) ON "
+            "DELETE CASCADE)");
+        transaction.commit();
+    }
 }
 
 void
@@ -160,12 +181,6 @@ SqliteUserDb::search(const FileContents& contents)
         }
     }
     return paths;
-}
-
-const fs::path&
-SqliteUserDb::path() const
-{
-    return m_impl->path;
 }
 
 } // namespace vca

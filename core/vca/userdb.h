@@ -28,7 +28,7 @@ public:
     path() const = 0;
 
     virtual void
-    create() = 0;
+    create(const fs::path& root_dir) = 0;
 
     virtual void
     update_file(const fs::path& path, const FileContents& contents) = 0;

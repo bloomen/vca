@@ -2,28 +2,53 @@
 
 #include <efsw/efsw.hpp>
 
+#include <vca/logging.h>
+
 namespace vca
 {
 
-struct FileWatcher::Impl final : public efsw::FileWatchListener
+struct FileWatcher::Impl final : public efsw::FileWatchListener,
+                                 public UserConfig::Observer
 {
     Impl(const AppConfig& app_config,
-         const UserConfig& user_config,
+         UserConfig& user_config,
          UserDb& user_db,
          const FileProcessor& file_processor)
         : app_config{app_config}
         , user_config{user_config}
+        , root_dir{user_config.root_dir()}
         , user_db{user_db}
         , file_processor{file_processor}
     {
-        watch = file_watcher.addWatch(
-            user_config.root_dir().u8string(), this, true);
+        user_config.add_observer(*this);
+        if (!fs::exists(root_dir))
+        {
+            VCA_ERROR << "root_dir does not exist: " << root_dir;
+            return;
+        }
+        watch = file_watcher.addWatch(root_dir.u8string(), this, true);
+        VCA_CHECK(watch > 0);
         file_watcher.watch();
     }
 
     ~Impl()
     {
         file_watcher.removeWatch(watch);
+        user_config.remove_observer(*this);
+    }
+
+    void
+    user_config_changed(const UserConfig&) override
+    {
+        if (root_dir != user_config.root_dir())
+        {
+            root_dir = user_config.root_dir();
+            VCA_INFO << "Reloading file watcher: " << root_dir;
+            user_db.create(root_dir);
+            file_watcher.removeWatch(watch);
+            watch = file_watcher.addWatch(root_dir.u8string(), this, true);
+            file_watcher.watch();
+        }
     }
 
     void
@@ -77,7 +102,8 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener
     }
 
     const AppConfig& app_config;
-    const UserConfig& user_config;
+    UserConfig& user_config;
+    fs::path root_dir;
     UserDb& user_db;
     const FileProcessor& file_processor;
     efsw::FileWatcher file_watcher;
@@ -85,7 +111,7 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener
 };
 
 FileWatcher::FileWatcher(const AppConfig& app_config,
-                         const UserConfig& user_config,
+                         UserConfig& user_config,
                          UserDb& user_db,
                          const FileProcessor& file_processor)
     : m_impl{std::make_unique<Impl>(app_config,
