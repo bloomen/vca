@@ -12,23 +12,20 @@ namespace vca
 class UserConfig
 {
 public:
-    explicit UserConfig(const fs::path& path);
+    explicit UserConfig(fs::path path);
 
     const fs::path&
     root_dir() const;
 
-    // TODO: Implement config changing
-    //    void
-    //    add_changed_callback();
-
 private:
     void
-    read(const fs::path& path);
+    read();
 
     void
-    write(const fs::path& path) const;
+    write() const;
 
     FileLock m_file_lock;
+    fs::path m_path;
     fs::path m_root_dir;
 };
 

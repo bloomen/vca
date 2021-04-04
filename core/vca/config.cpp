@@ -13,13 +13,14 @@ using json = nlohmann::json;
 namespace vca
 {
 
-UserConfig::UserConfig(const fs::path& path)
+UserConfig::UserConfig(fs::path path)
     : m_file_lock{path}
+    , m_path{std::move(path)}
 {
     std::lock_guard<FileLock> file_lock{m_file_lock};
-    if (fs::exists(path))
+    if (fs::exists(m_path))
     {
-        read(path);
+        read();
     }
     else
     {
@@ -30,7 +31,7 @@ UserConfig::UserConfig(const fs::path& path)
             VCA_CHECK(fs::exists(m_root_dir))
                 << "root dir does not exist: " << m_root_dir;
         }
-        write(path);
+        write();
     }
 }
 
@@ -41,11 +42,11 @@ UserConfig::root_dir() const
 }
 
 void
-UserConfig::read(const fs::path& path)
+UserConfig::read()
 {
     json j;
     {
-        std::ifstream file{path};
+        std::ifstream file{m_path};
         VCA_CHECK(file);
         j = json::parse(file);
         VCA_CHECK(!file.bad());
@@ -54,11 +55,11 @@ UserConfig::read(const fs::path& path)
 }
 
 void
-UserConfig::write(const fs::path& path) const
+UserConfig::write() const
 {
     json j;
     j["root_dir"] = m_root_dir.u8string();
-    std::ofstream{path} << j;
+    std::ofstream{m_path} << j;
 }
 
 const std::set<std::string>&
