@@ -16,7 +16,6 @@ class FileScanner
 {
 public:
     FileScanner(CommandQueue& commands,
-                const AppConfig& app_config,
                 UserConfig& user_config,
                 UserDb& user_db,
                 const FileProcessor& file_processor);

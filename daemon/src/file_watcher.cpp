@@ -11,12 +11,10 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
                                  public UserConfig::Observer
 {
     Impl(CommandQueue& commands,
-         const AppConfig& app_config,
          UserConfig& user_config,
          UserDb& user_db,
          const FileProcessor& file_processor)
         : commands{commands}
-        , app_config{app_config}
         , user_config{user_config}
         , root_dir{user_config.root_dir()}
         , user_db{user_db}
@@ -67,7 +65,7 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
         case efsw::Actions::Add:
         case efsw::Actions::Modified:
         {
-            if (app_config.matches_ext(path))
+            if (fs::is_regular_file(path))
             {
                 vca::FileContents contents;
                 contents.words = file_processor.process(path);
@@ -79,7 +77,7 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
         }
         case efsw::Actions::Delete:
         {
-            if (app_config.matches_ext(path))
+            if (fs::is_regular_file(path))
             {
                 commands.push([this, path] { user_db.remove_file(path); });
             }
@@ -88,9 +86,9 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
         case efsw::Actions::Moved:
         {
             auto old_path = fs::u8path(dir) / fs::u8path(old_filename);
-            if (app_config.matches_ext(old_path))
+            if (fs::is_regular_file(old_path))
             {
-                if (app_config.matches_ext(path))
+                if (fs::is_regular_file(path))
                 {
                     commands.push([this, path, old_path = std::move(old_path)] {
                         user_db.move_file(old_path, path);
@@ -111,7 +109,6 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
     }
 
     CommandQueue& commands;
-    const AppConfig& app_config;
     UserConfig& user_config;
     fs::path root_dir;
     UserDb& user_db;
@@ -121,12 +118,10 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
 }; // namespace vca
 
 FileWatcher::FileWatcher(CommandQueue& commands,
-                         const AppConfig& app_config,
                          UserConfig& user_config,
                          UserDb& user_db,
                          const FileProcessor& file_processor)
     : m_impl{std::make_unique<Impl>(commands,
-                                    app_config,
                                     user_config,
                                     user_db,
                                     file_processor)}

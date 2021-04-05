@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -10,7 +11,7 @@ struct FileData
 {
     const std::string& filename_stem;
     const std::string& filename_ext;
-    const std::vector<std::string>& initial_contents;
+    const std::optional<std::vector<std::string>>& initial_contents;
 };
 
 class Tokenizer

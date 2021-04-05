@@ -42,14 +42,14 @@ main(const int, char**)
                                   vca::UserDb::OpenType::ReadWrite};
         user_db.create(user_config.root_dir());
 
-        vca::FileProcessor file_processor;
+        vca::FileProcessor file_processor{app_config};
         file_processor.add_tokenizer(std::make_unique<vca::DefaultTokenizer>());
 
         vca::FileWatcher file_watcher{
-            commands, app_config, user_config, user_db, file_processor};
+            commands, user_config, user_db, file_processor};
 
         vca::FileScanner file_scanner{
-            commands, app_config, user_config, user_db, file_processor};
+            commands, user_config, user_db, file_processor};
 
         commands.run();
 

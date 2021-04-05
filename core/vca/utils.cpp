@@ -1,5 +1,6 @@
 #include "utils.h"
 
+#include <algorithm>
 #include <memory>
 
 #include "platform.h"
@@ -27,6 +28,15 @@ demangle_type(const char* const type_name)
 VcaError::VcaError(const std::string& message)
     : std::runtime_error{"VcaError: " + message}
 {
+}
+
+void
+to_lower(std::string& str)
+{
+    // TODO: Does this work with UTF-8?
+    std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
+        return std::tolower(c);
+    });
 }
 
 } // namespace vca

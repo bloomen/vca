@@ -6,6 +6,11 @@
 namespace vca
 {
 
+FileProcessor::FileProcessor(const AppConfig& app_config)
+    : m_app_config{app_config}
+{
+}
+
 void
 FileProcessor::add_tokenizer(std::unique_ptr<Tokenizer> tokenizer)
 {
@@ -16,9 +21,12 @@ std::vector<std::string>
 FileProcessor::process(const fs::path& file) const
 {
     const auto filename_stem = file.filename().stem().u8string();
-    const auto filename_ext = file.extension().u8string();
-    std::vector<std::string> initial_contents;
+    auto filename_ext = file.extension().u8string();
+    to_lower(filename_ext);
+    std::optional<std::vector<std::string>> initial_contents;
+    if (m_app_config.extensions().count(filename_ext) > 0)
     {
+        initial_contents = std::vector<std::string>{};
         std::ifstream f{file};
         std::string line;
         const size_t max_line_count = 100;
@@ -26,7 +34,7 @@ FileProcessor::process(const fs::path& file) const
         {
             if (!line.empty())
             {
-                initial_contents.emplace_back(line);
+                initial_contents->emplace_back(line);
             }
         }
     }

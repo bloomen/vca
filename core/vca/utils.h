@@ -87,4 +87,7 @@ private:
     std::string m_msg;
 };
 
+void
+to_lower(std::string& str);
+
 } // namespace vca

@@ -45,11 +45,13 @@ private:
 class AppConfig
 {
 public:
+    AppConfig() = default;
+
+    VCA_DELETE_COPY(AppConfig)
+    VCA_DEFAULT_MOVE(AppConfig)
+
     const std::set<std::string>&
     extensions() const;
-
-    bool
-    matches_ext(const fs::path& path) const;
 
 private:
     std::set<std::string> m_extensions = {".txt"};
