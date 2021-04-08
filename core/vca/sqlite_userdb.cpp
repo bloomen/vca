@@ -58,6 +58,8 @@ SqliteUserDb::SqliteUserDb(fs::path path, const OpenType open_type)
     : m_impl{std::make_unique<Impl>(std::move(path), open_type)}
 {
     m_impl->db.exec("PRAGMA foreign_keys = ON");
+    m_impl->db.exec("PRAGMA synchronous = OFF");
+    m_impl->db.exec("PRAGMA cache_size = 100000");
 }
 
 SqliteUserDb::~SqliteUserDb() = default;
