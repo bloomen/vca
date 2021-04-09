@@ -14,10 +14,10 @@
 #include <vca/time.h>
 #include <vca/utils.h>
 
-#include "default_tokenizer.h"
 #include "file_processor.h"
 #include "file_scanner.h"
 #include "file_watcher.h"
+#include "filename_tokenizer.h"
 
 std::atomic<int> g_signal_status{0};
 
@@ -57,7 +57,8 @@ main(const int, char**)
         user_db.create(user_config.root_dir());
 
         vca::FileProcessor file_processor{app_config};
-        file_processor.add_tokenizer(std::make_unique<vca::DefaultTokenizer>());
+        file_processor.add_tokenizer(
+            std::make_unique<vca::FilenameTokenizer>());
 
         vca::FileWatcher file_watcher{
             commands, user_config, user_db, file_processor};
