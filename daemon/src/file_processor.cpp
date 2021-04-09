@@ -1,5 +1,7 @@
 #include "file_processor.h"
 
+#include <boost/algorithm/string.hpp>
+
 #include <fstream>
 #include <set>
 
@@ -46,6 +48,7 @@ FileProcessor::process(const fs::path& file) const
         auto tokens = tokenizer->extract(data);
         for (auto& t : tokens)
         {
+            boost::trim(t);
             if (t.size() <= 1)
             {
                 continue;

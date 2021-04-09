@@ -18,6 +18,7 @@
 #include "file_scanner.h"
 #include "file_watcher.h"
 #include "filename_tokenizer.h"
+#include "txt_tokenizer.h"
 
 std::atomic<int> g_signal_status{0};
 
@@ -59,6 +60,7 @@ main(const int, char**)
         vca::FileProcessor file_processor{app_config};
         file_processor.add_tokenizer(
             std::make_unique<vca::FilenameTokenizer>());
+        file_processor.add_tokenizer(std::make_unique<vca::TxtTokenizer>());
 
         vca::FileWatcher file_watcher{
             commands, user_config, user_db, file_processor};

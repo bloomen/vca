@@ -9,6 +9,8 @@ add_executable(vca_daemon
     src/file_watcher.h
     src/file_watcher.cpp
     src/tokenizer.h
+    src/txt_tokenizer.h
+    src/txt_tokenizer.cpp
 )
 
 include_directories(
