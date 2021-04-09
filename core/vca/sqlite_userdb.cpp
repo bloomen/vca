@@ -94,15 +94,16 @@ SqliteUserDb::create(const fs::path& root_dir)
 void
 SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 {
-    VCA_DEBUG << __func__ << ": " << path;
+    const auto p = fs::relative(path, m_impl->root_dir);
+    VCA_DEBUG << __func__ << ": " << p;
     std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement del_stm{m_impl->db, "DELETE FROM files WHERE path = ?"};
-    SQLite::bind(del_stm, path.u8string());
+    SQLite::bind(del_stm, p.u8string());
     del_stm.exec();
     SQLite::Statement ins_stm{m_impl->db,
                               "INSERT INTO files (path, ext) VALUES (?, ?)"};
-    SQLite::bind(ins_stm, path.u8string(), path.extension().u8string());
+    SQLite::bind(ins_stm, p.u8string(), p.extension().u8string());
     ins_stm.exec();
     SQLite::Statement query_stm{m_impl->db,
                                 "SELECT last_insert_rowid() FROM files"};
@@ -125,11 +126,12 @@ SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 void
 SqliteUserDb::remove_file(const fs::path& path)
 {
-    VCA_DEBUG << __func__ << ": " << path;
+    const auto p = fs::relative(path, m_impl->root_dir);
+    VCA_DEBUG << __func__ << ": " << p;
     std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement del_stm{m_impl->db, "DELETE FROM files WHERE path = ?"};
-    SQLite::bind(del_stm, path.u8string());
+    SQLite::bind(del_stm, p.u8string());
     del_stm.exec();
     transaction.commit();
 }
@@ -137,12 +139,14 @@ SqliteUserDb::remove_file(const fs::path& path)
 void
 SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
 {
-    VCA_DEBUG << __func__ << ": " << old_path << " - " << path;
+    const auto old_p = fs::relative(old_path, m_impl->root_dir);
+    const auto p = fs::relative(path, m_impl->root_dir);
+    VCA_DEBUG << __func__ << ": " << old_p << " - " << p;
     std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement up_stm{m_impl->db,
                              "UPDATE files SET path = ? WHERE path = ?"};
-    SQLite::bind(up_stm, path.u8string(), old_path.u8string());
+    SQLite::bind(up_stm, p.u8string(), old_p.u8string());
     up_stm.exec();
     transaction.commit();
 }
