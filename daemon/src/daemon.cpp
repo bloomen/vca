@@ -1,3 +1,5 @@
+#include <atomic>
+#include <csignal>
 #include <fstream>
 #include <iostream>
 #include <set>
@@ -9,6 +11,7 @@
 #include <vca/filesystem.h>
 #include <vca/logging.h>
 #include <vca/sqlite_userdb.h>
+#include <vca/time.h>
 #include <vca/utils.h>
 
 #include "default_tokenizer.h"
@@ -16,11 +19,22 @@
 #include "file_scanner.h"
 #include "file_watcher.h"
 
+std::atomic<int> g_signal_status{0};
+
+void
+signal_handler(const int signal)
+{
+    g_signal_status = signal;
+}
+
 int
 main(const int, char**)
 {
     try
     {
+        std::signal(SIGINT, signal_handler);
+        std::signal(SIGTERM, signal_handler);
+
         const auto work_dir = vca::user_config_dir() / "vca";
         fs::create_directories(work_dir);
 
@@ -51,8 +65,20 @@ main(const int, char**)
         vca::FileScanner file_scanner{
             commands, user_config, user_db, file_processor};
 
-        commands.run();
+        while (g_signal_status == 0)
+        {
+            vca::Timer timer;
+            commands.sync(g_signal_status);
+            const auto interval = timer.us();
+            constexpr size_t frame_min_us = 16666;
+            if (interval < frame_min_us)
+            {
+                std::this_thread::sleep_for(
+                    std::chrono::microseconds{frame_min_us - interval});
+            }
+        }
 
+        VCA_INFO << "Received signal: " << g_signal_status;
         VCA_INFO << "Terminating daemon";
         return EXIT_SUCCESS;
     }

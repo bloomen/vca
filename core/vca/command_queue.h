@@ -1,9 +1,10 @@
 #pragma once
 
-#include <condition_variable>
+#include <atomic>
 #include <functional>
-#include <list>
-#include <mutex>
+#include <memory>
+
+#include "utils.h"
 
 namespace vca
 {
@@ -11,7 +12,10 @@ namespace vca
 class CommandQueue
 {
 public:
-    CommandQueue() = default;
+    CommandQueue();
+
+    VCA_DELETE_COPY(CommandQueue)
+    VCA_DEFAULT_MOVE(CommandQueue)
 
     ~CommandQueue();
 
@@ -19,13 +23,11 @@ public:
     push(std::function<void()> cmd);
 
     void
-    run();
+    sync(const std::atomic<int>& signal_status);
 
 private:
-    std::mutex m_mutex;
-    bool m_done = false;
-    std::condition_variable m_cv;
-    std::list<std::function<void()>> m_cmds;
+    struct Impl;
+    std::unique_ptr<Impl> m_impl;
 };
 
 } // namespace vca

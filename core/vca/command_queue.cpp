@@ -1,44 +1,37 @@
 #include "command_queue.h"
 
+#include <concurrentqueue.h>
+
 #include "logging.h"
 
 namespace vca
 {
 
-CommandQueue::~CommandQueue()
+struct CommandQueue::Impl
 {
-    std::lock_guard<std::mutex> lock{m_mutex};
-    m_done = true;
-    m_cv.notify_one();
+    moodycamel::ConcurrentQueue<std::function<void()>> queue;
+};
+
+CommandQueue::CommandQueue()
+    : m_impl{std::make_unique<Impl>()}
+{
 }
+
+CommandQueue::~CommandQueue() = default;
 
 void
 CommandQueue::push(std::function<void()> cmd)
 {
-    std::lock_guard<std::mutex> lock{m_mutex};
-    m_cmds.emplace_back(std::move(cmd));
-    m_cv.notify_one();
+    m_impl->queue.enqueue(std::move(cmd));
 }
 
 void
-CommandQueue::run()
+CommandQueue::sync(const std::atomic<int>& signal_status)
 {
-    for (;;)
+    std::function<void()> cmd;
+    while (signal_status == 0 && m_impl->queue.try_dequeue(cmd))
     {
-        std::list<std::function<void()>> cmds;
-        {
-            std::unique_lock<std::mutex> lock{m_mutex};
-            m_cv.wait(lock, [this] { return m_done || !m_cmds.empty(); });
-            if (m_done && m_cmds.empty())
-            {
-                break;
-            }
-            std::swap(m_cmds, cmds);
-        }
-        for (const auto& cmd : cmds)
-        {
-            cmd();
-        }
+        cmd();
     }
 }
 
