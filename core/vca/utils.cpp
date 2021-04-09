@@ -3,6 +3,11 @@
 #include <algorithm>
 #include <memory>
 
+#include <boost/spirit/include/qi_char_class.hpp>
+#include <boost/spirit/include/qi_numeric.hpp>
+#include <boost/spirit/include/qi_operator.hpp>
+#include <boost/spirit/include/qi_parse.hpp>
+
 #include "platform.h"
 
 #ifdef VCA_PLATFORM_UNIX
@@ -37,6 +42,17 @@ to_lower(std::string& str)
     std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
         return std::tolower(c);
     });
+}
+
+bool
+is_numeric(const std::string& str)
+{
+    std::string::const_iterator first(str.begin()), last(str.end());
+    return boost::spirit::qi::parse(first,
+                                    last,
+                                    boost::spirit::double_ >>
+                                        *boost::spirit::qi::space) &&
+        first == last;
 }
 
 } // namespace vca

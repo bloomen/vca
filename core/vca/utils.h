@@ -90,4 +90,7 @@ private:
 void
 to_lower(std::string& str);
 
+bool
+is_numeric(const std::string& str);
+
 } // namespace vca
