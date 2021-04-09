@@ -48,6 +48,7 @@ struct SqliteUserDb::Impl
         return path;
     }
 
+    int files_id = 0;
     fs::path path;
     SQLite::Database db;
     FileLock file_lock;
@@ -81,7 +82,7 @@ SqliteUserDb::create(const fs::path& root_dir)
         SQLite::Transaction transaction{m_impl->db};
         m_impl->db.exec("DROP TABLE IF EXISTS files");
         m_impl->db.exec("CREATE TABLE files (id INTEGER PRIMARY KEY "
-                        "AUTOINCREMENT, path TEXT NOT NULL, ext TEXT)");
+                        "AUTOINCREMENT, path TEXT NOT NULL)");
         m_impl->db.exec("DROP TABLE IF EXISTS words");
         m_impl->db.exec(
             "CREATE TABLE words (files_id INTEGER NOT NULL, word TEXT NOT "
@@ -102,24 +103,17 @@ SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
     SQLite::bind(del_stm, p.u8string());
     del_stm.exec();
     SQLite::Statement ins_stm{m_impl->db,
-                              "INSERT INTO files (path, ext) VALUES (?, ?)"};
-    SQLite::bind(ins_stm, p.u8string(), p.extension().u8string());
+                              "INSERT INTO files (id, path) VALUES (?, ?)"};
+    SQLite::bind(ins_stm, m_impl->files_id, p.u8string());
     ins_stm.exec();
-    SQLite::Statement query_stm{m_impl->db,
-                                "SELECT last_insert_rowid() FROM files"};
-    int files_id = -1;
-    if (query_stm.executeStep())
-    {
-        files_id = query_stm.getColumn(0).getInt();
-    }
-    VCA_CHECK(files_id > -1);
     for (const auto& word : contents.words)
     {
         SQLite::Statement ins_word_stm{
             m_impl->db, "INSERT INTO words (files_id, word) VALUES (?, ?)"};
-        SQLite::bind(ins_word_stm, files_id, word);
+        SQLite::bind(ins_word_stm, m_impl->files_id, word);
         ins_word_stm.exec();
     }
+    ++m_impl->files_id;
     transaction.commit();
 }
 
