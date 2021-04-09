@@ -150,27 +150,34 @@ SqliteUserDb::search(const FileContents& contents)
 {
     std::lock_guard<FileLock> file_lock{m_impl->file_lock};
 
-    std::string search_str = "%";
+    std::map<fs::path, size_t> path_map;
     for (const auto& word : contents.words)
     {
         if (word.empty())
         {
             continue;
         }
-        search_str += word + "%";
+        SQLite::Statement query_stm{
+            m_impl->db,
+            "SELECT path FROM files JOIN words ON files.id = words.files_id "
+            "WHERE words.word LIKE ?"};
+        SQLite::bind(query_stm, "%" + word + "%");
+        while (query_stm.executeStep())
+        {
+            const auto path = fs::u8path(query_stm.getColumn(0).getText());
+            path_map[path]++;
+        }
     }
 
     std::vector<fs::path> paths;
-    SQLite::Statement query_stm{
-        m_impl->db,
-        "SELECT path FROM files JOIN words ON files.id = words.files_id "
-        "WHERE words.word LIKE ?"};
-    SQLite::bind(query_stm, search_str);
-    while (query_stm.executeStep())
+    for (const auto& pair : path_map)
     {
-        const auto path = query_stm.getColumn(0).getText();
-        paths.emplace_back(fs::u8path(path));
+        if (pair.second == contents.words.size())
+        {
+            paths.emplace_back(pair.first);
+        }
     }
+
     return paths;
 }
 

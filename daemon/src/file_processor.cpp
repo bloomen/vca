@@ -46,6 +46,10 @@ FileProcessor::process(const fs::path& file) const
         auto tokens = tokenizer->extract(data);
         for (auto& t : tokens)
         {
+            if (t.size() <= 1)
+            {
+                continue;
+            }
             words.emplace(std::move(t));
         }
     }

@@ -8,7 +8,10 @@ namespace vca
 std::vector<std::string>
 FilenameTokenizer::extract(const FileData& data) const
 {
-    return {data.filename_stem + data.filename_ext};
+    std::vector<std::string> tokens;
+    boost::split(tokens, data.filename_stem, boost::is_any_of(" _-."));
+    tokens.emplace_back(data.filename_ext);
+    return tokens;
 }
 
 } // namespace vca
