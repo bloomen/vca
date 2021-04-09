@@ -81,11 +81,10 @@ SqliteUserDb::create(const fs::path& root_dir)
         SQLite::Transaction transaction{m_impl->db};
         m_impl->db.exec("DROP TABLE IF EXISTS files");
         m_impl->db.exec("CREATE TABLE files (id INTEGER PRIMARY KEY "
-                        "AUTOINCREMENT, path TEXT NOT NULL UNIQUE, ext TEXT)");
+                        "AUTOINCREMENT, path TEXT NOT NULL, ext TEXT)");
         m_impl->db.exec("DROP TABLE IF EXISTS words");
         m_impl->db.exec(
-            "CREATE TABLE words (id INTEGER PRIMARY KEY "
-            "AUTOINCREMENT, files_id INTEGER NOT NULL, word TEXT NOT "
+            "CREATE TABLE words (files_id INTEGER NOT NULL, word TEXT NOT "
             "NULL, FOREIGN KEY (files_id) REFERENCES files (id) ON "
             "DELETE CASCADE)");
         transaction.commit();
