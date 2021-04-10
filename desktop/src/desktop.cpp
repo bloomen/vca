@@ -78,6 +78,16 @@ main(const int, char**)
                     cmdline->info(path.u8string() + "\n");
                 }
             }
+            else if (values[0] == "a") // audio
+            {
+                if (values.size() <= 1)
+                {
+                    continue;
+                }
+                if (values[1] == "record")
+                {
+                }
+            }
             else
             {
                 cmdline->info("Unknown command.\n");

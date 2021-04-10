@@ -5,6 +5,8 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
 set(BUILD_SHARED_LIBS OFF)
+set(PA_BUILD_SHARED OFF)
+set(PA_BUILD_STATIC ON)
 set(SQLITECPP_RUN_CPPLINT OFF)
 set(BUILD_TESTING OFF)
 set(SQLITE_ENABLE_COLUMN_METADATA)
@@ -29,6 +31,7 @@ add_subdirectory(third_party/gcl)
 add_subdirectory(third_party/googletest)
 add_subdirectory(third_party/nlohmann_json)
 add_subdirectory(third_party/PlatformFolders)
+add_subdirectory(third_party/portaudio)
 add_subdirectory(third_party/readerwriterqueue)
 add_subdirectory(third_party/spdlog)
 add_subdirectory(third_party/SQLiteCpp)
@@ -45,6 +48,7 @@ include_directories(
     third_party/googletest/googletest/include
     third_party/nlohmann_json/single_include
     third_party/PlatformFolders
+    third_party/portaudio/include
     third_party/readerwriterqueue
     third_party/spdlog/include
     third_party/SQLiteCpp/include
