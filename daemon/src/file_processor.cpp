@@ -33,12 +33,18 @@ FileProcessor::process(const fs::path& file) const
         initial_contents = std::vector<std::string>{};
         std::ifstream f{file};
         std::string line;
-        const size_t max_line_count = 100;
-        for (size_t i = 0; i < max_line_count && std::getline(f, line); ++i)
+        constexpr size_t max_byte_count = 10000;
+        size_t bytes = 0;
+        while (std::getline(f, line))
         {
             if (!line.empty())
             {
+                bytes += line.size();
                 initial_contents->emplace_back(line);
+                if (bytes >= max_byte_count)
+                {
+                    break;
+                }
             }
         }
     }
