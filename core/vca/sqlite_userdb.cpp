@@ -153,10 +153,7 @@ SqliteUserDb::search(const FileContents& contents)
     std::map<fs::path, size_t> path_map;
     for (const auto& word : contents.words)
     {
-        if (word.empty())
-        {
-            continue;
-        }
+        VCA_DEBUG << __func__ << ": " << word;
         SQLite::Statement query_stm{
             m_impl->db,
             "SELECT path FROM files JOIN words ON files.id = words.files_id "
