@@ -6,6 +6,7 @@
 #include <spdlog/sinks/stdout_sinks.h>
 #include <spdlog/spdlog.h>
 
+#include <vca/audio.h>
 #include <vca/config.h>
 #include <vca/filesystem.h>
 #include <vca/logging.h>
@@ -30,6 +31,8 @@ main(const int, char**)
 
         vca::SqliteUserDb user_db{work_dir / "user_data" / "user.db",
                                   vca::UserDb::OpenType::ReadOnly};
+
+        vca::AudioRecorder audio_recorder{work_dir / "audio.raw"};
 
         std::string input;
         for (;;)
@@ -78,14 +81,25 @@ main(const int, char**)
                     cmdline->info(path.u8string() + "\n");
                 }
             }
-            else if (values[0] == "a") // audio
+            else if (values[0] == "r") // record
             {
                 if (values.size() <= 1)
                 {
+                    cmdline->info("Empty record command.\n");
                     continue;
                 }
-                if (values[1] == "record")
+                if (values[1] == "start")
                 {
+                    audio_recorder.start();
+                }
+                else if (values[1] == "stop")
+                {
+                    audio_recorder.stop();
+                }
+                else
+                {
+                    cmdline->info("Unknown record command.\n");
+                    continue;
                 }
             }
             else

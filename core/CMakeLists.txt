@@ -1,4 +1,6 @@
 add_library(vca_core
+    vca/audio.h
+    vca/audio.cpp
     vca/config.h
     vca/config.cpp
     vca/file_lock.h
