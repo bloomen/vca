@@ -56,6 +56,15 @@ main(const int, char**)
                     cmdline->info("Empty search string.\n");
                     continue;
                 }
+                for (auto& v : values)
+                {
+                    boost::trim(v);
+                }
+                values.erase(
+                    std::remove_if(values.begin(),
+                                   values.end(),
+                                   [](const auto& v) { return v.empty(); }),
+                    values.end());
                 const vca::FileContents file_contents{
                     {values.begin() + 1, values.end()}};
 

@@ -74,7 +74,8 @@ split(std::vector<std::string>& vec,
       const std::string& str,
       const char delimiter)
 {
-    boost::split(vec, str, boost::is_any_of(std::string{1, delimiter}));
+    const std::string delim{1, delimiter};
+    boost::split(vec, str, boost::is_any_of(delim));
 }
 
 std::string
