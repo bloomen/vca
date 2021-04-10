@@ -6,6 +6,9 @@
 namespace vca
 {
 
+const std::string&
+special_chars();
+
 void
 to_lower_case(std::string& str);
 

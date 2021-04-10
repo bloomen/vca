@@ -7,17 +7,9 @@
 namespace vca
 {
 
-namespace
-{
-
-const std::string special_chars =
-    R"( _-,.?!;:(){}[]~`@#$%^&*+=|\/"'<>)" + std::string{"\t"};
-
-}
-
 // TODO:
 // - include some numbers?
-// - ignore common words like I, you, we etc
+// - ignore common words like I, you, we etc?
 std::vector<std::string>
 TxtTokenizer::extract(const FileData& data) const
 {
@@ -33,19 +25,19 @@ TxtTokenizer::extract(const FileData& data) const
     std::string one_line;
     for (const auto& line : *data.initial_contents)
     {
-        if (line.back() == '-')
+        auto trimmed = line;
+        boost::trim(trimmed);
+        if (trimmed.back() == '-')
         {
-            one_line.insert(one_line.end(), line.begin(), line.end() - 1);
+            one_line.insert(one_line.end(), trimmed.begin(), trimmed.end() - 1);
         }
         else
         {
-            one_line += line;
+            one_line += trimmed + " ";
         }
-        one_line += " ";
     }
 
-    replace_all(one_line, special_chars, ' ');
-    one_line = merge_consecutive(one_line, ' ');
+    replace_all(one_line, special_chars(), ' ');
 
     std::vector<std::string> words;
     std::vector<std::string> tokens;

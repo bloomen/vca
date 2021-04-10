@@ -1,6 +1,6 @@
 #include "filename_tokenizer.h"
 
-#include <boost/algorithm/string.hpp>
+#include <vca/string.h>
 
 namespace vca
 {
@@ -8,8 +8,10 @@ namespace vca
 std::vector<std::string>
 FilenameTokenizer::extract(const FileData& data) const
 {
+    auto line = data.filename_stem;
+    replace_all(line, special_chars(), ' ');
     std::vector<std::string> tokens;
-    boost::split(tokens, data.filename_stem, boost::is_any_of(" _-."));
+    split(tokens, line);
     tokens.emplace_back(data.filename_ext);
     return tokens;
 }

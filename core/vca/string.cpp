@@ -14,6 +14,14 @@ namespace vca
 
 // TODO: Do these functions work with UTF-8?
 
+const std::string&
+special_chars()
+{
+    static const std::string specials =
+        std::string{R"( _-,.?!;:(){}[]~`@#$%^&*+=|\/"'<>)"} + std::string{"\t"};
+    return specials;
+}
+
 void
 to_lower_case(std::string& str)
 {

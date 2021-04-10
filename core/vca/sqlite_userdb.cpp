@@ -45,7 +45,6 @@ struct SqliteUserDb::Impl
     make_path(fs::path path)
     {
         fs::create_directories(path.parent_path());
-        fs::remove(path);
         return path;
     }
 
