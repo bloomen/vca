@@ -12,6 +12,8 @@ add_library(vca_core
     vca/command_queue.cpp
     vca/sqlite_userdb.h
     vca/sqlite_userdb.cpp
+    vca/string.h
+    vca/string.cpp
     vca/time.h
     vca/userdb.h
     vca/utils.h

@@ -10,6 +10,7 @@
 #include <vca/filesystem.h>
 #include <vca/logging.h>
 #include <vca/sqlite_userdb.h>
+#include <vca/string.h>
 #include <vca/time.h>
 #include <vca/utils.h>
 
@@ -42,7 +43,7 @@ main(const int, char**)
             boost::trim(input);
 
             std::vector<std::string> values;
-            boost::split(values, input, boost::is_any_of(" "));
+            vca::split(values, input);
 
             if (values[0] == "q") // quit
             {

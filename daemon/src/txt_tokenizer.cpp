@@ -2,13 +2,20 @@
 
 #include <boost/algorithm/string.hpp>
 
-#include <vca/utils.h>
+#include <vca/string.h>
 
 namespace vca
 {
 
+namespace
+{
+
+const std::string special_chars =
+    R"( _-,.?!;:(){}[]~`@#$%^&*+=|\/"'<>)" + std::string{"\t"};
+
+}
+
 // TODO:
-// - fix splitting
 // - include some numbers?
 // - ignore common words like I, you, we etc
 std::vector<std::string>
@@ -22,24 +29,39 @@ TxtTokenizer::extract(const FileData& data) const
     {
         return {};
     }
-    std::vector<std::string> words;
+
+    std::string one_line;
     for (const auto& line : *data.initial_contents)
     {
-        std::vector<std::string> tokens;
-        boost::split(tokens, line, boost::is_any_of(" _-,.?!;:(){}[]"));
-        for (auto& t : tokens)
+        if (line.back() == '-')
         {
-            boost::trim(t);
-            if (t.size() <= 1)
-            {
-                continue;
-            }
-            if (is_numeric(t))
-            {
-                continue;
-            }
-            words.emplace_back(std::move(t));
+            one_line.insert(one_line.end(), line.begin(), line.end() - 1);
         }
+        else
+        {
+            one_line += line;
+        }
+        one_line += " ";
+    }
+
+    replace_all(one_line, special_chars, ' ');
+    one_line = merge_consecutive(one_line, ' ');
+
+    std::vector<std::string> words;
+    std::vector<std::string> tokens;
+    split(tokens, one_line);
+    for (auto& t : tokens)
+    {
+        boost::trim(t);
+        if (t.size() <= 1)
+        {
+            continue;
+        }
+        if (is_numeric(t))
+        {
+            continue;
+        }
+        words.emplace_back(std::move(t));
     }
     return words;
 }

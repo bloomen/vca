@@ -1,9 +1,11 @@
 #include "file_processor.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include <fstream>
 #include <set>
+
+#include <boost/algorithm/string.hpp>
+
+#include <vca/string.h>
 
 namespace vca
 {
@@ -24,7 +26,7 @@ FileProcessor::process(const fs::path& file) const
 {
     const auto filename_stem = file.filename().stem().u8string();
     auto filename_ext = file.extension().u8string();
-    to_lower(filename_ext);
+    to_lower_case(filename_ext);
     std::optional<std::vector<std::string>> initial_contents;
     if (m_app_config.extensions().count(filename_ext) > 0)
     {
