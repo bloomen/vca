@@ -37,6 +37,7 @@ FileProcessor::process(const fs::path& file) const
         size_t bytes = 0;
         while (std::getline(f, line))
         {
+            boost::trim(line);
             if (!line.empty())
             {
                 bytes += line.size();

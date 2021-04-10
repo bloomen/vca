@@ -25,15 +25,13 @@ TxtTokenizer::extract(const FileData& data) const
     std::string one_line;
     for (const auto& line : *data.initial_contents)
     {
-        auto trimmed = line;
-        boost::trim(trimmed);
-        if (trimmed.back() == '-')
+        if (line.back() == '-')
         {
-            one_line.insert(one_line.end(), trimmed.begin(), trimmed.end() - 1);
+            one_line.insert(one_line.end(), line.begin(), line.end() - 1);
         }
         else
         {
-            one_line += trimmed + " ";
+            one_line += line + " ";
         }
     }
 
