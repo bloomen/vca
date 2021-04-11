@@ -60,4 +60,4 @@ endif()
 
 add_subdirectory(core)
 add_subdirectory(daemon)
-add_subdirectory(desktop)
+add_subdirectory(command)
