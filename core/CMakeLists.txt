@@ -20,7 +20,7 @@ add_library(vca_core
     vca/utils.cpp
 )
 
-target_link_libraries(vca_core PUBLIC
+target_link_libraries(vca_core
     ${Boost_LIBRARIES}
     nlohmann_json
     platform_folders
