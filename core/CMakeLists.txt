@@ -27,6 +27,7 @@ target_link_libraries(vca_core PUBLIC
     spdlog
     sqlite3
     SQLiteCpp
+    tinyutf8
 )
 
 add_executable(vca_core_test
