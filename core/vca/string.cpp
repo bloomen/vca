@@ -18,7 +18,8 @@ const std::string&
 special_chars()
 {
     static const std::string specials =
-        std::string{R"( _-,.?!;:(){}[]~`@#$%^&*+=|\/"'<>)"} + std::string{"\t"};
+        std::string{R"( _-,.?!;:(){}[]~`@#$%^&*+=|\/"'<>)"} + "\t" + "。" +
+        "，" + "。" + "·" + "《" + "》" + "？" + "“" + "”" + "、" + "‘" + "’";
     return specials;
 }
 
@@ -41,21 +42,6 @@ is_numeric(const std::string& str)
         first == last;
 }
 
-std::string
-remove_all(const std::string& str, const std::string& chars)
-{
-    const std::set<char> chars_set{chars.begin(), chars.end()};
-    std::vector<char> result;
-    for (const auto v : str)
-    {
-        if (chars_set.count(v) == 0)
-        {
-            result.emplace_back(v);
-        }
-    }
-    return {result.begin(), result.end()};
-}
-
 void
 replace_all(std::string& str, const std::string& chars, const char with)
 {
@@ -76,30 +62,6 @@ split(std::vector<std::string>& vec,
 {
     const std::string delim{1, delimiter};
     boost::split(vec, str, boost::is_any_of(delim));
-}
-
-std::string
-merge_consecutive(const std::string& str, const char c)
-{
-    bool merging = false;
-    std::vector<char> result;
-    for (const auto v : str)
-    {
-        if (v == c)
-        {
-            if (!merging)
-            {
-                result.emplace_back(v);
-                merging = true;
-            }
-        }
-        else
-        {
-            merging = false;
-            result.emplace_back(v);
-        }
-    }
-    return {result.begin(), result.end()};
 }
 
 } // namespace vca
