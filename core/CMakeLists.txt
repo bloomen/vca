@@ -20,15 +20,10 @@ add_library(vca_core
     vca/utils.cpp
 )
 
-target_link_directories(vca_core PUBLIC
-    ${PROJECT_BINARY_DIR}/third_party/portaudio
-)
-
 target_link_libraries(vca_core PUBLIC
     ${Boost_LIBRARIES}
     nlohmann_json
     platform_folders
-    portaudio
     spdlog
     sqlite3
     SQLiteCpp
