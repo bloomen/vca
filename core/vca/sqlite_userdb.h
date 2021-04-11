@@ -24,6 +24,9 @@ public:
     void
     create(const fs::path& root_dir) override;
 
+    virtual std::string
+    property(const std::string& key) const override;
+
     void
     update_file(const fs::path& path, const FileContents& contents) override;
 
@@ -34,7 +37,7 @@ public:
     move_file(const fs::path& old_path, const fs::path& path) override;
 
     std::vector<fs::path>
-    search(const FileContents& contents) override;
+    search(const FileContents& contents) const override;
 
 private:
     struct Impl;

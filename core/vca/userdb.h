@@ -30,6 +30,9 @@ public:
     virtual void
     create(const fs::path& root_dir) = 0;
 
+    virtual std::string
+    property(const std::string& key) const = 0;
+
     virtual void
     update_file(const fs::path& path, const FileContents& contents) = 0;
 
@@ -40,7 +43,7 @@ public:
     move_file(const fs::path& old_path, const fs::path& path) = 0;
 
     virtual std::vector<fs::path>
-    search(const FileContents& contents) = 0;
+    search(const FileContents& contents) const = 0;
 };
 
 } // namespace vca
