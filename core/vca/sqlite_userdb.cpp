@@ -80,14 +80,14 @@ SqliteUserDb::create(const fs::path& root_dir)
         m_impl->root_dir = root_dir;
         std::lock_guard<FileLock> file_lock{m_impl->file_lock};
         SQLite::Transaction transaction{m_impl->db};
-        m_impl->db.exec("DROP TABLE IF EXISTS files");
-        m_impl->db.exec("CREATE TABLE files (id INTEGER PRIMARY KEY "
-                        "AUTOINCREMENT, path TEXT NOT NULL)");
-        m_impl->db.exec("DROP TABLE IF EXISTS words");
         m_impl->db.exec(
-            "CREATE TABLE words (files_id INTEGER NOT NULL, word TEXT NOT "
-            "NULL, FOREIGN KEY (files_id) REFERENCES files (id) ON "
-            "DELETE CASCADE)");
+            "CREATE TABLE IF NOT EXISTS files (id INTEGER PRIMARY KEY "
+            "AUTOINCREMENT, path TEXT NOT NULL)");
+        m_impl->db.exec("CREATE TABLE IF NOT EXISTS words (files_id INTEGER "
+                        "NOT NULL, word TEXT NOT "
+                        "NULL, FOREIGN KEY (files_id) REFERENCES files (id) ON "
+                        "DELETE CASCADE)");
+        m_impl->db.exec("DELETE FROM files");
         transaction.commit();
     }
 }
