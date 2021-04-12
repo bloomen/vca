@@ -84,8 +84,8 @@ SqliteUserDb::create(const fs::path& root_dir)
                         "NULL UNIQUE, value TEXT NOT NULL)");
         m_impl->db.exec("DELETE FROM properties");
         m_impl->db.exec(
-            "CREATE TABLE IF NOT EXISTS files (id INTEGER PRIMARY KEY "
-            "AUTOINCREMENT, path TEXT NOT NULL)");
+            "CREATE TABLE IF NOT EXISTS files (id INTEGER PRIMARY KEY, "
+            "path TEXT NOT NULL)");
         m_impl->db.exec("CREATE TABLE IF NOT EXISTS words (files_id INTEGER "
                         "NOT NULL, word TEXT NOT "
                         "NULL, FOREIGN KEY (files_id) REFERENCES files (id) ON "
