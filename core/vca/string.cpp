@@ -8,6 +8,8 @@
 #include <boost/spirit/include/qi_operator.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
 
+#include "case_mappings.h"
+
 namespace vca
 {
 
@@ -45,10 +47,29 @@ to_lower_case(std::string& str)
 void
 to_lower_case(String& str)
 {
-    //    std::transform(str.begin(), str.end(), str.begin(), [](const Char c) {
-    //        if ()
-    //        return std::tolower(c);
-    //    });
+    const auto& u2l = upper_to_lower_map();
+    std::transform(str.begin(), str.end(), str.begin(), [&u2l](const Char c) {
+        const auto it = u2l.find(c);
+        if (it != u2l.end())
+        {
+            return it->second;
+        }
+        return c;
+    });
+}
+
+void
+to_upper_case(String& str)
+{
+    const auto& l2u = lower_to_upper_map();
+    std::transform(str.begin(), str.end(), str.begin(), [&l2u](const Char c) {
+        const auto it = l2u.find(c);
+        if (it != l2u.end())
+        {
+            return it->second;
+        }
+        return c;
+    });
 }
 
 bool

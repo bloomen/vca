@@ -4,7 +4,16 @@
 #include <string>
 #include <vector>
 
+#include "platform.h"
+
+#ifdef VCA_COMPILER_GCC
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wconversion"
+#endif
 #include <tinyutf8/tinyutf8.h>
+#ifdef VCA_COMPILER_GCC
+#pragma GCC diagnostic pop
+#endif
 
 namespace vca
 {
@@ -23,6 +32,9 @@ to_lower_case(std::string& str);
 
 void
 to_lower_case(String& str);
+
+void
+to_upper_case(String& str);
 
 bool
 is_numeric(const std::string& str);

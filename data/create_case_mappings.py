@@ -18,7 +18,7 @@ with open(os.path.join(dir_path, "..", "core", "vca", "case_mappings.cpp"), "w")
     f.write('    static const std::unordered_map<Char, Char> map{\n')
     for _, row in data.iterrows():
         l = row[0]
-        u = row[13]
+        u = row[12]
         if type(u) == str:
             f.write("        {0x%s, 0x%s},\n" % (l, u))
     f.write('    };\n')
@@ -30,7 +30,7 @@ with open(os.path.join(dir_path, "..", "core", "vca", "case_mappings.cpp"), "w")
     f.write('    static const std::unordered_map<Char, Char> map{\n')
     for _, row in data.iterrows():
         u = row[0]
-        l = row[12]
+        l = row[13]
         if type(l) == str:
             f.write("        {0x%s, 0x%s},\n" % (u, l))
     f.write('    };\n')

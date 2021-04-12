@@ -34,6 +34,7 @@ target_link_libraries(vca_core
 
 add_executable(vca_core_test
     test/core_test.cpp
+    test/string_test.cpp
     test/utils_test.cpp
 )
 
