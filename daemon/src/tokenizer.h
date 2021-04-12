@@ -4,14 +4,16 @@
 #include <string>
 #include <vector>
 
+#include <vca/string.h>
+
 namespace vca
 {
 
 struct FileData
 {
-    const std::string& filename_stem;
-    const std::string& filename_ext;
-    const std::optional<std::vector<std::string>>& initial_contents;
+    const String& filename_stem;
+    const String& filename_ext;
+    const std::optional<std::vector<String>>& initial_contents;
 };
 
 class Tokenizer
@@ -19,7 +21,7 @@ class Tokenizer
 public:
     virtual ~Tokenizer() = default;
 
-    virtual std::vector<std::string>
+    virtual std::vector<String>
     extract(const FileData& data) const = 0;
 };
 

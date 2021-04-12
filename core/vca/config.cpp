@@ -186,7 +186,7 @@ UserConfig::remove_observer(Observer& observer)
     m_impl->observers.erase(&observer);
 }
 
-const std::set<std::string>&
+const std::set<String>&
 AppConfig::extensions() const
 {
     return m_extensions;

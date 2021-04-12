@@ -24,24 +24,25 @@ FileProcessor::add_tokenizer(std::unique_ptr<Tokenizer> tokenizer)
 std::vector<std::string>
 FileProcessor::process(const fs::path& file) const
 {
-    const auto filename_stem = file.filename().stem().u8string();
-    auto filename_ext = file.extension().u8string();
+    const auto filename_stem = file.filename().stem().u32string();
+    auto filename_ext = file.extension().u32string();
     to_lower_case(filename_ext);
-    std::optional<std::vector<std::string>> initial_contents;
+    std::optional<std::vector<String>> initial_contents;
     if (m_app_config.extensions().count(filename_ext) > 0)
     {
-        initial_contents = std::vector<std::string>{};
+        initial_contents = std::vector<String>{};
         std::ifstream f{file};
         std::string line;
         constexpr size_t max_byte_count = 10000;
         size_t bytes = 0;
         while (std::getline(f, line))
         {
-            boost::trim(line);
-            if (!line.empty())
+            auto wide_line = narrow_to_wide(line);
+            trim(wide_line);
+            if (!wide_line.empty())
             {
-                bytes += line.size();
-                initial_contents->emplace_back(line);
+                bytes += wide_line.size() * 4;
+                initial_contents->emplace_back(std::move(wide_line));
                 if (bytes >= max_byte_count)
                 {
                     break;
@@ -57,12 +58,12 @@ FileProcessor::process(const fs::path& file) const
         auto tokens = tokenizer->extract(data);
         for (auto& t : tokens)
         {
-            boost::trim(t);
+            trim(t);
             if (t.size() <= 1)
             {
                 continue;
             }
-            words.emplace(std::move(t));
+            words.emplace(wide_to_narrow(t));
         }
     }
     return {words.begin(), words.end()};

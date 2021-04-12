@@ -6,6 +6,7 @@
 #include "command_queue.h"
 #include "file_lock.h"
 #include "filesystem.h"
+#include "string.h"
 
 namespace vca
 {
@@ -50,11 +51,11 @@ public:
     VCA_DELETE_COPY(AppConfig)
     VCA_DEFAULT_MOVE(AppConfig)
 
-    const std::set<std::string>&
+    const std::set<String>&
     extensions() const;
 
 private:
-    std::set<std::string> m_extensions = {".txt"};
+    std::set<String> m_extensions = {U".txt"};
 };
 
 } // namespace vca

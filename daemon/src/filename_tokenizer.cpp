@@ -5,15 +5,16 @@
 namespace vca
 {
 
-std::vector<std::string>
+std::vector<String>
 FilenameTokenizer::extract(const FileData& data) const
 {
     auto line = data.filename_stem;
-    replace_all(line, special_chars(), ' ');
-    std::vector<std::string> tokens;
+    to_lower_case(line);
+    replace_all(line, spec_chars(), U' ');
+    std::list<String> tokens;
     split(tokens, line);
     tokens.emplace_back(data.filename_ext);
-    return tokens;
+    return {tokens.begin(), tokens.end()};
 }
 
 } // namespace vca

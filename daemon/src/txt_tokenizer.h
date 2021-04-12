@@ -8,7 +8,7 @@ namespace vca
 class TxtTokenizer : public Tokenizer
 {
 public:
-    std::vector<std::string>
+    std::vector<String>
     extract(const FileData& data) const override;
 };
 
