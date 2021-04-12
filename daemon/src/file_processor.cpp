@@ -3,8 +3,6 @@
 #include <fstream>
 #include <set>
 
-#include <boost/algorithm/string.hpp>
-
 #include <vca/string.h>
 
 namespace vca

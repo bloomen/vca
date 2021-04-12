@@ -1,15 +1,10 @@
 #include "txt_tokenizer.h"
 
-#include <boost/algorithm/string.hpp>
-
 #include <vca/string.h>
 
 namespace vca
 {
 
-// TODO:
-// - include some numbers?
-// - ignore common words like I, you, we etc?
 std::vector<String>
 TxtTokenizer::extract(const FileData& data) const
 {
