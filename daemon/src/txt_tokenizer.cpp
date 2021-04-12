@@ -35,7 +35,6 @@ TxtTokenizer::extract(const FileData& data) const
         }
     }
 
-    to_lower_case(one_line);
     replace_all(one_line, special_chars(), U' ');
 
     std::vector<String> words;

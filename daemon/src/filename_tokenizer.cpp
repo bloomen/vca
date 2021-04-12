@@ -9,7 +9,6 @@ std::vector<String>
 FilenameTokenizer::extract(const FileData& data) const
 {
     auto line = data.filename_stem;
-    to_lower_case(line);
     replace_all(line, special_chars(), U' ');
     std::list<String> tokens;
     split(tokens, line);
