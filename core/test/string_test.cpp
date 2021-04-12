@@ -1,6 +1,5 @@
 #include <gtest/gtest.h>
 
-#include <iostream>
 #include <vca/string.h>
 
 TEST(string, to_lower_case_withEmptyString)
