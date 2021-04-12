@@ -1,4 +1,6 @@
 add_library(vca_core
+    vca/case_mappings.h
+    vca/case_mappings.cpp
     vca/config.h
     vca/config.cpp
     vca/file_lock.h

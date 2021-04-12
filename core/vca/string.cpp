@@ -1,7 +1,6 @@
 #include "string.h"
 
 #include <algorithm>
-#include <set>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/spirit/include/qi_char_class.hpp>
@@ -23,12 +22,33 @@ special_chars()
     return specials;
 }
 
+const std::set<Char>&
+spec_chars()
+{
+    static const std::set<Char> specials{
+        U'_',  U'-',  U',',  U'.', U'?', U'!',  U';',  U':',  U'(',
+        U')',  U'{',  U'}',  U'[', U']', U'~',  U'`',  U'@',  U'#',
+        U'$',  U'%',  U'^',  U'&', U'*', U'+',  U'=',  U'|',  U'\\',
+        U'/',  U'"',  U'\'', U'<', U'>', U'\t', U'。', U'，', U'·',
+        U'《', U'》', U'？', U'“', U'”', U'、', U'‘',  U'’'};
+    return specials;
+}
+
 void
 to_lower_case(std::string& str)
 {
     std::transform(str.begin(), str.end(), str.begin(), [](unsigned char c) {
         return std::tolower(c);
     });
+}
+
+void
+to_lower_case(String& str)
+{
+    //    std::transform(str.begin(), str.end(), str.begin(), [](const Char c) {
+    //        if ()
+    //        return std::tolower(c);
+    //    });
 }
 
 bool
