@@ -14,8 +14,6 @@
 namespace vca
 {
 
-// TODO: Do these functions work with UTF-8?
-
 String
 narrow_to_wide(const std::string& narrow)
 {
@@ -30,17 +28,8 @@ wide_to_narrow(const String& wide)
     return cvt.to_bytes(wide);
 }
 
-const std::string&
-special_chars()
-{
-    static const std::string specials =
-        std::string{R"( _-,.?!;:(){}[]~`@#$%^&*+=|\/"'<>)"} + "\t" + "。" +
-        "，" + "。" + "·" + "《" + "》" + "？" + "“" + "”" + "、" + "‘" + "’";
-    return specials;
-}
-
 const std::unordered_set<Char>&
-spec_chars()
+special_chars()
 {
     static const std::unordered_set<Char> specials{
         U'_',  U'-', U',',  U'.',  U'?',  U'!', U';',  U':',  U'(',  U')',
@@ -88,11 +77,6 @@ to_upper_case(String& str)
 }
 
 bool
-is_numeric(const std::string& str)
-{
-}
-
-bool
 is_numeric(const String& str)
 {
     typename String::const_iterator first(str.begin()), last(str.end());
@@ -101,11 +85,6 @@ is_numeric(const String& str)
                                     boost::spirit::double_ >>
                                         *boost::spirit::qi::space) &&
         first == last;
-}
-
-void
-replace_all(std::string& str, const std::string& chars, const char with)
-{
 }
 
 void
@@ -118,15 +97,6 @@ replace_all(String& str, const std::unordered_set<Char>& chars, Char with)
             c = with;
         }
     }
-}
-
-void
-split(std::vector<std::string>& vec,
-      const std::string& str,
-      const char delimiter)
-{
-    const std::string delim{1, delimiter};
-    boost::split(vec, str, boost::is_any_of(delim));
 }
 
 void

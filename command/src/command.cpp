@@ -40,16 +40,17 @@ main(const int, char**)
             {
                 continue;
             }
-            boost::trim(input);
+            auto wide_input = vca::narrow_to_wide(input);
+            vca::trim(wide_input);
 
-            std::vector<std::string> values;
-            vca::split(values, input);
+            std::list<vca::String> values;
+            vca::split(values, wide_input);
 
-            if (values[0] == "q") // quit
+            if (values.front() == U"q") // quit
             {
                 break;
             }
-            else if (values[0] == "s") // search
+            else if (values.front() == U"s") // search
             {
                 if (values.size() <= 1)
                 {
@@ -58,15 +59,18 @@ main(const int, char**)
                 }
                 for (auto& v : values)
                 {
-                    boost::trim(v);
+                    vca::trim(v);
                 }
-                values.erase(
-                    std::remove_if(values.begin(),
-                                   values.end(),
-                                   [](const auto& v) { return v.empty(); }),
-                    values.end());
-                const vca::FileContents file_contents{
-                    {values.begin() + 1, values.end()}};
+                values.remove_if([](const auto& v) { return v.empty(); });
+
+                vca::FileContents file_contents;
+                auto v = values.begin();
+                ++v;
+                while (v != values.end())
+                {
+                    file_contents.words.emplace_back(vca::wide_to_narrow(*v));
+                    ++v;
+                }
 
                 cmdline->info("Searching ...\n");
                 vca::Timer timer;
