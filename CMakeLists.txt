@@ -8,6 +8,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(BUILD_SHARED_LIBS OFF)
 set(SQLITECPP_RUN_CPPLINT OFF)
 set(BUILD_TESTING OFF)
+set(CMAKE_DISABLE_TESTING OFF)
 set(SQLITE_ENABLE_COLUMN_METADATA)
 
 if (MSVC)
@@ -30,9 +31,11 @@ add_subdirectory(third_party/gcl)
 add_subdirectory(third_party/googletest)
 add_subdirectory(third_party/nlohmann_json)
 add_subdirectory(third_party/PlatformFolders)
+add_subdirectory(third_party/pugixml)
 add_subdirectory(third_party/spdlog)
 add_subdirectory(third_party/tiny-utf8)
 add_subdirectory(third_party/SQLiteCpp)
+add_subdirectory(third_party/zip)
 
 find_package(Boost 1.71.0 COMPONENTS date_time)
 add_definitions(-DBOOST_ALL_NO_LIB)
@@ -46,9 +49,11 @@ include_directories(
     third_party/googletest/googletest/include
     third_party/nlohmann_json/single_include
     third_party/PlatformFolders
+    third_party/pugixml/src
     third_party/spdlog/include
     third_party/tiny-utf8/include
     third_party/SQLiteCpp/include
+    third_party/zip/src
 )
 
 if (MSVC)
