@@ -18,6 +18,7 @@ add_library(vca_core
     vca/string.cpp
     vca/time.h
     vca/userdb.h
+    vca/userdb.cpp
     vca/utils.h
     vca/utils.cpp
 )

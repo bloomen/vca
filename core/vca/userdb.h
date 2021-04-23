@@ -1,10 +1,10 @@
 #pragma once
 
 #include <set>
-#include <string>
 #include <vector>
 
 #include "filesystem.h"
+#include "string.h"
 
 namespace vca
 {
@@ -12,6 +12,9 @@ namespace vca
 struct FileContents
 {
     std::vector<std::string> words;
+
+    static FileContents
+    fromSearch(std::list<String> values);
 };
 
 class UserDb

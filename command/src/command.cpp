@@ -52,25 +52,15 @@ main(const int, char**)
             }
             else if (values.front() == U"s") // search
             {
-                if (values.size() <= 1)
+                values.erase(values.begin());
+                if (values.empty())
                 {
                     cmdline->info("Empty search string.\n");
                     continue;
                 }
-                for (auto& v : values)
-                {
-                    vca::trim(v);
-                }
-                values.remove_if([](const auto& v) { return v.empty(); });
 
-                vca::FileContents file_contents;
-                auto v = values.begin();
-                ++v;
-                while (v != values.end())
-                {
-                    file_contents.words.emplace_back(vca::wide_to_narrow(*v));
-                    ++v;
-                }
+                const auto file_contents =
+                    vca::FileContents::fromSearch(values);
 
                 cmdline->info("Searching ...\n");
                 vca::Timer timer;
