@@ -1,5 +1,7 @@
 #include "file_watcher.h"
 
+#include <map>
+
 #include <efsw/efsw.hpp>
 
 #include <vca/logging.h>
@@ -7,48 +9,31 @@
 namespace vca
 {
 
-struct FileWatcher::Impl final : public efsw::FileWatchListener,
-                                 public UserConfig::Observer
+namespace
 {
-    Impl(CommandQueue& commands,
-         UserConfig& user_config,
-         UserDb& user_db,
-         const FileProcessor& file_processor)
+
+struct Watcher : efsw::FileWatchListener
+{
+    Watcher(CommandQueue& commands,
+            fs::path root_dir,
+            UserDb& user_db,
+            const FileProcessor& file_processor)
         : commands{commands}
-        , user_config{user_config}
-        , root_dir{user_config.root_dir()}
+        , root_dir{std::move(root_dir)}
         , user_db{user_db}
         , file_processor{file_processor}
     {
-        user_config.add_observer(*this);
-        if (!fs::exists(root_dir))
-        {
-            VCA_ERROR << "root_dir does not exist: " << root_dir;
-            return;
-        }
-        watch = file_watcher.addWatch(root_dir.u8string(), this, true);
+        VCA_CHECK(fs::exists(this->root_dir))
+            << "root_dir does not exist: " << this->root_dir;
+        VCA_INFO << "Adding watch for: " << this->root_dir;
+        watch = file_watcher.addWatch(this->root_dir.u8string(), this, true);
         VCA_CHECK(watch > 0);
         file_watcher.watch();
     }
 
-    ~Impl()
+    ~Watcher()
     {
         file_watcher.removeWatch(watch);
-        user_config.remove_observer(*this);
-    }
-
-    void
-    user_config_changed(const UserConfig&) override
-    {
-        if (root_dir != user_config.root_dir())
-        {
-            root_dir = user_config.root_dir();
-            VCA_INFO << "Reloading file watcher: " << root_dir;
-            user_db.create(root_dir);
-            file_watcher.removeWatch(watch);
-            watch = file_watcher.addWatch(root_dir.u8string(), this, true);
-            file_watcher.watch();
-        }
     }
 
     // called from file watcher thread
@@ -109,12 +94,78 @@ struct FileWatcher::Impl final : public efsw::FileWatchListener,
     }
 
     CommandQueue& commands;
-    UserConfig& user_config;
     fs::path root_dir;
     UserDb& user_db;
     const FileProcessor& file_processor;
     efsw::FileWatcher file_watcher;
     efsw::WatchID watch;
+};
+
+} // namespace
+
+struct FileWatcher::Impl final : UserConfig::Observer
+{
+    Impl(CommandQueue& commands,
+         UserConfig& user_config,
+         UserDb& user_db,
+         const FileProcessor& file_processor)
+        : commands{commands}
+        , user_config{user_config}
+        , user_db{user_db}
+        , file_processor{file_processor}
+    {
+        user_config.add_observer(*this);
+        user_config_changed(user_config);
+    }
+
+    ~Impl()
+    {
+        user_config.remove_observer(*this);
+    }
+
+    void
+    user_config_changed(const UserConfig&) override
+    {
+        // find dirs that don't need watching anymore
+        std::set<fs::path> trash;
+        for (const auto& [dir, s] : watchers)
+        {
+            if (user_config.root_dirs().find(dir) ==
+                user_config.root_dirs().end())
+            {
+                trash.emplace(dir);
+            }
+        }
+        for (const auto& dir : trash)
+        {
+            watchers.erase(dir);
+            user_db.remove_root_dir(dir);
+        }
+        // add new dirs that need watching
+        for (const auto& dir : user_config.root_dirs())
+        {
+            if (watchers.find(dir) == watchers.end())
+            {
+                user_db.add_root_dir(dir);
+                try
+                {
+                    watchers.emplace(
+                        dir,
+                        std::make_unique<Watcher>(
+                            commands, dir, user_db, file_processor));
+                }
+                catch (...)
+                {
+                }
+            }
+        }
+    }
+
+    CommandQueue& commands;
+    UserConfig& user_config;
+    UserDb& user_db;
+    const FileProcessor& file_processor;
+    std::map<fs::path, std::unique_ptr<Watcher>> watchers;
 }; // namespace vca
 
 FileWatcher::FileWatcher(CommandQueue& commands,

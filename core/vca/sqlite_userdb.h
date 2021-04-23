@@ -22,10 +22,13 @@ public:
     path() const override;
 
     void
-    create(const fs::path& root_dir) override;
+    create(const std::set<fs::path>& root_dir) override;
 
-    virtual std::string
-    property(const std::string& key) const override;
+    void
+    add_root_dir(const fs::path& root_dir) override;
+
+    void
+    remove_root_dir(const fs::path& root_dir) override;
 
     void
     update_file(const fs::path& path, const FileContents& contents) override;

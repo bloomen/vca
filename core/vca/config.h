@@ -29,8 +29,8 @@ public:
 
     ~UserConfig();
 
-    const fs::path&
-    root_dir() const;
+    const std::set<fs::path>&
+    root_dirs() const;
 
     void
     add_observer(Observer& observer);

@@ -51,11 +51,10 @@ main(const int, char**)
 
         vca::UserConfig user_config{commands,
                                     work_dir / "user_config" / "user.json"};
-        VCA_INFO << "User root dir: " << user_config.root_dir();
 
         vca::SqliteUserDb user_db{work_dir / "user_data" / "user.db",
                                   vca::UserDb::OpenType::ReadWrite};
-        user_db.create(user_config.root_dir());
+        user_db.create(user_config.root_dirs());
 
         vca::FileProcessor file_processor{app_config};
         file_processor.add_tokenizer(

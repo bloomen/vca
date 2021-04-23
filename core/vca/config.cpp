@@ -16,6 +16,16 @@ using json = nlohmann::json;
 namespace vca
 {
 
+namespace
+{
+
+struct Keys
+{
+    constexpr static const char* const root_dirs = "root_dirs";
+};
+
+} // namespace
+
 struct UserConfig::Impl : public efsw::FileWatchListener
 {
     Impl(CommandQueue& commands, UserConfig& user_config, fs::path path)
@@ -53,6 +63,46 @@ struct UserConfig::Impl : public efsw::FileWatchListener
     }
 
     void
+    normalize_root_dirs()
+    {
+        std::set<fs::path> trash;
+        for (const auto& dir : root_dirs)
+        {
+            for (const auto& dir_ref : root_dirs)
+            {
+                if (dir != dir_ref)
+                {
+                    if (is_parent_of(dir_ref, dir))
+                    {
+                        VCA_ERROR << dir << " is a child dir of: " << dir_ref;
+                        trash.emplace(dir);
+                    }
+                }
+            }
+        }
+        for (const auto& dir : trash)
+        {
+            root_dirs.erase(dir);
+        }
+    }
+
+    bool
+    valid_root_dir(const fs::path& path)
+    {
+        if (!fs::exists(path))
+        {
+            VCA_ERROR << "root_dir does not exist: " << path;
+            return false;
+        }
+        if (!path.is_absolute())
+        {
+            VCA_ERROR << "root_dir is not absolute: " << path;
+            return false;
+        }
+        return true;
+    }
+
+    void
     read()
     {
         json j;
@@ -62,26 +112,41 @@ struct UserConfig::Impl : public efsw::FileWatchListener
             j = json::parse(file);
             VCA_CHECK(!file.bad());
         }
-        root_dir = fs::u8path(j["root_dir"].get<std::string>());
+        root_dirs.clear();
+        for (const auto& dir : j[Keys::root_dirs])
+        {
+            auto path = fs::u8path(dir.get<std::string>());
+            if (!valid_root_dir(path))
+            {
+                continue;
+            }
+            root_dirs.emplace(std::move(path));
+        }
+        normalize_root_dirs();
     }
 
     void
     populate()
     {
-        root_dir = user_documents_dir();
-        if (!fs::exists(root_dir))
+        auto dir = user_documents_dir();
+        if (!fs::exists(dir))
         {
-            root_dir = root_dir.parent_path();
-            VCA_CHECK(fs::exists(root_dir))
-                << "root dir does not exist: " << root_dir;
+            dir = dir.parent_path();
+            VCA_CHECK(valid_root_dir(dir));
         }
+        root_dirs.emplace(std::move(dir));
     }
 
     void
     write() const
     {
         json j;
-        j["root_dir"] = root_dir.u8string();
+        auto dirs = json::array();
+        for (const auto& dir : root_dirs)
+        {
+            dirs.push_back(dir.u8string());
+        }
+        j[Keys::root_dirs] = dirs;
         std::ofstream{path} << j;
     }
 
@@ -106,11 +171,6 @@ struct UserConfig::Impl : public efsw::FileWatchListener
                 VCA_INFO << "User config modified";
                 std::lock_guard<FileLock> lock{file_lock};
                 read();
-                if (!fs::exists(root_dir))
-                {
-                    VCA_ERROR << "root_dir does not exist: " << root_dir;
-                    return;
-                }
                 for (auto& observer : observers)
                 {
                     observer->user_config_changed(user_config);
@@ -155,7 +215,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
     UserConfig& user_config;
     fs::path path;
     FileLock file_lock;
-    fs::path root_dir;
+    std::set<fs::path> root_dirs;
     std::set<UserConfig::Observer*> observers;
     efsw::FileWatcher file_watcher;
     efsw::WatchID watch;
@@ -168,10 +228,10 @@ UserConfig::UserConfig(CommandQueue& commands, fs::path path)
 
 UserConfig::~UserConfig() = default;
 
-const fs::path&
-UserConfig::root_dir() const
+const std::set<fs::path>&
+UserConfig::root_dirs() const
 {
-    return m_impl->root_dir;
+    return m_impl->root_dirs;
 }
 
 void

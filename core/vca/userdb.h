@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include <string>
 #include <vector>
 
@@ -28,10 +29,13 @@ public:
     path() const = 0;
 
     virtual void
-    create(const fs::path& root_dir) = 0;
+    create(const std::set<fs::path>& root_dirs) = 0;
 
-    virtual std::string
-    property(const std::string& key) const = 0;
+    virtual void
+    add_root_dir(const fs::path& root_dir) = 0;
+
+    virtual void
+    remove_root_dir(const fs::path& root_dir) = 0;
 
     virtual void
     update_file(const fs::path& path, const FileContents& contents) = 0;
