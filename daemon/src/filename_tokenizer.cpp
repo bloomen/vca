@@ -5,6 +5,12 @@
 namespace vca
 {
 
+bool
+FilenameTokenizer::contents_supported(const String&) const
+{
+    return false;
+}
+
 std::vector<String>
 FilenameTokenizer::extract(const FileData& data) const
 {

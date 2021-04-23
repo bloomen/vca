@@ -50,12 +50,6 @@ public:
 
     VCA_DELETE_COPY(AppConfig)
     VCA_DEFAULT_MOVE(AppConfig)
-
-    const std::set<String>&
-    extensions() const;
-
-private:
-    std::set<String> m_extensions = {U".txt"};
 };
 
 } // namespace vca

@@ -25,8 +25,19 @@ FileProcessor::process(const fs::path& file) const
     const auto filename_stem = file.filename().stem().u32string();
     auto filename_ext = file.extension().u32string();
     to_lower_case(filename_ext);
+
+    bool contents_supported = false;
+    for (const auto& tokenizer : m_tokenizers)
+    {
+        if (tokenizer->contents_supported(filename_ext))
+        {
+            contents_supported = true;
+            break;
+        }
+    }
+
     std::optional<std::vector<String>> initial_contents;
-    if (m_app_config.extensions().count(filename_ext) > 0)
+    if (contents_supported)
     {
         initial_contents = std::vector<String>{};
         std::ifstream f{file};

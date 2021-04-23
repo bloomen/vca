@@ -5,10 +5,26 @@
 namespace vca
 {
 
+TxtTokenizer::TxtTokenizer(const String& exts)
+{
+    std::list<String> values;
+    split(values, exts);
+    for (auto& v : values)
+    {
+        m_exts.emplace(std::move(v));
+    }
+}
+
+bool
+TxtTokenizer::contents_supported(const String& filename_ext) const
+{
+    return m_exts.count(filename_ext) > 0;
+}
+
 std::vector<String>
 TxtTokenizer::extract(const FileData& data) const
 {
-    if (data.filename_ext != U".txt")
+    if (!contents_supported(data.filename_ext))
     {
         return {};
     }
