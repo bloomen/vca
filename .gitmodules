@@ -31,6 +31,3 @@
 [submodule "third_party/zip"]
 	path = third_party/zip
 	url = git@github.com:kuba--/zip.git
-[submodule "third_party/duckx"]
-	path = third_party/duckx
-	url = git@github.com:amiremohamadi/DuckX.git
