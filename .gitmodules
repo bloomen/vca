@@ -25,3 +25,12 @@
 [submodule "third_party/tiny-utf8"]
 	path = third_party/tiny-utf8
 	url = https://github.com/DuffsDevice/tiny-utf8
+[submodule "third_party/pugixml"]
+	path = third_party/pugixml
+	url = git@github.com:zeux/pugixml.git
+[submodule "third_party/zip"]
+	path = third_party/zip
+	url = git@github.com:kuba--/zip.git
+[submodule "third_party/duckx"]
+	path = third_party/duckx
+	url = git@github.com:amiremohamadi/DuckX.git
