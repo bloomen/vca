@@ -93,7 +93,7 @@ TEST(string, split)
 {
     const vca::String str = U"你好  martin kühn";
     std::list<vca::String> vec;
-    vca::split(vec, str);
+    vca::split(vec, str, vca::space_char());
     std::list<vca::String> vec_exp{U"你好", U"martin", U"kühn"};
     ASSERT_EQ(vec_exp, vec);
 }
@@ -102,7 +102,7 @@ TEST(string, split_withNoDelims)
 {
     const vca::String str = U"你好martinkühn";
     std::list<vca::String> vec;
-    vca::split(vec, str);
+    vca::split(vec, str, vca::space_char());
     std::list<vca::String> vec_exp{U"你好martinkühn"};
     ASSERT_EQ(vec_exp, vec);
 }
@@ -111,7 +111,7 @@ TEST(string, split_withEmpyStr)
 {
     const vca::String str;
     std::list<vca::String> vec;
-    vca::split(vec, str);
+    vca::split(vec, str, vca::space_char());
     std::list<vca::String> vec_exp;
     ASSERT_EQ(vec_exp, vec);
 }

@@ -32,12 +32,35 @@ const std::unordered_set<Char>&
 special_chars()
 {
     static const std::unordered_set<Char> specials{
-        U'_',  U'-',  U',',  U'.',  U'?',  U'!',  U';',  U':', U'(',  U')',
-        U'{',  U'}',  U'[',  U']',  U'~',  U'`',  U'@',  U'#', U'$',  U'%',
-        U'^',  U'&',  U'*',  U'+',  U'=',  U'|',  U'\\', U'/', U'"',  U'\'',
-        U'<',  U'>',  U'\t', U'\r', U'\n', U'。', U'，', U'·', U'《', U'》',
-        U'（', U'）', U'？', U'“',  U'”',  U'、', U'‘',  U'’', U'…'};
+        U'\x3001', U'\xff1f', U'\xff09', U'\x2026', U'\xff08', U'\x3002',
+        U'\xff0c', U'\x9',    U'\x3e',   U'\x3c',   U'\x2019', U'\x27',
+        U'\x22',   U'\x7c',   U'\x3d',   U'\x201d', U'\x2b',   U'\x201c',
+        U'\xb7',   U'\x2a',   U'\x2018', U'\x26',   U'\x2f',   U'\x5e',
+        U'\x25',   U'\x24',   U'\x23',   U'\x40',   U'\x60',   U'\x300b',
+        U'\x7e',   U'\x300a', U'\x7d',   U'\x7b',   U'\x29',   U'\x28',
+        U'\x3a',   U'\x3b',   U'\x21',   U'\x3f',   U'\x5d',   U'\x2e',
+        U'\x5b',   U'\x2c',   U'\x5c',   U'\x2d',   U'\x5f'};
     return specials;
+}
+
+const std::unordered_set<Char>&
+end_of_line_chars()
+{
+    static const std::unordered_set<Char> eols{
+        U'\xa', U'\xb', U'\xc', U'\xd', U'\x85', U'\x2028', U'\x2029'};
+    return eols;
+}
+
+Char
+line_feed_char()
+{
+    return U'\xa';
+}
+
+Char
+space_char()
+{
+    return U'\x20';
 }
 
 void

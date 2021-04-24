@@ -26,9 +26,9 @@ TxtTokenizer::extract(const fs::path& file) const
         }
     }
 
-    replace_all(one_line, {U'\r', U'\025', U'\036'}, U'\n');
+    replace_all(one_line, end_of_line_chars(), line_feed_char());
     std::list<String> lines;
-    split(lines, one_line, U'\n');
+    split(lines, one_line, line_feed_char());
 
     one_line.clear();
     for (const auto& line : lines)
@@ -43,11 +43,11 @@ TxtTokenizer::extract(const fs::path& file) const
         }
     }
 
-    replace_all(one_line, special_chars(), U' ');
+    replace_all(one_line, special_chars(), space_char());
 
     std::vector<String> words;
     std::list<String> tokens;
-    split(tokens, one_line);
+    split(tokens, one_line, space_char());
     for (auto& t : tokens)
     {
         trim(t);

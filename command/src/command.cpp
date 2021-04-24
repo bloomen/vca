@@ -44,7 +44,7 @@ main(const int, char**)
             vca::trim(wide_input);
 
             std::list<vca::String> values;
-            vca::split(values, wide_input);
+            vca::split(values, wide_input, vca::space_char());
 
             if (values.front() == U"q") // quit
             {

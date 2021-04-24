@@ -21,6 +21,15 @@ wide_to_narrow(const String& wide);
 const std::unordered_set<Char>&
 special_chars();
 
+const std::unordered_set<Char>&
+end_of_line_chars();
+
+Char
+line_feed_char();
+
+Char
+space_char();
+
 void
 to_lower_case(String& str);
 
@@ -34,7 +43,7 @@ void
 replace_all(String& str, const std::unordered_set<Char>& chars, Char with);
 
 void
-split(std::list<String>& vec, const String& str, Char delimiter = U' ');
+split(std::list<String>& vec, const String& str, Char delimiter);
 
 void
 trim(String& str);
