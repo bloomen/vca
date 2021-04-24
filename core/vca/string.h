@@ -48,4 +48,20 @@ split(std::list<String>& vec, const String& str, Char delimiter);
 void
 trim(String& str);
 
+class XMLParser
+{
+public:
+    explicit XMLParser(const std::string& content);
+
+    bool
+    end() const;
+
+    String
+    next();
+
+private:
+    const std::string& m_content;
+    int m_index = 0;
+};
+
 } // namespace vca

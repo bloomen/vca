@@ -8,16 +8,22 @@
 namespace vca
 {
 
+namespace
+{
+
+constexpr size_t g_max_byte_count = 8192;
+
+}
+
 std::vector<String>
 TxtTokenizer::extract(const fs::path& file) const
 {
     String one_line;
     {
         std::ifstream f{file, std::ios_base::binary};
-        constexpr size_t max_byte_count = 8192;
         try
         {
-            one_line = read_text(f, max_byte_count);
+            one_line = read_text(f, g_max_byte_count);
         }
         catch (...)
         {

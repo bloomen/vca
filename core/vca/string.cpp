@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <codecvt>
+#include <map>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/spirit/include/qi_char_class.hpp>
@@ -13,6 +14,25 @@
 
 namespace vca
 {
+
+namespace
+{
+
+void
+xml_unescape(std::string& text)
+{
+    static const std::map<std::string, std::string> str_map{{"&amp;", "&"},
+                                                            {"&quot;", "\""},
+                                                            {"&apos;", "'"},
+                                                            {"&lt;", "<"},
+                                                            {"&gt;", ">"}};
+    for (const auto& [from, to] : str_map)
+    {
+        boost::replace_all(text, from, to);
+    }
+}
+
+} // namespace
 
 String
 narrow_to_wide(const std::string& narrow)
@@ -129,6 +149,46 @@ trim(String& str)
         str,
         boost::is_any_of(U"\x2000\x2001\x2002\x2003\x2004\x2005\x2006\x2007"
                          U"\x2009\x200A\x2028\x2029\x202f\x205f\x3000"));
+}
+
+XMLParser::XMLParser(const std::string& content)
+    : m_content{content}
+{
+}
+
+bool
+XMLParser::end() const
+{
+    return static_cast<size_t>(m_index + 1) >= m_content.size();
+}
+
+String
+XMLParser::next()
+{
+    constexpr char start_tag = '>';
+    constexpr char end_tag = '<';
+    int start_index = -1;
+    int end_index = -1;
+    while (!end())
+    {
+        if (m_content[m_index] == start_tag)
+        {
+            start_index = m_index + 1;
+        }
+        else if (start_index >= 0 && m_content[m_index] == end_tag)
+        {
+            end_index = m_index - 1;
+            break;
+        }
+        ++m_index;
+    }
+    if (start_index >= end_index)
+    {
+        return {};
+    }
+    auto text = m_content.substr(start_index, end_index - start_index);
+    xml_unescape(text);
+    return narrow_to_wide(text);
 }
 
 } // namespace vca

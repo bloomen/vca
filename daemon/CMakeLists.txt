@@ -20,6 +20,7 @@ target_link_libraries(vca_daemon_lib
     efsw
     gcl
     vca_core
+    zip
 )
 
 add_executable(vca_daemon
