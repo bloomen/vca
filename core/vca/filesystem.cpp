@@ -42,4 +42,15 @@ is_parent_of(const fs::path& parent, const fs::path& child)
     return child_it != child.end();
 }
 
+String
+read_text(std::istream& f, const size_t max_byte_count)
+{
+    VCA_CHECK(f.good());
+    std::string data(max_byte_count, 0);
+    f.read(data.data(), data.size());
+    const auto byte_count = f.gcount();
+    data.resize(byte_count);
+    return narrow_to_wide(data);
+}
+
 } // namespace vca

@@ -14,10 +14,10 @@
 #include <vca/time.h>
 #include <vca/utils.h>
 
+#include "docx_tokenizer.h"
 #include "file_processor.h"
 #include "file_scanner.h"
 #include "file_watcher.h"
-#include "filename_tokenizer.h"
 #include "txt_tokenizer.h"
 
 std::atomic<int> g_signal_status{0};
@@ -57,14 +57,10 @@ main(const int, char**)
         user_db.create(user_config.root_dirs());
 
         vca::FileProcessor file_processor{app_config};
-        file_processor.add_tokenizer(
-            std::make_unique<vca::FilenameTokenizer>());
-        file_processor.add_tokenizer(
-            std::make_unique<vca::TxtTokenizer>(U".txt"));
-        file_processor.add_tokenizer(
-            std::make_unique<vca::TxtTokenizer>(U".json"));
-        file_processor.add_tokenizer(
-            std::make_unique<vca::TxtTokenizer>(U".xml"));
+        file_processor.set_default_tokenizer(
+            std::make_unique<vca::TxtTokenizer>());
+        file_processor.add_tokenizer(U".docx",
+                                     std::make_unique<vca::DocxTokenizer>());
 
         vca::FileWatcher file_watcher{
             commands, user_config, user_db, file_processor};

@@ -1,35 +1,37 @@
 #include "txt_tokenizer.h"
 
-#include <vca/string.h>
+#include <fstream>
+
+#include <vca/filesystem.h>
+#include <vca/logging.h>
 
 namespace vca
 {
 
-TxtTokenizer::TxtTokenizer(String ext)
-    : m_ext{std::move(ext)}
-{
-}
-
-bool
-TxtTokenizer::contents_supported(const String& filename_ext) const
-{
-    return m_ext == filename_ext;
-}
-
 std::vector<String>
-TxtTokenizer::extract(const FileData& data) const
+TxtTokenizer::extract(const fs::path& file) const
 {
-    if (!contents_supported(data.filename_ext))
+    String one_line;
     {
-        return {};
-    }
-    if (!data.initial_contents)
-    {
-        return {};
+        std::ifstream f{file, std::ios_base::binary};
+        constexpr size_t max_byte_count = 8192;
+        try
+        {
+            one_line = read_text(f, max_byte_count);
+        }
+        catch (...)
+        {
+            VCA_DEBUG << "Read text failed for: " << file;
+            return {};
+        }
     }
 
-    String one_line;
-    for (const auto& line : *data.initial_contents)
+    replace_all(one_line, {U'\r', U'\025', U'\036'}, U'\n');
+    std::list<String> lines;
+    split(lines, one_line, U'\n');
+
+    one_line.clear();
+    for (const auto& line : lines)
     {
         if (line.back() == U'-')
         {

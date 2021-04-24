@@ -32,11 +32,11 @@ const std::unordered_set<Char>&
 special_chars()
 {
     static const std::unordered_set<Char> specials{
-        U'_',  U'-', U',',  U'.',  U'?',  U'!', U';',  U':',  U'(',  U')',
-        U'{',  U'}', U'[',  U']',  U'~',  U'`', U'@',  U'#',  U'$',  U'%',
-        U'^',  U'&', U'*',  U'+',  U'=',  U'|', U'\\', U'/',  U'"',  U'\'',
-        U'<',  U'>', U'\t', U'。', U'，', U'·', U'《', U'》', U'（', U'）',
-        U'？', U'“', U'”',  U'、', U'‘',  U'’', U'…'};
+        U'_',  U'-',  U',',  U'.',  U'?',  U'!',  U';',  U':', U'(',  U')',
+        U'{',  U'}',  U'[',  U']',  U'~',  U'`',  U'@',  U'#', U'$',  U'%',
+        U'^',  U'&',  U'*',  U'+',  U'=',  U'|',  U'\\', U'/', U'"',  U'\'',
+        U'<',  U'>',  U'\t', U'\r', U'\n', U'。', U'，', U'·', U'《', U'》',
+        U'（', U'）', U'？', U'“',  U'”',  U'、', U'‘',  U'’', U'…'};
     return specials;
 }
 
