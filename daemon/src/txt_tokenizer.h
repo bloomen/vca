@@ -10,7 +10,7 @@ namespace vca
 class TxtTokenizer : public Tokenizer
 {
 public:
-    explicit TxtTokenizer(const String& exts);
+    explicit TxtTokenizer(String ext);
 
     bool
     contents_supported(const String& filename_ext) const override;
@@ -19,7 +19,7 @@ public:
     extract(const FileData& data) const override;
 
 private:
-    std::set<String> m_exts;
+    String m_ext;
 };
 
 } // namespace vca

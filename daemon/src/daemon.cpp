@@ -60,7 +60,11 @@ main(const int, char**)
         file_processor.add_tokenizer(
             std::make_unique<vca::FilenameTokenizer>());
         file_processor.add_tokenizer(
-            std::make_unique<vca::TxtTokenizer>(U".txt .json .xml"));
+            std::make_unique<vca::TxtTokenizer>(U".txt"));
+        file_processor.add_tokenizer(
+            std::make_unique<vca::TxtTokenizer>(U".json"));
+        file_processor.add_tokenizer(
+            std::make_unique<vca::TxtTokenizer>(U".xml"));
 
         vca::FileWatcher file_watcher{
             commands, user_config, user_db, file_processor};
