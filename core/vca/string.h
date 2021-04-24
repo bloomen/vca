@@ -48,6 +48,9 @@ split(std::list<String>& vec, const String& str, Char delimiter);
 void
 trim(String& str);
 
+void
+xml_unescape(String& text);
+
 class XMLParser
 {
 public:

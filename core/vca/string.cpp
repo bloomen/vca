@@ -15,25 +15,6 @@
 namespace vca
 {
 
-namespace
-{
-
-void
-xml_unescape(std::string& text)
-{
-    static const std::map<std::string, std::string> str_map{{"&amp;", "&"},
-                                                            {"&quot;", "\""},
-                                                            {"&apos;", "'"},
-                                                            {"&lt;", "<"},
-                                                            {"&gt;", ">"}};
-    for (const auto& [from, to] : str_map)
-    {
-        boost::replace_all(text, from, to);
-    }
-}
-
-} // namespace
-
 String
 narrow_to_wide(const std::string& narrow)
 {
@@ -151,6 +132,20 @@ trim(String& str)
                          U"\x2009\x200A\x2028\x2029\x202f\x205f\x3000"));
 }
 
+void
+xml_unescape(String& text)
+{
+    static const std::map<String, String> str_map{{U"&amp;", U"&"},
+                                                  {U"&quot;", U"\""},
+                                                  {U"&apos;", U"'"},
+                                                  {U"&lt;", U"<"},
+                                                  {U"&gt;", U">"}};
+    for (const auto& [from, to] : str_map)
+    {
+        boost::replace_all(text, from, to);
+    }
+}
+
 XMLParser::XMLParser(const std::string& content)
     : m_content{content}
 {
@@ -186,9 +181,10 @@ XMLParser::next()
     {
         return {};
     }
-    auto text = m_content.substr(start_index, end_index - start_index);
-    xml_unescape(text);
-    return narrow_to_wide(text);
+    const auto text = m_content.substr(start_index, end_index - start_index);
+    auto wide_text = narrow_to_wide(text);
+    xml_unescape(wide_text);
+    return wide_text;
 }
 
 } // namespace vca

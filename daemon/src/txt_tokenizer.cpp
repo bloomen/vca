@@ -49,6 +49,7 @@ TxtTokenizer::extract(const fs::path& file) const
         }
     }
 
+    xml_unescape(one_line);
     replace_all(one_line, special_chars(), space_char());
 
     std::vector<String> words;
