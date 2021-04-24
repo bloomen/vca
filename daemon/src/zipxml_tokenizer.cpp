@@ -1,4 +1,4 @@
-#include "docx_tokenizer.h"
+#include "zipxml_tokenizer.h"
 
 #include <vca/logging.h>
 #include <vca/string.h>
@@ -15,8 +15,12 @@ constexpr size_t g_max_byte_count = 8192;
 
 }
 
+ZipxmlTokenizer::ZipxmlTokenizer(std::string entry)
+    : m_entry{std::move(entry)}
+{}
+
 std::vector<String>
-DocxTokenizer::extract(const fs::path& file) const
+ZipxmlTokenizer::extract(const fs::path& file) const
 {
     auto zip_file = zip_open(file.u8string().c_str(), 0, 'r');
     if (!zip_file)
@@ -24,7 +28,7 @@ DocxTokenizer::extract(const fs::path& file) const
         VCA_ERROR << "Could not open zip file: " << file;
         return {};
     }
-    if (zip_entry_open(zip_file, "word/document.xml"))
+    if (zip_entry_open(zip_file, m_entry.c_str()))
     {
         VCA_ERROR << "Could not open zip entry in: " << file;
         zip_close(zip_file);

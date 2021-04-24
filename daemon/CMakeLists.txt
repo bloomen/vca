@@ -3,8 +3,6 @@ include_directories(
 )
 
 add_library(vca_daemon_lib
-    src/docx_tokenizer.h
-    src/docx_tokenizer.cpp
     src/file_processor.h
     src/file_processor.cpp
     src/file_scanner.h
@@ -14,6 +12,8 @@ add_library(vca_daemon_lib
     src/tokenizer.h
     src/txt_tokenizer.h
     src/txt_tokenizer.cpp
+    src/zipxml_tokenizer.h
+    src/zipxml_tokenizer.cpp
 )
 
 target_link_libraries(vca_daemon_lib

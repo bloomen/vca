@@ -14,11 +14,11 @@
 #include <vca/time.h>
 #include <vca/utils.h>
 
-#include "docx_tokenizer.h"
 #include "file_processor.h"
 #include "file_scanner.h"
 #include "file_watcher.h"
 #include "txt_tokenizer.h"
+#include "zipxml_tokenizer.h"
 
 std::atomic<int> g_signal_status{0};
 
@@ -59,8 +59,12 @@ main(const int, char**)
         vca::FileProcessor file_processor{app_config};
         file_processor.set_default_tokenizer(
             std::make_unique<vca::TxtTokenizer>());
-        file_processor.add_tokenizer(U".docx",
-                                     std::make_unique<vca::DocxTokenizer>());
+        file_processor.add_tokenizer(
+            U".docx",
+            std::make_unique<vca::ZipxmlTokenizer>("word/document.xml"));
+        file_processor.add_tokenizer(
+            U".xlsx",
+            std::make_unique<vca::ZipxmlTokenizer>("xl/sharedStrings.xml"));
 
         vca::FileWatcher file_watcher{
             commands, user_config, user_db, file_processor};
