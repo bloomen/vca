@@ -59,6 +59,8 @@ main(const int, char**)
         vca::FileProcessor file_processor{app_config};
         file_processor.set_default_tokenizer(
             std::make_unique<vca::TxtTokenizer>());
+        file_processor.add_tokenizer(U".xml",
+                                     std::make_unique<vca::TxtTokenizer>(true));
         file_processor.add_tokenizer(
             U".docx",
             std::make_unique<vca::ZipxmlTokenizer>("word/document.xml"));

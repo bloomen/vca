@@ -187,4 +187,28 @@ XMLParser::next()
     return wide_text;
 }
 
+std::vector<String>
+tokenize(String line)
+{
+    replace_all(line, special_chars(), space_char());
+
+    std::vector<String> words;
+    std::list<String> tokens;
+    split(tokens, line, space_char());
+    for (auto& t : tokens)
+    {
+        trim(t);
+        if (t.size() <= 1)
+        {
+            continue;
+        }
+        if (is_numeric(t))
+        {
+            continue;
+        }
+        words.emplace_back(std::move(t));
+    }
+    return words;
+}
+
 } // namespace vca

@@ -3,6 +3,7 @@
 #include <list>
 #include <string>
 #include <unordered_set>
+#include <vector>
 
 #include "platform.h"
 
@@ -66,5 +67,8 @@ private:
     const std::string& m_content;
     int m_index = 0;
 };
+
+std::vector<String>
+tokenize(String line);
 
 } // namespace vca

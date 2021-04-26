@@ -15,6 +15,11 @@ constexpr size_t g_max_byte_count = 8192;
 
 }
 
+TxtTokenizer::TxtTokenizer(const bool xml_unescape)
+    : m_xml_unescape{xml_unescape}
+{
+}
+
 std::vector<String>
 TxtTokenizer::extract(const fs::path& file) const
 {
@@ -49,26 +54,11 @@ TxtTokenizer::extract(const fs::path& file) const
         }
     }
 
-    xml_unescape(one_line);
-    replace_all(one_line, special_chars(), space_char());
-
-    std::vector<String> words;
-    std::list<String> tokens;
-    split(tokens, one_line, space_char());
-    for (auto& t : tokens)
+    if (m_xml_unescape)
     {
-        trim(t);
-        if (t.size() <= 1)
-        {
-            continue;
-        }
-        if (is_numeric(t))
-        {
-            continue;
-        }
-        words.emplace_back(std::move(t));
+        xml_unescape(one_line);
     }
-    return words;
+    return tokenize(std::move(one_line));
 }
 
 } // namespace vca
