@@ -52,29 +52,8 @@ ZipxmlTokenizer::extract(const fs::path& file) const
         return {};
     }
 
-    XMLParser parser{content};
-
-    String one_line;
-    size_t byte_count = 0;
-    while (!parser.end() && byte_count < g_max_byte_count)
-    {
-        const auto line = parser.next();
-        if (line.empty())
-        {
-            continue;
-        }
-        byte_count += line.size() * 4;
-        if (line.back() == U'-')
-        {
-            one_line.insert(one_line.end(), line.begin(), line.end() - 1);
-        }
-        else
-        {
-            one_line += line + U" ";
-        }
-    }
-
-    return tokenize(std::move(one_line));
+    auto tag_content = xml_tag_content(content, g_max_byte_count);
+    return tokenize(std::move(tag_content));
 }
 
 } // namespace vca

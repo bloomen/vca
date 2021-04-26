@@ -68,6 +68,9 @@ private:
     int m_index = 0;
 };
 
+String
+xml_tag_content(const std::string& content, size_t max_byte_count);
+
 std::vector<String>
 tokenize(String line);
 

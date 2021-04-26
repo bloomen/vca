@@ -187,6 +187,36 @@ XMLParser::next()
     return wide_text;
 }
 
+String
+xml_tag_content(const std::string& content, const size_t max_byte_count)
+{
+    XMLParser parser{content};
+
+    String one_line;
+    size_t byte_count = 0;
+    while (!parser.end() && byte_count < max_byte_count)
+    {
+        auto line = parser.next();
+        trim(line);
+        if (line.empty())
+        {
+            continue;
+        }
+        byte_count += line.size() * 4;
+        if (line.back() == U'-')
+        {
+            one_line.insert(one_line.end(), line.begin(), line.end() - 1);
+        }
+        else
+        {
+            one_line += line + U" ";
+        }
+    }
+
+    xml_unescape(one_line);
+    return one_line;
+}
+
 std::vector<String>
 tokenize(String line)
 {

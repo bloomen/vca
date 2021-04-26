@@ -18,6 +18,7 @@
 #include "file_scanner.h"
 #include "file_watcher.h"
 #include "txt_tokenizer.h"
+#include "xml_tokenizer.h"
 #include "zipxml_tokenizer.h"
 
 std::atomic<int> g_signal_status{0};
@@ -61,6 +62,8 @@ main(const int, char**)
             std::make_unique<vca::TxtTokenizer>());
         file_processor.add_tokenizer(U".xml",
                                      std::make_unique<vca::TxtTokenizer>(true));
+        file_processor.add_tokenizer(U".svg",
+                                     std::make_unique<vca::XmlTokenizer>());
         file_processor.add_tokenizer(
             U".docx",
             std::make_unique<vca::ZipxmlTokenizer>("word/document.xml"));

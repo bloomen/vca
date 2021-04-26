@@ -28,7 +28,7 @@ TxtTokenizer::extract(const fs::path& file) const
         std::ifstream f{file, std::ios_base::binary};
         try
         {
-            one_line = read_text(f, g_max_byte_count);
+            one_line = narrow_to_wide(read_text(f, g_max_byte_count * 2));
         }
         catch (...)
         {
