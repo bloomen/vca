@@ -38,6 +38,7 @@ ZipxmlTokenizer::extract(const fs::path& file) const
 
     void* buf = nullptr;
     size_t size;
+    // TODO: Replace with only reading the first little bit of the file
     zip_entry_read(zip_file, &buf, &size);
 
     zip_entry_close(zip_file);
