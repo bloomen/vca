@@ -37,12 +37,18 @@ add_subdirectory(third_party/tiny-utf8)
 add_subdirectory(third_party/SQLiteCpp)
 add_subdirectory(third_party/zip)
 
+include_directories(
+    third_party/zlib
+)
+add_subdirectory(third_party/zlib)
+
 find_package(Boost 1.71.0 COMPONENTS date_time)
 add_definitions(-DBOOST_ALL_NO_LIB)
 add_definitions(-DVCA_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 
 include_directories(
     ${Boost_INCLUDE_DIRS}
+    ${CMAKE_BINARY_DIR}/third_party/zlib
     third_party/concurrentqueue
     third_party/efsw/include
     third_party/gcl/include

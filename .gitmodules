@@ -31,3 +31,6 @@
 [submodule "third_party/zip"]
 	path = third_party/zip
 	url = git@github.com:kuba--/zip.git
+[submodule "third_party/zlib"]
+	path = third_party/zlib
+	url = git@github.com:bloomen/zlib.git

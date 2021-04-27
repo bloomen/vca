@@ -21,6 +21,8 @@ add_library(vca_core
     vca/userdb.cpp
     vca/utils.h
     vca/utils.cpp
+    vca/zip_inflater.h
+    vca/zip_inflater.cpp
 )
 
 target_link_libraries(vca_core
@@ -30,7 +32,7 @@ target_link_libraries(vca_core
     spdlog
     sqlite3
     SQLiteCpp
-    tinyutf8
+    zlib
 )
 
 add_executable(vca_core_test
