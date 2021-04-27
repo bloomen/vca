@@ -2,8 +2,7 @@
 
 #include <vca/logging.h>
 #include <vca/string.h>
-
-#include <zip.h>
+#include <vca/zip_inflater.h>
 
 namespace vca
 {
@@ -23,34 +22,12 @@ ZipxmlTokenizer::ZipxmlTokenizer(std::string entry)
 std::vector<String>
 ZipxmlTokenizer::extract(const fs::path& file) const
 {
-    auto zip_file = zip_open(file.u8string().c_str(), 0, 'r');
-    if (!zip_file)
-    {
-        VCA_ERROR << "Could not open zip file: " << file;
-        return {};
-    }
-    if (zip_entry_open(zip_file, m_entry.c_str()))
-    {
-        VCA_ERROR << "Could not open zip entry in: " << file;
-        zip_close(zip_file);
-        return {};
-    }
+    ZipInflater zip_inflater{file, g_max_byte_count, m_entry};
 
-    void* buf = nullptr;
-    size_t size;
-    // TODO: Replace with only reading the first little bit of the file
-    zip_entry_read(zip_file, &buf, &size);
-
-    zip_entry_close(zip_file);
-    zip_close(zip_file);
-    const std::string content(static_cast<char*>(buf),
-                              static_cast<char*>(buf) + size);
-    free(buf);
-
-    if (!buf || !size)
+    std::string content;
+    while (!zip_inflater.end())
     {
-        VCA_ERROR << "Reading from zip file failed: " << file;
-        return {};
+        content += zip_inflater.next();
     }
 
     auto tag_content = xml_tag_content(content, g_max_byte_count);
