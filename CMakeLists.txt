@@ -31,9 +31,7 @@ add_subdirectory(third_party/gcl)
 add_subdirectory(third_party/googletest)
 add_subdirectory(third_party/nlohmann_json)
 add_subdirectory(third_party/PlatformFolders)
-add_subdirectory(third_party/pugixml)
 add_subdirectory(third_party/spdlog)
-add_subdirectory(third_party/tiny-utf8)
 add_subdirectory(third_party/SQLiteCpp)
 add_subdirectory(third_party/zip)
 
@@ -55,9 +53,7 @@ include_directories(
     third_party/googletest/googletest/include
     third_party/nlohmann_json/single_include
     third_party/PlatformFolders
-    third_party/pugixml/src
     third_party/spdlog/include
-    third_party/tiny-utf8/include
     third_party/SQLiteCpp/include
     third_party/zip/src
 )
