@@ -100,9 +100,15 @@ ZipInflater::ZipInflater(const fs::path& file,
 ZipInflater::~ZipInflater() = default;
 
 const std::string&
-ZipInflater::get() const
+ZipInflater::get() const&
 {
     return m_impl->buffer.data;
+}
+
+std::string&&
+ZipInflater::get() &&
+{
+    return std::move(m_impl->buffer.data);
 }
 
 } // namespace vca

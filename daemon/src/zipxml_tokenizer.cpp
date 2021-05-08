@@ -22,8 +22,18 @@ ZipxmlTokenizer::ZipxmlTokenizer(std::string entry)
 std::vector<String>
 ZipxmlTokenizer::extract(const fs::path& file) const
 {
-    ZipInflater zip_inflater{file, g_max_byte_count, m_entry};
-    auto tag_content = xml_tag_content(zip_inflater.get(), g_max_byte_count);
+    std::string content;
+    try
+    {
+        content = ZipInflater{file, g_max_byte_count, m_entry}.get();
+    }
+    catch (...)
+    {
+        VCA_DEBUG << "Zip inflate failed for: " << file;
+        return {};
+    }
+
+    auto tag_content = xml_tag_content(content, g_max_byte_count);
     return tokenize(std::move(tag_content));
 }
 

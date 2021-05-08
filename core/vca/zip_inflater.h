@@ -21,7 +21,10 @@ public:
     ~ZipInflater();
 
     const std::string&
-    get() const;
+    get() const&;
+
+    std::string&&
+    get() &&;
 
 private:
     struct Impl;
