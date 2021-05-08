@@ -20,11 +20,8 @@ public:
 
     ~ZipInflater();
 
-    bool
-    end() const;
-
-    std::string
-    next();
+    const std::string&
+    get() const;
 
 private:
     struct Impl;
