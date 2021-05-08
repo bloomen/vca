@@ -17,6 +17,7 @@
 #include "file_processor.h"
 #include "file_scanner.h"
 #include "file_watcher.h"
+#include "pdf_tokenizer.h"
 #include "txt_tokenizer.h"
 #include "xml_tokenizer.h"
 #include "zipxml_tokenizer.h"
@@ -70,6 +71,8 @@ main(const int, char**)
         file_processor.add_tokenizer(
             U".xlsx",
             std::make_unique<vca::ZipxmlTokenizer>("xl/sharedStrings.xml"));
+        file_processor.add_tokenizer(U".pdf",
+                                     std::make_unique<vca::PdfTokenizer>(""));
 
         vca::FileWatcher file_watcher{
             commands, user_config, user_db, file_processor};

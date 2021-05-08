@@ -9,6 +9,8 @@ add_library(vca_daemon_lib
     src/file_scanner.cpp
     src/file_watcher.h
     src/file_watcher.cpp
+    src/pdf_tokenizer.h
+    src/pdf_tokenizer.cpp
     src/tokenizer.h
     src/txt_tokenizer.h
     src/txt_tokenizer.cpp
