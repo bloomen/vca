@@ -8,13 +8,10 @@ namespace vca
 class PdfTokenizer : public Tokenizer
 {
 public:
-    explicit PdfTokenizer(std::string entry);
+    PdfTokenizer() = default;
 
     std::vector<String>
     extract(const fs::path& file) const override;
-
-private:
-    std::string m_entry;
 };
 
 } // namespace vca

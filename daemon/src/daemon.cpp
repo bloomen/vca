@@ -72,7 +72,7 @@ main(const int, char**)
             U".xlsx",
             std::make_unique<vca::ZipxmlTokenizer>("xl/sharedStrings.xml"));
         file_processor.add_tokenizer(U".pdf",
-                                     std::make_unique<vca::PdfTokenizer>(""));
+                                     std::make_unique<vca::PdfTokenizer>());
 
         vca::FileWatcher file_watcher{
             commands, user_config, user_db, file_processor};

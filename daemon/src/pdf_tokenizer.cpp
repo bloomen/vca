@@ -14,11 +14,6 @@ constexpr size_t g_max_byte_count = 8192;
 
 }
 
-PdfTokenizer::PdfTokenizer(std::string entry)
-    : m_entry{std::move(entry)}
-{
-}
-
 std::vector<String>
 PdfTokenizer::extract(const fs::path&) const
 {
