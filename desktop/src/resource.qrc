@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>desktop.qml</file>
+        <file>AppInput.qml</file>
+        <file>AppOutput.qml</file>
+    </qresource>
+</RCC>

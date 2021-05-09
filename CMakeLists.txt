@@ -85,5 +85,6 @@ else()
 endif()
 
 add_subdirectory(core)
-add_subdirectory(daemon)
 add_subdirectory(command)
+add_subdirectory(daemon)
+add_subdirectory(desktop)
