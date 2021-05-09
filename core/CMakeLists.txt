@@ -1,4 +1,6 @@
 add_library(vca_core
+    vca/async.h
+    vca/async.cpp
     vca/case_mappings.h
     vca/case_mappings.cpp
     vca/config.h
