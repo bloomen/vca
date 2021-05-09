@@ -6,46 +6,24 @@ Window {
     visible: true
     width: 640
     height: 480
-    title: qsTr("Hello World")
+    title: qsTr("Search Me")
 
     Column {
+        anchors.centerIn: parent
         spacing: 20
 
-        Button {
-            text: "button1"
-            property int value
-            onClicked: {
-                value += 1;
-                appModel.update("/settings/foo", value);
-            }
-            Component.onCompleted: {
-                value = appModel.defaultValue("/settings/foo")
+        TextField {
+            width: 400
+            placeholderText: qsTr("What are you looking for?")
+            onAccepted: {
+                appModel.update("/search/input", text);
             }
         }
 
         Label {
             AppOutput {
-                endpoint: "/settings/foo"
+                endpoint: "/search/output"
                 onUpdated: parent.text = value
-            }
-        }
-
-        Label {
-            AppOutput {
-                endpoint: "/settings/bar"
-                onUpdated: parent.text = value
-            }
-        }
-
-        Slider {
-            minimumValue: 1
-            maximumValue: 100
-            AppInput {
-                endpoint: "/settings/bar"
-                value: parent.value
-            }
-            Component.onCompleted: {
-                value = appModel.defaultValue("/settings/bar")
             }
         }
 

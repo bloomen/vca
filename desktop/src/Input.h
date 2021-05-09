@@ -39,9 +39,9 @@ private:
     void
     setValue(const QVariant& value);
 
-    Model* model_{};
-    QString endpoint_;
-    QVariant value_;
+    Model* m_model{};
+    QString m_endpoint;
+    QVariant m_value;
 };
 
 } // namespace app

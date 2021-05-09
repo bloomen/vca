@@ -40,9 +40,9 @@ public:
 
 private:
     std::map<QString, std::unique_ptr<Handler>>
-        handlers_; // endpoint -> handler
+        m_handlers; // endpoint -> handler
     std::map<QString, std::set<Listener*>>
-        listeners_; // endpoint -> set(listener)
+        m_listeners; // endpoint -> set(listener)
 };
 
 } // namespace app

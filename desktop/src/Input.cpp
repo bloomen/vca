@@ -8,35 +8,35 @@ void
 Input::componentComplete()
 {
     QQuickItem::componentComplete();
-    if (value_.isValid())
+    if (m_value.isValid())
     {
-        setValue(value_);
+        setValue(m_value);
     }
 }
 
 Model*
 Input::model() const
 {
-    return model_;
+    return m_model;
 }
 
 void
 Input::setModel(Model* model)
 {
     Q_ASSERT(model);
-    model_ = model;
+    m_model = model;
 }
 
 const QString&
 Input::endpoint() const
 {
-    return endpoint_;
+    return m_endpoint;
 }
 
 void
 Input::setEndpoint(const QString& endpoint)
 {
-    endpoint_ = endpoint;
+    m_endpoint = endpoint;
 }
 
 QVariant
@@ -44,12 +44,12 @@ Input::value() const
 {
     if (isComponentComplete())
     {
-        Q_ASSERT(model_);
-        return model_->get(endpoint_);
+        Q_ASSERT(m_model);
+        return m_model->get(m_endpoint);
     }
     else
     {
-        return value_;
+        return m_value;
     }
 }
 
@@ -58,12 +58,12 @@ Input::setValue(const QVariant& value)
 {
     if (isComponentComplete())
     {
-        Q_ASSERT(model_);
-        model_->update(endpoint_, value);
+        Q_ASSERT(m_model);
+        m_model->update(m_endpoint, value);
     }
     else
     {
-        value_ = value;
+        m_value = value;
     }
 }
 

@@ -1,8 +1,8 @@
 #include "HandlerFactory.h"
 #include "Model.h"
 
-#include "handler/SettingsBar.h"
-#include "handler/SettingsFoo.h"
+#include "handler/SearchInput.h"
+#include "handler/SearchOutput.h"
 
 namespace
 {
@@ -25,11 +25,12 @@ namespace app
 {
 
 std::vector<std::unique_ptr<Handler>>
-makeHandlers(Model& model)
+makeHandlers(Model& model, const vca::UserDb& user_db)
 {
     std::vector<std::unique_ptr<Handler>> handlers;
-    insertHandler<handler::SettingsBar>(handlers, model);
-    insertHandler<handler::SettingsFoo>(handlers, model);
+    auto& search_input = insertHandler<handler::SearchInput>(handlers, model);
+    search_input.set_user_db(user_db);
+    insertHandler<handler::SearchOutput>(handlers, model);
     return handlers;
 }
 

@@ -19,10 +19,10 @@ add_executable(vca_desktop
     src/Handler.cpp
     src/HandlerFactory.h
     src/HandlerFactory.cpp
-    src/handler/SettingsBar.h
-    src/handler/SettingsBar.cpp
-    src/handler/SettingsFoo.h
-    src/handler/SettingsFoo.cpp
+    src/handler/SearchInput.h
+    src/handler/SearchInput.cpp
+    src/handler/SearchOutput.h
+    src/handler/SearchOutput.cpp
     src/Input.h
     src/Input.cpp
     src/Model.h

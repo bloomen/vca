@@ -54,6 +54,10 @@ protected:
     QVariant
     get(const QString& endpoint) const;
 
+    // Sets the value of a specific endpoint.
+    void
+    set(const QString& endpoint, const QVariant& variant);
+
     // Adds a new listener to the model.
     void
     addListener(const QString& endpoint, Listener& listener);
@@ -63,9 +67,9 @@ protected:
     removeListener(const QString& endpoint, Listener& listener);
 
 private:
-    Model* model_{};
-    QVariant default_value_;
-    QVariant value_;
+    Model* m_model{};
+    QVariant m_default_value;
+    QVariant m_value;
 };
 
 } // namespace app

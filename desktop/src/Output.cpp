@@ -6,16 +6,16 @@ namespace app
 
 Output::~Output()
 {
-    Q_ASSERT(model_);
-    model_->removeListener(endpoint_, *this);
+    Q_ASSERT(m_model);
+    m_model->removeListener(m_endpoint, *this);
 }
 
 void
 Output::componentComplete()
 {
     QQuickItem::componentComplete();
-    Q_ASSERT(model_);
-    model_->addListener(endpoint_, *this);
+    Q_ASSERT(m_model);
+    m_model->addListener(m_endpoint, *this);
 }
 
 void
@@ -27,26 +27,26 @@ Output::valueChanged(const QVariant& value, bool)
 Model*
 Output::model() const
 {
-    return model_;
+    return m_model;
 }
 
 void
 Output::setModel(Model* model)
 {
     Q_ASSERT(model);
-    model_ = model;
+    m_model = model;
 }
 
 const QString&
 Output::endpoint() const
 {
-    return endpoint_;
+    return m_endpoint;
 }
 
 void
 Output::setEndpoint(const QString& endpoint)
 {
-    endpoint_ = endpoint;
+    m_endpoint = endpoint;
 }
 
 } // namespace app

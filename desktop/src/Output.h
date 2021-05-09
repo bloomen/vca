@@ -42,8 +42,8 @@ private:
     void
     setEndpoint(const QString& endpoint);
 
-    Model* model_{};
-    QString endpoint_;
+    Model* m_model{};
+    QString m_endpoint;
 };
 
 } // namespace app

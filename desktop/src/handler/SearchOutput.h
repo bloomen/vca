@@ -7,10 +7,10 @@ namespace app
 namespace handler
 {
 
-class SettingsBar : public Handler
+class SearchOutput : public Handler
 {
 public:
-    SettingsBar();
+    SearchOutput();
 
     QString
     endpoint() const override;

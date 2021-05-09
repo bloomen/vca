@@ -6,14 +6,14 @@ namespace app
 void
 ModelImpl::setHandlers(std::vector<std::unique_ptr<Handler>> handlers)
 {
-    Q_ASSERT(handlers_.empty());
+    Q_ASSERT(m_handlers.empty());
     for (auto& handler : handlers)
     {
-        Q_ASSERT(handlers_.find(handler->endpoint()) ==
-                 handlers_.end()); // endpoint handler cannot exist yet
-        handlers_[handler->endpoint()] = std::move(handler);
+        Q_ASSERT(m_handlers.find(handler->endpoint()) ==
+                 m_handlers.end()); // endpoint handler cannot exist yet
+        m_handlers[handler->endpoint()] = std::move(handler);
     }
-    for (auto& handler_pair : handlers_)
+    for (auto& handler_pair : m_handlers)
     {
         addListener(handler_pair.first, *(handler_pair.second));
     }
@@ -22,15 +22,15 @@ ModelImpl::setHandlers(std::vector<std::unique_ptr<Handler>> handlers)
 void
 ModelImpl::update(const QString& endpoint, const QVariant& value, bool input)
 {
-    auto handler_pair = handlers_.find(endpoint);
-    if (handler_pair != handlers_.end())
+    auto handler_pair = m_handlers.find(endpoint);
+    if (handler_pair != m_handlers.end())
     {
         auto& handler = handler_pair->second;
         if (value != handler->get())
         {
             handler->setValue(value);
-            auto listener_pair = listeners_.find(endpoint);
-            if (listener_pair != listeners_.end())
+            auto listener_pair = m_listeners.find(endpoint);
+            if (listener_pair != m_listeners.end())
             {
                 for (auto listener : listener_pair->second)
                 {
@@ -48,8 +48,8 @@ ModelImpl::update(const QString& endpoint, const QVariant& value, bool input)
 QVariant
 ModelImpl::defaultValue(const QString& endpoint) const
 {
-    auto handler_pair = handlers_.find(endpoint);
-    if (handler_pair != handlers_.end())
+    auto handler_pair = m_handlers.find(endpoint);
+    if (handler_pair != m_handlers.end())
     {
         return handler_pair->second->defaultValue();
     }
@@ -63,8 +63,8 @@ ModelImpl::defaultValue(const QString& endpoint) const
 QVariant
 ModelImpl::get(const QString& endpoint) const
 {
-    auto handler_pair = handlers_.find(endpoint);
-    if (handler_pair != handlers_.end())
+    auto handler_pair = m_handlers.find(endpoint);
+    if (handler_pair != m_handlers.end())
     {
         return handler_pair->second->get();
     }
@@ -79,7 +79,7 @@ void
 ModelImpl::addListener(const QString& endpoint, Listener& listener)
 {
     listener.valueChanged(get(endpoint), false);
-    auto& listeners = listeners_[endpoint];
+    auto& listeners = m_listeners[endpoint];
     Q_ASSERT(listeners.find(&listener) ==
              listeners.end()); // listener must not be added yet
     listeners.insert(&listener);
@@ -88,8 +88,8 @@ ModelImpl::addListener(const QString& endpoint, Listener& listener)
 void
 ModelImpl::removeListener(const QString& endpoint, Listener& listener)
 {
-    auto listener_pair = listeners_.find(endpoint);
-    if (listener_pair != listeners_.end())
+    auto listener_pair = m_listeners.find(endpoint);
+    if (listener_pair != m_listeners.end())
     {
         Q_ASSERT(listener_pair->second.find(&listener) !=
                  listener_pair->second.end()); // listener must be present
