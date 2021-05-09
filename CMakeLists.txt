@@ -18,7 +18,7 @@ set(BUILD_TESTING OFF)
 set(CMAKE_DISABLE_TESTING ON)
 set(SQLITE_ENABLE_COLUMN_METADATA)
 
-if (MSVC)
+if(MSVC)
     set(CompilerFlags
         CMAKE_CXX_FLAGS
         CMAKE_CXX_FLAGS_DEBUG
@@ -65,7 +65,7 @@ include_directories(
     third_party/zip/src
 )
 
-if (MSVC)
+if(MSVC)
     add_compile_options(/W4 /bigobj /EHsc /wd4503 /wd4996 /wd4702 /wd4100 /wd4706 /wd26812 /wd4373)
     if(${MSVC_VERSION} GREATER_EQUAL 1929)
         if(vca_enable_asan)
