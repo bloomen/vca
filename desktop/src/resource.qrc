@@ -1,7 +1,27 @@
 <RCC>
     <qresource prefix="/">
-        <file>desktop.qml</file>
-        <file>AppInput.qml</file>
-        <file>AppOutput.qml</file>
+        <file>view/font/OpenSans-Bold.ttf</file>
+        <file>view/font/OpenSans-BoldItalic.ttf</file>
+        <file>view/font/OpenSans-ExtraBold.ttf</file>
+        <file>view/font/OpenSans-ExtraBoldItalic.ttf</file>
+        <file>view/font/OpenSans-Light.ttf</file>
+        <file>view/font/OpenSans-LightItalic.ttf</file>
+        <file>view/font/OpenSans-Regular.ttf</file>
+        <file>view/font/OpenSans-RegularItalic.ttf</file>
+        <file>view/font/OpenSans-SemiBold.ttf</file>
+        <file>view/font/OpenSans-SemiBoldItalic.ttf</file>
+        <file>view/img/logo.svg</file>
+        <file>view/qml/qmldir</file>
+        <file>view/qml/Main.qml</file>
+        <file>view/qml/VcaInput.qml</file>
+        <file>view/qml/VcaOutput.qml</file>
+        <file>view/qml/VcaInputField.qml</file>
+        <file>view/qml/Style.qml</file>
+        <file>view/qml/VcaImage.qml</file>
+        <file>view/qml/VcaButton.qml</file>
+        <file>view/qml/VcaBlocker.qml</file>
+        <file>view/qml/VcaCheckBox.qml</file>
+        <file>view/qml/VcaComboBox.qml</file>
+        <file>view/qml/VcaLabel.qml</file>
     </qresource>
 </RCC>

@@ -6,23 +6,24 @@ Window {
     visible: true
     width: 640
     height: 480
-    title: qsTr("Search Me")
+    title: qsTr("SearchMe")
 
     Column {
         anchors.centerIn: parent
         spacing: 20
 
-        TextField {
+        VcaInputField {
             width: 400
             placeholderText: qsTr("What are you looking for?")
-            onAccepted: {
-                appModel.update("/search/input", text);
+            onTextChanged: {
+                vcaModel.setValue("/search", "input", text);
             }
         }
 
-        Label {
-            AppOutput {
-                endpoint: "/search/output"
+        VcaLabel {
+            VcaOutput {
+                endpoint: "/search"
+                node: "result"
                 onUpdated: parent.text = value
             }
         }
