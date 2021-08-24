@@ -5,7 +5,7 @@ import "."
 Rectangle {
     id: inputField
     color: "white"
-    height: 25
+    height: 35
     width: 200
     radius: Style.radius
 
@@ -24,7 +24,9 @@ Rectangle {
     VcaLabel {
         verticalAlignment: Qt.AlignVCenter
         anchors.fill: parent
-        anchors.leftMargin: 5
+        anchors.margins: 5
+        anchors.leftMargin: 10
+        anchors.rightMargin: 30
         visible: inputField.placeholderText.length > 0 && textInput.text.length === 0
         text: inputField.placeholderText
         color: "lightgrey"
@@ -34,8 +36,9 @@ Rectangle {
         id: textInput
         verticalAlignment: Qt.AlignVCenter
         anchors.fill: parent
-        anchors.leftMargin: 5
-        anchors.rightMargin: 5
+        anchors.margins: 5
+        anchors.leftMargin: 10
+        anchors.rightMargin: 30
         echoMode: inputField.echoMode
         selectByMouse: true
         selectionColor: Style.dim(Style.colorPrimary)
@@ -43,5 +46,21 @@ Rectangle {
         color: Style.textColorNormal
         font.family: Style.fontRegular.name
         font.pointSize: Style.fontSizeNormal
+    }
+
+    Label {
+        visible: textInput.text.length > 0
+        anchors.right: parent.right
+        anchors.top: parent.top
+        anchors.bottom: parent.bottom
+        anchors.margins: 10
+        text: "X"
+        color: Style.colorPrimary
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                textInput.clear();
+            }
+        }
     }
 }

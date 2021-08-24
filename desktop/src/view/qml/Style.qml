@@ -21,7 +21,7 @@ QtObject {
 
     readonly property color colorBackground: rgba(211, 211, 211, 1)
 
-    readonly property color colorPrimary: rgba(252, 92, 99, 1)
+    readonly property color colorPrimary: rgba(128, 0, 128, 1)
     readonly property color colorSecondary: rgba(224, 255, 255, 1)
     readonly property color colorTertiary: rgba(105, 105, 105, 1)
 

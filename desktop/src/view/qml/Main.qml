@@ -1,19 +1,23 @@
 import QtQuick 2.6
 import QtQuick.Controls 1.0
 import QtQuick.Window 2.2
+import QtQuick.Layouts 1.3
 
 Window {
     visible: true
-    width: 640
-    height: 480
-    title: vcaModel.appName() + qsTr("- find anything!")
+    minimumWidth: 640
+    minimumHeight: 480
+    title: vcaModel.appName() + qsTr(" - find anything!")
 
-    Column {
-        anchors.centerIn: parent
-        spacing: 20
+    ColumnLayout {
+        anchors.fill: parent
+        anchors.margins: 30
 
         VcaInputField {
-            width: 400
+            border.color: Style.colorPrimary
+            border.width: 1
+            width: 500
+            Layout.alignment: Qt.AlignCenter | Qt.AlignTop
             placeholderText: qsTr("What are you looking for?")
             onTextChanged: {
                 vcaModel.setValue("/search", "input", text);
@@ -21,12 +25,13 @@ Window {
         }
 
         VcaLabel {
+            Layout.fillWidth: true
+            Layout.alignment: Qt.AlignHLeft | Qt.AlignTop
             VcaOutput {
                 endpoint: "/search"
                 node: "result"
                 onUpdated: parent.text = value
             }
         }
-
     }
 }
