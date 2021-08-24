@@ -45,6 +45,11 @@ Model::~Model()
 {
 }
 
+QString Model::appName() const
+{
+    return mSettings.applicationName();
+}
+
 void
 Model::addHandler(std::unique_ptr<Handler> handler)
 {

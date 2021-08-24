@@ -55,7 +55,7 @@ main(int argc, char** argv)
     MEGA_REGISTER_QT_METATYPE(QList<quint64>);
     MEGA_REGISTER_QT_METATYPE(QList<QString>);
 
-    qtc::Model model{"Vca", "SearchMe"};
+    qtc::Model model{"Vca", "Findle"};
     qtc::ThreadPool threadPool{std::thread::hardware_concurrency()};
 
     qtc::CommandQueue mainQueue;

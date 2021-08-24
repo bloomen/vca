@@ -6,7 +6,7 @@ Window {
     visible: true
     width: 640
     height: 480
-    title: qsTr("SearchMe")
+    title: vcaModel.appName() + qsTr("- find anything!")
 
     Column {
         anchors.centerIn: parent

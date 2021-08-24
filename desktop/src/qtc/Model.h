@@ -31,6 +31,9 @@ public:
 
     Q_DISABLE_COPY(Model)
 
+    Q_INVOKABLE QString
+    appName() const;
+
     void
     addHandler(std::unique_ptr<Handler> handler);
 
