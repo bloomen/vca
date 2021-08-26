@@ -24,14 +24,26 @@ Window {
             }
         }
 
-        VcaLabel {
-            Layout.fillWidth: true
-            Layout.alignment: Qt.AlignHLeft | Qt.AlignTop
-            VcaOutput {
-                endpoint: "/search"
-                node: "result"
-                onUpdated: parent.text = value
+        VcaOutput {
+            id: result_count
+            endpoint: "/search"
+            node: "result_count"
+        }
+
+        VcaOutput {
+            id: result_files
+            endpoint: "/search"
+            node: "result_files"
+        }
+
+        ColumnLayout {
+            Repeater {
+                model: result_count.value
+                Label {
+                    text: result_files.value[index] ? result_files.value[index] : ""
+                }
             }
         }
     }
+
 }

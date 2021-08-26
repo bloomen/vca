@@ -15,6 +15,7 @@ class Output : public QQuickItem
     Q_PROPERTY(Model* model READ getModel WRITE setModel)
     Q_PROPERTY(QString endpoint READ getEndpoint WRITE setEndpoint)
     Q_PROPERTY(QString node READ getNode WRITE setNode)
+    Q_PROPERTY(QVariant value READ getValue NOTIFY valueChanged)
 public:
     Output() = default;
     ~Output();
@@ -23,7 +24,7 @@ public:
 
 signals:
     void
-    updated(const QVariant& value);
+    valueChanged(const QVariant&);
 
 private:
     void
@@ -44,9 +45,13 @@ private:
     void
     setNode(const QString& node);
 
+    const QVariant&
+    getValue() const;
+
     Model* mModel{};
     QString mEndpoint;
     QString mNode;
+    QVariant mValue;
     const NodeBase::ListenerUnsafe* mListener{};
 };
 

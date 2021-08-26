@@ -17,6 +17,19 @@ struct FileContents
     fromSearch(std::list<String> values);
 };
 
+struct SearchResult
+{
+    fs::path dir;
+    fs::path file;
+    std::string ext;
+
+    bool
+    operator<(const SearchResult& o) const
+    {
+        return std::tie(dir, file, ext) < std::tie(o.dir, o.file, o.ext);
+    }
+};
+
 class UserDb
 {
 public:
@@ -49,7 +62,7 @@ public:
     virtual void
     move_file(const fs::path& old_path, const fs::path& path) = 0;
 
-    virtual std::vector<fs::path>
+    virtual std::vector<SearchResult>
     search(const FileContents& contents) const = 0;
 };
 

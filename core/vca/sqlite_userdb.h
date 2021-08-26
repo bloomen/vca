@@ -39,7 +39,7 @@ public:
     void
     move_file(const fs::path& old_path, const fs::path& path) override;
 
-    std::vector<fs::path>
+    std::vector<SearchResult>
     search(const FileContents& contents) const override;
 
 private:

@@ -226,12 +226,12 @@ SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
     transaction.commit();
 }
 
-std::vector<fs::path>
+std::vector<SearchResult>
 SqliteUserDb::search(const FileContents& contents) const
 {
     std::lock_guard<FileLock> file_lock{m_impl->file_lock};
 
-    std::map<fs::path, size_t> path_map;
+    std::map<SearchResult, size_t> results_map;
     for (const auto& word : contents.words)
     {
         VCA_DEBUG << __func__ << ": " << word;
@@ -245,20 +245,23 @@ SqliteUserDb::search(const FileContents& contents) const
         {
             const auto root_dir = fs::u8path(query_stm.getColumn(0).getText());
             const auto path = fs::u8path(query_stm.getColumn(1).getText());
-            path_map[root_dir / path]++;
+            const auto p = root_dir / path;
+            SearchResult result{
+                p.parent_path(), p.filename(), p.extension().u8string()};
+            results_map[std::move(result)]++;
         }
     }
 
-    std::vector<fs::path> paths;
-    for (const auto& pair : path_map)
+    std::vector<SearchResult> results;
+    for (const auto& pair : results_map)
     {
         if (pair.second == contents.words.size())
         {
-            paths.emplace_back(pair.first);
+            results.emplace_back(pair.first);
         }
     }
 
-    return paths;
+    return results;
 }
 
 } // namespace vca

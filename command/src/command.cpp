@@ -64,12 +64,12 @@ main(const int, char**)
 
                 cmdline->info("Searching ...\n");
                 vca::Timer timer;
-                const auto result = user_db.search(file_contents);
+                const auto results = user_db.search(file_contents);
                 cmdline->info("Search took: {} us\n", timer.us());
 
-                for (const auto& path : result)
+                for (const auto& result : results)
                 {
-                    cmdline->info(path.u8string() + "\n");
+                    cmdline->info((result.dir / result.file).u8string() + "\n");
                 }
             }
             else
