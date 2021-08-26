@@ -23,7 +23,7 @@
 
 #include <view/View.h>
 
-#define MEGA_REGISTER_QT_METATYPE(typeName)                                    \
+#define VCA_REGISTER_QT_METATYPE(typeName)                                     \
     qRegisterMetaType<typeName>();                                             \
     qRegisterMetaTypeStreamOperators<typeName>(#typeName)
 
@@ -47,13 +47,13 @@ main(int argc, char** argv)
 
     QGuiApplication app{argc, argv};
 
-    MEGA_REGISTER_QT_METATYPE(QList<bool>);
-    MEGA_REGISTER_QT_METATYPE(QList<double>);
-    MEGA_REGISTER_QT_METATYPE(QList<qint32>);
-    MEGA_REGISTER_QT_METATYPE(QList<quint32>);
-    MEGA_REGISTER_QT_METATYPE(QList<qint64>);
-    MEGA_REGISTER_QT_METATYPE(QList<quint64>);
-    MEGA_REGISTER_QT_METATYPE(QList<QString>);
+    VCA_REGISTER_QT_METATYPE(QList<bool>);
+    VCA_REGISTER_QT_METATYPE(QList<double>);
+    VCA_REGISTER_QT_METATYPE(QList<qint32>);
+    VCA_REGISTER_QT_METATYPE(QList<quint32>);
+    VCA_REGISTER_QT_METATYPE(QList<qint64>);
+    VCA_REGISTER_QT_METATYPE(QList<quint64>);
+    VCA_REGISTER_QT_METATYPE(QList<QString>);
 
     qtc::Model model{"Vca", "Findle"};
     qtc::ThreadPool threadPool{std::thread::hardware_concurrency()};
