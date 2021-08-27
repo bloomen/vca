@@ -23,6 +23,7 @@ add_library(vca_daemon_lib
 target_link_libraries(vca_daemon_lib
     efsw
     gcl
+    served
     vca_core
     zip
 )
