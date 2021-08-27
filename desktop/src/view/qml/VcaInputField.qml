@@ -54,7 +54,7 @@ Rectangle {
         anchors.top: parent.top
         anchors.bottom: parent.bottom
         anchors.margins: 10
-        text: "X"
+        text: "✘"
         color: Style.colorPrimary
         MouseArea {
             anchors.fill: parent
