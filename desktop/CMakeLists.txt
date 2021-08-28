@@ -40,8 +40,9 @@ add_executable(vca_desktop
 )
 
 target_link_libraries(vca_desktop
-    vca_core
-    restclient-cpp
     Qt5::Qml
     Qt5::Quick
+    restclient-cpp
+    served
+    vca_core
 )

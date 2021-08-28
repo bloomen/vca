@@ -11,7 +11,6 @@
 
 #include <vca/filesystem.h>
 #include <vca/logging.h>
-#include <vca/sqlite_userdb.h>
 
 #include <qtc/CommandQueue.h>
 #include <qtc/Input.h>
@@ -42,9 +41,6 @@ main(int argc, char** argv)
     VCA_INFO << "Starting vca_desktop";
     VCA_INFO << "work_dir: " << work_dir;
 
-    vca::SqliteUserDb user_db{work_dir / "user_data" / "user.db",
-                              vca::UserDb::OpenType::ReadOnly};
-
     QGuiApplication app{argc, argv};
 
     VCA_REGISTER_QT_METATYPE(QList<bool>);
@@ -60,8 +56,8 @@ main(int argc, char** argv)
 
     qtc::CommandQueue mainQueue;
 
-    model.addHandler(std::make_unique<vca::SearchHandler>(
-        model, threadPool, mainQueue, user_db));
+    model.addHandler(
+        std::make_unique<vca::SearchHandler>(model, threadPool, mainQueue));
 
     model.connectHandlers();
 

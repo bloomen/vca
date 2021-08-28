@@ -1,17 +1,21 @@
 #include "SearchHandler.h"
 
+#include <restclient-cpp/restclient.h>
+#include <served/served.hpp>
+
+#include <vca/json.h>
 #include <vca/logging.h>
 #include <vca/time.h>
+
+using json = nlohmann::json;
 
 namespace vca
 {
 
 SearchHandler::SearchHandler(qtc::Model& model,
                              qtc::ThreadPool& threadPool,
-                             qtc::CommandQueue& mainQueue,
-                             const vca::UserDb& user_db)
+                             qtc::CommandQueue& mainQueue)
     : Handler{model, threadPool, mainQueue, "/search"}
-    , m_user_db{&user_db}
 {
 }
 
@@ -29,39 +33,36 @@ SearchHandler::connect()
                 m_result_exts.assignDefault();
                 return;
             }
-            auto wide_input = vca::narrow_to_wide(value.toUtf8().data());
-            vca::trim(wide_input);
-
-            std::list<vca::String> values;
-            vca::split(values, wide_input, vca::space_char());
-
-            if (values.empty())
-            {
-                VCA_INFO << "Empty search string";
-                return;
-            }
-
-            const auto file_contents = vca::FileContents::fromSearch(values);
 
             VCA_INFO << "Searching ...";
             vca::Timer timer;
-            const auto results = m_user_db->search(file_contents);
+            const auto query = "http://127.0.0.1:7777/s?v=" +
+                served::query_escape(value.toStdString());
+            VCA_INFO << "Query: " << query;
+            const auto response = RestClient::get(query);
+            if (response.code != 200)
+            {
+                VCA_ERROR << "Received error code: " << response.code;
+                return;
+            }
             VCA_INFO << "Search took: " << timer.us() << " us";
+            json j = json::parse(response.body);
 
-            const int result_count = static_cast<int>(results.size());
             QList<QString> result_dirs;
             QList<QString> result_files;
             QList<QString> result_exts;
 
-            for (const auto& result : results)
+            for (const auto& result : j["results"])
             {
                 result_dirs.append(
-                    QString::fromUtf8(result.dir.u8string().c_str()));
+                    QString::fromUtf8(result["d"].get<std::string>().c_str()));
                 result_files.append(
-                    QString::fromUtf8(result.file.u8string().c_str()));
-                result_exts.append(QString::fromUtf8(result.ext.c_str()));
+                    QString::fromUtf8(result["f"].get<std::string>().c_str()));
+                result_exts.append(
+                    QString::fromUtf8(result["e"].get<std::string>().c_str()));
             }
 
+            const auto result_count = result_dirs.size();
             m_result_dirs.setValue(std::move(result_dirs));
             m_result_files.setValue(std::move(result_files));
             m_result_exts.setValue(std::move(result_exts));
