@@ -33,6 +33,7 @@ Rectangle {
     }
 
     TextInput {
+        focus: true
         id: textInput
         verticalAlignment: Qt.AlignVCenter
         anchors.fill: parent

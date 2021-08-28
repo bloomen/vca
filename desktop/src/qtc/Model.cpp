@@ -2,7 +2,7 @@
 
 #include "Handler.h"
 
-#include <QtCore/qlogging.h>
+#include <vca/logging.h>
 
 namespace qtc
 {
@@ -38,14 +38,15 @@ makeQmlValue(const QVariant& value)
 Model::Model(const QString& organization, const QString& application)
     : mSettings{organization, application}
 {
-    qInfo("Settings: %s", mSettings.fileName().toUtf8().data());
+    VCA_INFO << "Settings: " << mSettings.fileName().toUtf8().data();
 }
 
 Model::~Model()
 {
 }
 
-QString Model::appName() const
+QString
+Model::appName() const
 {
     return mSettings.applicationName();
 }

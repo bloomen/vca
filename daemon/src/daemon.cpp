@@ -41,13 +41,13 @@ main(const int, char**)
         std::signal(SIGINT, signal_handler);
         std::signal(SIGTERM, signal_handler);
 
-        const auto work_dir = vca::user_config_dir() / "vca";
+        const auto work_dir = vca::user_config_dir() / "findle";
         fs::create_directories(work_dir);
 
-        vca::init_logging(work_dir / "logs" / "vca_daemon.log");
+        vca::init_logging(work_dir / "logs" / "findled.log");
         vca::set_log_level(vca::Logger::Level::Debug);
 
-        VCA_INFO << "Starting vca_daemon";
+        VCA_INFO << "Starting findled";
         VCA_INFO << "work_dir: " << work_dir;
 
         vca::CommandQueue commands;

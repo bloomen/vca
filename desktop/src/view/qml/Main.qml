@@ -13,15 +13,27 @@ Window {
         anchors.fill: parent
         anchors.margins: 30
 
-        VcaInputField {
-            border.color: Style.colorPrimary
-            border.width: 1
-            width: 500
-            Layout.alignment: Qt.AlignCenter | Qt.AlignTop
-            placeholderText: qsTr("What are you looking for?")
-            onTextChanged: {
-                vcaModel.setValue("/search", "input", text);
+        RowLayout {
+            Layout.fillWidth: true
+
+            VcaInputField {
+                Layout.fillWidth: true
+                border.color: Style.colorPrimary
+                border.width: 1
+                Layout.alignment: Qt.AlignCenter | Qt.AlignTop
+                placeholderText: qsTr("What are you looking for?")
+                onTextChanged: {
+                    vcaModel.setValue("/search", "input", text);
+                }
             }
+
+            VcaLabel {
+                Layout.preferredWidth: 20
+                text: "⚙"
+                font.pointSize: Style.fontSizeHuge
+                color: Style.colorPrimary
+            }
+
         }
 
         VcaOutput {
@@ -39,7 +51,7 @@ Window {
         ColumnLayout {
             Repeater {
                 model: result_count.value
-                Label {
+                VcaLabel {
                     text: result_files.value[index] ? result_files.value[index] : ""
                 }
             }
