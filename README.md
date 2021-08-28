@@ -1,5 +1,6 @@
 Prerequisites:
 
+* Curl
 * Boost
 * Qt5.12
 

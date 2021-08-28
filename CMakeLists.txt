@@ -38,6 +38,7 @@ add_subdirectory(third_party/gcl)
 add_subdirectory(third_party/googletest)
 add_subdirectory(third_party/nlohmann_json)
 add_subdirectory(third_party/PlatformFolders)
+add_subdirectory(third_party/restclient-cpp)
 add_subdirectory(third_party/served)
 add_subdirectory(third_party/spdlog)
 add_subdirectory(third_party/SQLiteCpp)
@@ -61,6 +62,7 @@ include_directories(
     third_party/googletest/googletest/include
     third_party/nlohmann_json/single_include
     third_party/PlatformFolders
+    third_party/restclient-cpp/include
     third_party/served/src
     third_party/spdlog/include
     third_party/SQLiteCpp/include
