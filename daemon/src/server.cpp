@@ -12,7 +12,7 @@ Server::Server(vca::CommandQueue& commands,
                UserConfig& user_config,
                const vca::UserDb& user_db,
                const std::string& host,
-               const std::string& port)
+               int port)
     : m_commands{commands}
     , m_user_config{user_config}
     , m_user_db{user_db}
@@ -21,7 +21,24 @@ Server::Server(vca::CommandQueue& commands,
         .get([this](auto&... p) { get_config(p...); })
         .post([this](auto&... p) { set_config(p...); });
     m_mux.handle("/s").get([this](auto&... p) { search(p...); });
-    m_server = std::make_unique<served::net::server>(host, port, m_mux, false);
+    int retry = 0;
+    while (!m_server)
+    {
+        try
+        {
+            m_server = std::make_unique<served::net::server>(
+                host, std::to_string(port), m_mux, false);
+        }
+        catch (const boost::system::system_error&)
+        {
+            ++retry;
+            ++port;
+            if (retry >= 100)
+            {
+                throw;
+            }
+        }
+    }
     m_server->run(std::thread::hardware_concurrency(), false);
     VCA_INFO << "Serving on: " << host << ":" << port;
 }

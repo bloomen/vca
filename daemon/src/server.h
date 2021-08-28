@@ -17,7 +17,7 @@ public:
            UserConfig& user_config,
            const vca::UserDb& user_db,
            const std::string& host,
-           const std::string& port);
+           int port);
 
     VCA_DELETE_COPY(Server)
     VCA_DELETE_MOVE(Server)

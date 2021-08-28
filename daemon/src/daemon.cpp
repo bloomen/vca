@@ -82,7 +82,7 @@ main(const int, char**)
         vca::FileScanner file_scanner{
             commands, user_config, user_db, file_processor};
 
-        vca::Server server{commands, user_config, user_db, "127.0.0.1", "7777"};
+        vca::Server server{commands, user_config, user_db, "127.0.0.1", 7777};
 
         while (g_signal_status == 0)
         {
@@ -98,7 +98,7 @@ main(const int, char**)
         }
 
         VCA_INFO << "Received signal: " << g_signal_status;
-        VCA_INFO << "Terminating daemon";
+        VCA_INFO << "Terminating findled";
         return EXIT_SUCCESS;
     }
     catch (const std::exception& e)
