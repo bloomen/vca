@@ -9,12 +9,17 @@ namespace vca
 {
 
 Server::Server(vca::CommandQueue& commands,
+               UserConfig& user_config,
                const vca::UserDb& user_db,
                const std::string& host,
                const std::string& port)
     : m_commands{commands}
+    , m_user_config{user_config}
     , m_user_db{user_db}
 {
+    m_mux.handle("/c")
+        .get([this](auto&... p) { get_config(p...); })
+        .post([this](auto&... p) { set_config(p...); });
     m_mux.handle("/s").get([this](auto&... p) { search(p...); });
     m_server = std::make_unique<served::net::server>(host, port, m_mux, false);
     m_server->run(std::thread::hardware_concurrency(), false);
@@ -24,6 +29,21 @@ Server::Server(vca::CommandQueue& commands,
 Server::~Server()
 {
     m_server->stop();
+}
+
+void
+Server::get_config(served::response& res, const served::request&)
+{
+    res << m_user_config.as_json();
+    res.set_status(200);
+}
+
+void
+Server::set_config(served::response& res, const served::request& req)
+{
+    const auto json = req.body();
+    m_user_config.set_json(json);
+    res.set_status(200);
 }
 
 void

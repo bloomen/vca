@@ -228,6 +228,28 @@ UserConfig::UserConfig(CommandQueue& commands, fs::path path)
 
 UserConfig::~UserConfig() = default;
 
+std::string
+UserConfig::as_json() const
+{
+    std::lock_guard<FileLock> lock{m_impl->file_lock};
+    std::ifstream file{m_impl->path};
+    VCA_CHECK(file);
+    auto j = json::parse(file); // ensure it's valid json
+    VCA_CHECK(!file.bad());
+    std::ostringstream os;
+    os << j;
+    return os.str();
+}
+
+void
+UserConfig::set_json(const std::string& json)
+{
+    std::lock_guard<FileLock> lock{m_impl->file_lock};
+    auto j = json::parse(json); // ensure it's valid json
+    (void)j;
+    std::ofstream{m_impl->path} << json;
+}
+
 const std::set<fs::path>&
 UserConfig::root_dirs() const
 {

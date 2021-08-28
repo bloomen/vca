@@ -29,6 +29,12 @@ public:
 
     ~UserConfig();
 
+    std::string
+    as_json() const;
+
+    void
+    set_json(const std::string& json);
+
     const std::set<fs::path>&
     root_dirs() const;
 
