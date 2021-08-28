@@ -6,7 +6,6 @@
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <SQLiteCpp/VariadicBind.h>
 
-#include "file_lock.h"
 #include "logging.h"
 #include "utils.h"
 
@@ -36,7 +35,6 @@ struct SqliteUserDb::Impl
     explicit Impl(fs::path path, const UserDb::OpenType open_type)
         : path{make_path(std::move(path))}
         , db{this->path.u8string(), toSQLiteOpenType(open_type)}
-        , file_lock{this->path.parent_path()}
     {
         VCA_CHECK(db.getHandle());
     }
@@ -86,7 +84,6 @@ struct SqliteUserDb::Impl
     int files_id = 0;
     fs::path path;
     SQLite::Database db;
-    FileLock file_lock;
     int roots_id = 0;
     std::map<fs::path, int> root_dirs;
 };
@@ -111,7 +108,6 @@ void
 SqliteUserDb::create(const std::set<fs::path>& root_dirs)
 {
     VCA_INFO << "Create user db";
-    std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
 
     m_impl->db.exec("CREATE TABLE IF NOT EXISTS roots (id INTEGER PRIMARY KEY, "
@@ -146,7 +142,6 @@ SqliteUserDb::add_root_dir(const fs::path& root_dir)
         return;
     }
     VCA_INFO << __func__ << ": " << root_dir;
-    std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
     m_impl->add_root_dir(root_dir);
     transaction.commit();
@@ -160,7 +155,6 @@ SqliteUserDb::remove_root_dir(const fs::path& root_dir)
         return;
     }
     VCA_INFO << __func__ << ": " << root_dir;
-    std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
     m_impl->remove_root_dir(root_dir);
     transaction.commit();
@@ -171,7 +165,6 @@ SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 {
     VCA_DEBUG << __func__ << ": " << path;
     const auto [p, roots_id] = m_impl->relative(path);
-    std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
 
     SQLite::Statement del_stm{
@@ -201,7 +194,6 @@ SqliteUserDb::remove_file(const fs::path& path)
 {
     VCA_DEBUG << __func__ << ": " << path;
     const auto [p, roots_id] = m_impl->relative(path);
-    std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement del_stm{m_impl->db, "DELETE FROM files WHERE path = ?"};
     SQLite::bind(del_stm, p.u8string());
@@ -215,7 +207,6 @@ SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
     VCA_DEBUG << __func__ << ": " << old_path << " - " << path;
     const auto [old_p, old_roots_id] = m_impl->relative(old_path);
     const auto [p, roots_id] = m_impl->relative(path);
-    std::lock_guard<FileLock> file_lock{m_impl->file_lock};
     SQLite::Transaction transaction{m_impl->db};
 
     SQLite::Statement up_stm{
@@ -229,8 +220,6 @@ SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
 std::vector<SearchResult>
 SqliteUserDb::search(const FileContents& contents) const
 {
-    std::lock_guard<FileLock> file_lock{m_impl->file_lock};
-
     std::map<SearchResult, size_t> results_map;
     for (const auto& word : contents.words)
     {

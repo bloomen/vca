@@ -54,10 +54,9 @@ main(const int, char**)
 
         vca::AppConfig app_config;
 
-        vca::UserConfig user_config{commands,
-                                    work_dir / "user_config" / "user.json"};
+        vca::UserConfig user_config{commands, work_dir / "user.json"};
 
-        vca::SqliteUserDb user_db{work_dir / "user_data" / "user.db",
+        vca::SqliteUserDb user_db{work_dir / "user.db",
                                   vca::UserDb::OpenType::ReadWrite};
         user_db.create(user_config.root_dirs());
 

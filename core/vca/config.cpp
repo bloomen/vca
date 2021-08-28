@@ -32,9 +32,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         : commands{commands}
         , user_config{user_config}
         , path{make_path(std::move(path))}
-        , file_lock{this->path.parent_path()}
     {
-        std::lock_guard<FileLock> lock{file_lock};
         if (fs::exists(this->path))
         {
             read();
@@ -169,7 +167,6 @@ struct UserConfig::Impl : public efsw::FileWatchListener
                     return;
                 }
                 VCA_INFO << "User config modified";
-                std::lock_guard<FileLock> lock{file_lock};
                 read();
                 for (auto& observer : observers)
                 {
@@ -186,7 +183,6 @@ struct UserConfig::Impl : public efsw::FileWatchListener
                     return;
                 }
                 VCA_INFO << "User config deleted";
-                std::lock_guard<FileLock> lock{file_lock};
                 populate();
                 write();
             });
@@ -200,7 +196,6 @@ struct UserConfig::Impl : public efsw::FileWatchListener
                     return;
                 }
                 VCA_INFO << "User config moved";
-                std::lock_guard<FileLock> lock{file_lock};
                 populate();
                 write();
             });
@@ -214,7 +209,6 @@ struct UserConfig::Impl : public efsw::FileWatchListener
     CommandQueue& commands;
     UserConfig& user_config;
     fs::path path;
-    FileLock file_lock;
     std::set<fs::path> root_dirs;
     std::set<UserConfig::Observer*> observers;
     efsw::FileWatcher file_watcher;
@@ -231,7 +225,6 @@ UserConfig::~UserConfig() = default;
 std::string
 UserConfig::as_json() const
 {
-    std::lock_guard<FileLock> lock{m_impl->file_lock};
     std::ifstream file{m_impl->path};
     VCA_CHECK(file);
     auto j = json::parse(file); // ensure it's valid json
@@ -244,7 +237,6 @@ UserConfig::as_json() const
 void
 UserConfig::set_json(const std::string& json)
 {
-    std::lock_guard<FileLock> lock{m_impl->file_lock};
     auto j = json::parse(json); // ensure it's valid json
     (void)j;
     std::ofstream{m_impl->path} << json;
