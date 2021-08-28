@@ -20,12 +20,6 @@ CommandQueue::CommandQueue()
 CommandQueue::~CommandQueue() = default;
 
 void
-CommandQueue::push(std::function<void()> cmd)
-{
-    m_impl->queue.enqueue(std::move(cmd));
-}
-
-void
 CommandQueue::sync(const std::atomic<int>& signal_status)
 {
     std::function<void()> cmd;
@@ -33,6 +27,12 @@ CommandQueue::sync(const std::atomic<int>& signal_status)
     {
         cmd();
     }
+}
+
+void
+CommandQueue::push_impl(std::function<void()>&& cmd)
+{
+    m_impl->queue.enqueue(std::move(cmd));
 }
 
 } // namespace vca
