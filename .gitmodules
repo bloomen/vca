@@ -40,3 +40,6 @@
 [submodule "third_party/restclient-cpp"]
 	path = third_party/restclient-cpp
 	url = git@github.com:bloomen/restclient-cpp.git
+[submodule "third_party/sockpp"]
+	path = third_party/sockpp
+	url = https://github.com/bloomen/sockpp

@@ -17,6 +17,8 @@ set(SERVED_BUILD_SHARED OFF)
 set(SERVED_BUILD_STATIC ON)
 set(SERVED_BUILD_TESTS OFF)
 set(SERVED_BUILD_EXAMPLES OFF)
+set(SOCKPP_BUILD_SHARED OFF)
+set(SOCKPP_BUILD_STATIC ON)
 set(SQLITECPP_RUN_CPPLINT OFF)
 set(SQLITE_ENABLE_COLUMN_METADATA)
 set(BUILD_TESTING OFF)
@@ -44,6 +46,7 @@ add_subdirectory(third_party/nlohmann_json)
 add_subdirectory(third_party/PlatformFolders)
 add_subdirectory(third_party/restclient-cpp)
 add_subdirectory(third_party/served)
+add_subdirectory(third_party/sockpp)
 add_subdirectory(third_party/spdlog)
 add_subdirectory(third_party/SQLiteCpp)
 add_subdirectory(third_party/zip)
@@ -68,6 +71,7 @@ include_directories(
     third_party/PlatformFolders
     third_party/restclient-cpp/include
     third_party/served/src
+    third_party/sockpp/include
     third_party/spdlog/include
     third_party/SQLiteCpp/include
     third_party/zip/src

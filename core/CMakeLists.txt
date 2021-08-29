@@ -31,6 +31,7 @@ target_link_libraries(vca_core
     ${Boost_LIBRARIES}
     nlohmann_json
     platform_folders
+    sockpp-static
     spdlog
     sqlite3
     SQLiteCpp
