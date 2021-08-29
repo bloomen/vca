@@ -1,4 +1,4 @@
-#include "server.h"
+#include "http_server.h"
 
 #include <vca/json.h>
 #include <vca/logging.h>
@@ -8,14 +8,16 @@ using json = nlohmann::json;
 namespace vca
 {
 
-Server::Server(vca::CommandQueue& commands,
-               UserConfig& user_config,
-               const vca::UserDb& user_db,
-               const std::string& host,
-               int port)
+HttpServer::HttpServer(vca::CommandQueue& commands,
+                       UserConfig& user_config,
+                       const vca::UserDb& user_db,
+                       std::string host,
+                       int port)
     : m_commands{commands}
     , m_user_config{user_config}
     , m_user_db{user_db}
+    , m_host{std::move(host)}
+    , m_port{port}
 {
     m_mux.handle("/c")
         .get([this](auto&... p) { get_config(p...); })
@@ -27,12 +29,12 @@ Server::Server(vca::CommandQueue& commands,
         try
         {
             m_server = std::make_unique<served::net::server>(
-                host, std::to_string(port), m_mux, false);
+                m_host, std::to_string(m_port), m_mux, false);
         }
         catch (const boost::system::system_error&)
         {
             ++retry;
-            ++port;
+            ++m_port;
             if (retry >= 100)
             {
                 throw;
@@ -40,23 +42,36 @@ Server::Server(vca::CommandQueue& commands,
         }
     }
     m_server->run(std::thread::hardware_concurrency(), false);
-    VCA_INFO << "Serving on: " << host << ":" << port;
+    VCA_INFO << "Serving on: " << m_host << ":" << m_port;
 }
 
-Server::~Server()
+const std::string&
+HttpServer::host() const
 {
+    return m_host;
+}
+
+int
+HttpServer::port() const
+{
+    return m_port;
+}
+
+HttpServer::~HttpServer()
+{
+    VCA_INFO << "Exiting HttpServer";
     m_server->stop();
 }
 
 void
-Server::get_config(served::response& res, const served::request&)
+HttpServer::get_config(served::response& res, const served::request&)
 {
     res << m_user_config.as_json();
     res.set_status(200);
 }
 
 void
-Server::set_config(served::response& res, const served::request& req)
+HttpServer::set_config(served::response& res, const served::request& req)
 {
     const auto json = req.body();
     m_user_config.set_json(json);
@@ -64,7 +79,7 @@ Server::set_config(served::response& res, const served::request& req)
 }
 
 void
-Server::search(served::response& res, const served::request& req)
+HttpServer::search(served::response& res, const served::request& req)
 {
     const auto value = req.query.get("v");
 

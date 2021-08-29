@@ -10,19 +10,24 @@
 namespace vca
 {
 
-class Server
+class HttpServer
 {
 public:
-    Server(vca::CommandQueue& commands,
-           UserConfig& user_config,
-           const vca::UserDb& user_db,
-           const std::string& host,
-           int port);
+    HttpServer(vca::CommandQueue& commands,
+               UserConfig& user_config,
+               const vca::UserDb& user_db,
+               std::string host,
+               int port);
 
-    VCA_DELETE_COPY(Server)
-    VCA_DELETE_MOVE(Server)
+    const std::string&
+    host() const;
+    int
+    port() const;
 
-    ~Server();
+    VCA_DELETE_COPY(HttpServer)
+    VCA_DELETE_MOVE(HttpServer)
+
+    ~HttpServer();
 
 private:
     void
@@ -35,6 +40,8 @@ private:
     vca::CommandQueue& m_commands;
     UserConfig& m_user_config;
     const vca::UserDb& m_user_db;
+    std::string m_host;
+    int m_port;
     served::multiplexer m_mux;
     std::unique_ptr<served::net::server> m_server;
 };

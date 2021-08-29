@@ -9,13 +9,15 @@ add_library(vca_daemon_lib
     src/file_scanner.cpp
     src/file_watcher.h
     src/file_watcher.cpp
+    src/http_server.h
+    src/http_server.cpp
     src/pdf_tokenizer.h
     src/pdf_tokenizer.cpp
     src/tokenizer.h
-    src/server.h
-    src/server.cpp
     src/txt_tokenizer.h
     src/txt_tokenizer.cpp
+    src/uds_server.h
+    src/uds_server.cpp
     src/xml_tokenizer.h
     src/xml_tokenizer.cpp
     src/zipxml_tokenizer.h
@@ -25,6 +27,7 @@ add_library(vca_daemon_lib
 target_link_libraries(vca_daemon_lib
     efsw
     gcl
+    sockpp-static
     served
     vca_core
     zip

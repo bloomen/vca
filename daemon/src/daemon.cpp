@@ -6,8 +6,6 @@
 #include <thread>
 #include <vector>
 
-#include <served/served.hpp>
-
 #include <vca/command_queue.h>
 #include <vca/config.h>
 #include <vca/filesystem.h>
@@ -19,9 +17,10 @@
 #include "file_processor.h"
 #include "file_scanner.h"
 #include "file_watcher.h"
+#include "http_server.h"
 #include "pdf_tokenizer.h"
-#include "server.h"
 #include "txt_tokenizer.h"
+#include "uds_server.h"
 #include "xml_tokenizer.h"
 #include "zipxml_tokenizer.h"
 
@@ -82,7 +81,10 @@ main(const int, char**)
         vca::FileScanner file_scanner{
             commands, user_config, user_db, file_processor};
 
-        vca::Server server{commands, user_config, user_db, "127.0.0.1", 7777};
+        vca::HttpServer http_server{
+            commands, user_config, user_db, "127.0.0.1", 7777};
+
+        vca::UdsServer uds_server{http_server, work_dir / "findle.sock"};
 
         while (g_signal_status == 0)
         {
