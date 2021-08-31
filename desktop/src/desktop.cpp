@@ -18,9 +18,12 @@
 #include <qtc/Output.h>
 #include <qtc/ThreadPool.h>
 
+#include <engine/DaemonHandler.h>
 #include <engine/SearchHandler.h>
 
 #include <view/View.h>
+
+#include "uds_client.h"
 
 #define VCA_REGISTER_QT_METATYPE(typeName)                                     \
     qRegisterMetaType<typeName>();                                             \
@@ -57,6 +60,11 @@ main(int argc, char** argv)
 
     qtc::CommandQueue mainQueue;
 
+    vca::UdsClient uds_client{work_dir / "findle.sock",
+                              work_dir / "findled.sock"};
+
+    model.addHandler(std::make_unique<vca::DaemonHandler>(
+        uds_client.host(), uds_client.port(), model, threadPool, mainQueue));
     model.addHandler(
         std::make_unique<vca::SearchHandler>(model, threadPool, mainQueue));
 

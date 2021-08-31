@@ -7,6 +7,8 @@
 #include <vca/logging.h>
 #include <vca/time.h>
 
+#include "DaemonHandler.h"
+
 using json = nlohmann::json;
 
 namespace vca
@@ -22,22 +24,35 @@ SearchHandler::SearchHandler(qtc::Model& model,
 void
 SearchHandler::connect()
 {
-    m_input.addListener(
-        [this](const qtc::Node<QString>& input, qtc::UpdateType) {
-            const auto value = input.getValue();
-            if (value.isEmpty())
-            {
-                m_result_count.assignDefault();
-                m_result_dirs.assignDefault();
-                m_result_files.assignDefault();
-                m_result_exts.assignDefault();
-                return;
-            }
+    m_input.addListener([this](const qtc::Node<QString>& input,
+                               qtc::UpdateType) {
+        const auto value = input.getValue();
+        if (value.isEmpty())
+        {
+            m_result_count.assignDefault();
+            m_result_dirs.assignDefault();
+            m_result_files.assignDefault();
+            m_result_exts.assignDefault();
+            return;
+        }
 
+        const auto& daemon_handler =
+            static_cast<DaemonHandler&>(getHandler("/daemon"));
+
+        int result_count = 0;
+        QList<QString> result_dirs;
+        QList<QString> result_files;
+        QList<QString> result_exts;
+
+        const auto hosts = daemon_handler.m_daemon_hosts.getValue();
+        const auto ports = daemon_handler.m_daemon_ports.getValue();
+        for (int i = 0; i < daemon_handler.m_daemon_count.getValue(); ++i)
+        {
             VCA_INFO << "Searching ...";
             vca::Timer timer;
-            const auto query = "http://127.0.0.1:7777/s?v=" +
-                served::query_escape(value.toStdString());
+            const auto query = "http://" + hosts[i].toStdString() + ":" +
+                ports[i].toStdString() +
+                "/s?v=" + served::query_escape(value.toStdString());
             VCA_INFO << "Query: " << query;
             const auto response = RestClient::get(query);
             if (response.code != 200)
@@ -48,10 +63,6 @@ SearchHandler::connect()
             VCA_INFO << "Search took: " << timer.us() << " us";
             json j = json::parse(response.body);
 
-            QList<QString> result_dirs;
-            QList<QString> result_files;
-            QList<QString> result_exts;
-
             for (const auto& result : j["results"])
             {
                 result_dirs.append(
@@ -61,13 +72,14 @@ SearchHandler::connect()
                 result_exts.append(
                     QString::fromUtf8(result["e"].get<std::string>().c_str()));
             }
+        }
 
-            const auto result_count = result_dirs.size();
-            m_result_dirs.setValue(std::move(result_dirs));
-            m_result_files.setValue(std::move(result_files));
-            m_result_exts.setValue(std::move(result_exts));
-            m_result_count.setValue(result_count);
-        });
+        result_count += result_dirs.size();
+        m_result_dirs.setValue(std::move(result_dirs));
+        m_result_files.setValue(std::move(result_files));
+        m_result_exts.setValue(std::move(result_exts));
+        m_result_count.setValue(result_count);
+    });
 }
 
 } // namespace vca

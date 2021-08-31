@@ -84,7 +84,7 @@ main(const int, char**)
         vca::HttpServer http_server{
             commands, user_config, user_db, "127.0.0.1", 7777};
 
-        vca::UdsServer uds_server{http_server, work_dir / "findle.sock"};
+        vca::UdsServer uds_server{http_server, work_dir / "findled.sock"};
 
         while (g_signal_status == 0)
         {

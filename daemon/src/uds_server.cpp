@@ -56,7 +56,7 @@ UdsServer::run()
             std::ostringstream os;
             os << j;
             const auto data = os.str();
-            m_socket.send_to(data.c_str(), data.size() + 1, src_addr);
+            m_socket.send_to(data, src_addr);
             break;
         }
         default:

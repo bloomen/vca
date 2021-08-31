@@ -15,6 +15,10 @@ include_directories(
 
 add_executable(vca_desktop
     src/desktop.cpp
+    src/uds_client.h
+    src/uds_client.cpp
+    src/engine/DaemonHandler.h
+    src/engine/DaemonHandler.cpp
     src/engine/SearchHandler.h
     src/engine/SearchHandler.cpp
     src/qtc/Action.h
@@ -44,5 +48,6 @@ target_link_libraries(vca_desktop
     Qt5::Quick
     restclient-cpp
     served
+    sockpp-static
     vca_core
 )
