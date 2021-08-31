@@ -15,6 +15,7 @@ Window {
 
         RowLayout {
             Layout.fillWidth: true
+            Layout.alignment: Qt.AlignTop
 
             VcaInputField {
                 Layout.fillWidth: true
@@ -49,7 +50,11 @@ Window {
         }
 
         ColumnLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
             Repeater {
+                Layout.fillWidth: true
+                Layout.fillHeight: true
                 model: result_count.value
                 VcaLabel {
                     text: result_files.value[index] ? result_files.value[index] : ""
