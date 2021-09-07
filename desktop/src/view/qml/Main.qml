@@ -51,6 +51,13 @@ Window {
             }
         }
 
+        VcaSettings {
+            visible: settingsToggle.toggled
+            Layout.fillWidth: true
+            border.color: Style.colorPrimary
+            border.width: 1
+        }
+
         VcaOutput {
             id: result_count
             endpoint: "/search"

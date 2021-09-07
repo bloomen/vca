@@ -23,5 +23,6 @@
         <file>view/qml/VcaCheckBox.qml</file>
         <file>view/qml/VcaComboBox.qml</file>
         <file>view/qml/VcaLabel.qml</file>
+        <file>view/qml/VcaSettings.qml</file>
     </qresource>
 </RCC>
