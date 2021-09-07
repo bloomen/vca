@@ -59,9 +59,10 @@ Rectangle {
         color: Style.colorPrimary
         MouseArea {
             anchors.fill: parent
-            onClicked: {
-                textInput.clear();
-            }
+            hoverEnabled: true
+            onClicked: textInput.clear()
+            onEntered: parent.opacity = 0.7
+            onExited: parent.opacity = 1
         }
     }
 }

@@ -7,14 +7,20 @@ Window {
     visible: true
     minimumWidth: 640
     minimumHeight: 480
-    title: vcaModel.appName() + qsTr(" - find anything!")
+    title: vcaModel.appName()
 
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 30
+        spacing: 20
+
+        VcaLabel {
+            Layout.alignment: Qt.AlignHCenter
+            text: qsTr("Find Anything!")
+            color: Style.colorPrimary
+        }
 
         RowLayout {
-            Layout.fillWidth: true
             Layout.alignment: Qt.AlignTop
 
             VcaInputField {
@@ -29,12 +35,20 @@ Window {
             }
 
             VcaLabel {
+                id: settingsToggle
+                property bool toggled: false
                 Layout.preferredWidth: 20
                 text: "⚙"
                 font.pointSize: Style.fontSizeHuge
-                color: Style.colorPrimary
+                color: toggled ? Style.colorTertiary : Style.colorPrimary
+                MouseArea {
+                    anchors.fill: parent
+                    hoverEnabled: true
+                    onClicked: parent.toggled = !parent.toggled
+                    onEntered: parent.opacity = 0.7
+                    onExited: parent.opacity = 1
+                }
             }
-
         }
 
         VcaOutput {
@@ -47,6 +61,11 @@ Window {
             id: result_files
             endpoint: "/search"
             node: "result_files"
+        }
+
+        Item {
+            // filler item
+            Layout.fillHeight: true
         }
 
         ColumnLayout {
