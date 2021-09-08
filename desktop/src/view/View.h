@@ -20,12 +20,15 @@ public:
     Q_INVOKABLE void
     addHostDirectory(const QString& host,
                      const QString& port,
-                     const QString& dir) const;
+                     const QString& url) const;
 
     Q_INVOKABLE void
     removeHostDirectory(const QString& host,
                         const QString& port,
-                        const QString& dir) const;
+                        const QString& url) const;
+
+    Q_INVOKABLE QString
+    joinPaths(const QString& path1, const QString& path2) const;
 };
 
 } // namespace vca

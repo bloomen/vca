@@ -68,20 +68,54 @@ Window {
             node: "result_files"
         }
 
+        VcaOutput {
+            id: result_dirs
+            endpoint: "/search"
+            node: "result_dirs"
+        }
+
         Item {
             // filler item
             Layout.fillHeight: true
+        }
+
+        TextEdit{
+            id: textEdit
+            visible: false
         }
 
         ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
             Repeater {
-                Layout.fillWidth: true
-                Layout.fillHeight: true
+                Layout.alignment: Qt.AlignTop
                 model: result_count.value
-                VcaLabel {
-                    text: result_files.value[index] ? result_files.value[index] : ""
+                Row {
+                    spacing: 10
+                    VcaLabel {
+                        text: result_files.value[index] ? result_files.value[index] : ""
+                        color: Style.colorPrimary
+                    }
+                    VcaLabel {
+                        text: result_dirs.value[index] ? result_dirs.value[index] : ""
+                    }
+                    VcaLabel {
+                        text: "⎘"
+                        font.pointSize: Style.fontSizeNormal
+                        color: Style.colorPrimary
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: {
+                                textEdit.text = vcaView.joinPaths(result_dirs.value[index], result_files.value[index]);
+                                textEdit.selectAll();
+                                textEdit.copy();
+                                parent.opacity = 1;
+                            }
+                            onEntered: parent.opacity = 0.7
+                            onExited: parent.opacity = 1
+                        }
+                    }
                 }
             }
         }

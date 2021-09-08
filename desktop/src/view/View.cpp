@@ -5,6 +5,7 @@
 
 #include <restclient-cpp/restclient.h>
 
+#include <vca/filesystem.h>
 #include <vca/json.h>
 #include <vca/logging.h>
 #include <vca/time.h>
@@ -60,13 +61,13 @@ View::getHostDirectories(const QString& host, const QString& port) const
 void
 View::addHostDirectory(const QString& host,
                        const QString& port,
-                       const QString& dir) const
+                       const QString& url) const
 {
     auto j = fetchConfig(host, port);
     const auto query =
         "http://" + host.toStdString() + ":" + port.toStdString() + "/c";
     VCA_INFO << "POST: " << query;
-    j["root_dirs"].push_back(pathFromUrl(dir).toStdString());
+    j["root_dirs"].push_back(pathFromUrl(url).toStdString());
     std::ostringstream os;
     os << j;
     const auto response = RestClient::post(query, "application/json", os.str());
@@ -79,9 +80,9 @@ View::addHostDirectory(const QString& host,
 void
 View::removeHostDirectory(const QString& host,
                           const QString& port,
-                          const QString& dir) const
+                          const QString& url) const
 {
-    const auto dir_std = pathFromUrl(dir).toStdString();
+    const auto dir_std = pathFromUrl(url).toStdString();
     auto j = fetchConfig(host, port);
     const auto query =
         "http://" + host.toStdString() + ":" + port.toStdString() + "/c";
@@ -103,6 +104,15 @@ View::removeHostDirectory(const QString& host,
     {
         VCA_ERROR << "Received error code: " << response.code;
     }
+}
+
+QString
+View::joinPaths(const QString& path1, const QString& path2) const
+{
+    return QString::fromUtf8(
+        (fs::u8path(path1.toStdString()) / fs::u8path(path2.toStdString()))
+            .u8string()
+            .c_str());
 }
 
 } // namespace vca
