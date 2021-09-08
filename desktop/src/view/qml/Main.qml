@@ -85,19 +85,31 @@ Window {
         }
 
         ColumnLayout {
-            Layout.fillWidth: true
-            Layout.fillHeight: true
             Repeater {
-                Layout.alignment: Qt.AlignTop
                 model: result_count.value
                 Row {
+                    Layout.alignment: Qt.AlignTop
+                    id: currentRow
                     spacing: 10
+                    property var path: vcaView.joinPaths(result_dirs.value[index], result_files.value[index])
                     VcaLabel {
                         text: result_files.value[index] ? result_files.value[index] : ""
                         color: Style.colorPrimary
                     }
                     VcaLabel {
-                        text: result_dirs.value[index] ? result_dirs.value[index] : ""
+                        text: "↗"
+                        font.pointSize: Style.fontSizeNormal
+                        color: Style.colorPrimary
+                        MouseArea {
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            onClicked: {
+                                vcaView.showFile(result_dirs.value[index], result_files.value[index]);
+                                parent.opacity = 1;
+                            }
+                            onEntered: parent.opacity = 0.7
+                            onExited: parent.opacity = 1
+                        }
                     }
                     VcaLabel {
                         text: "⎘"
@@ -107,7 +119,7 @@ Window {
                             anchors.fill: parent
                             hoverEnabled: true
                             onClicked: {
-                                textEdit.text = vcaView.joinPaths(result_dirs.value[index], result_files.value[index]);
+                                textEdit.text = currentRow.path;
                                 textEdit.selectAll();
                                 textEdit.copy();
                                 parent.opacity = 1;
@@ -115,6 +127,9 @@ Window {
                             onEntered: parent.opacity = 0.7
                             onExited: parent.opacity = 1
                         }
+                    }
+                    VcaLabel {
+                        text: result_dirs.value[index] ? result_dirs.value[index] : ""
                     }
                 }
             }

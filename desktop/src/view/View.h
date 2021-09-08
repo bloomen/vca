@@ -29,6 +29,9 @@ public:
 
     Q_INVOKABLE QString
     joinPaths(const QString& path1, const QString& path2) const;
+
+    Q_INVOKABLE void
+    showFile(const QString& dir, const QString& file) const;
 };
 
 } // namespace vca

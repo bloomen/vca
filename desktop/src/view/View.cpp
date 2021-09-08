@@ -2,6 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
+#include <QtGui/QDesktopServices>
 
 #include <restclient-cpp/restclient.h>
 
@@ -113,6 +114,12 @@ View::joinPaths(const QString& path1, const QString& path2) const
         (fs::u8path(path1.toStdString()) / fs::u8path(path2.toStdString()))
             .u8string()
             .c_str());
+}
+
+void
+View::showFile(const QString& dir, const QString& file) const
+{
+    QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }
 
 } // namespace vca
