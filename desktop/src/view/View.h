@@ -16,6 +16,16 @@ public:
 
     Q_INVOKABLE QList<QString>
     getHostDirectories(const QString& host, const QString& port) const;
+
+    Q_INVOKABLE void
+    addHostDirectory(const QString& host,
+                     const QString& port,
+                     const QString& dir) const;
+
+    Q_INVOKABLE void
+    removeHostDirectory(const QString& host,
+                        const QString& port,
+                        const QString& dir) const;
 };
 
 } // namespace vca
