@@ -3,8 +3,12 @@ import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.3
 import Qt.labs.platform 1.1
 
-Item {
+Rectangle {
     id: vcaSettings
+    height: row.height
+    radius: Style.radius
+    border.color: Style.colorPrimary
+    border.width: 1
     property var root_dirs
     property bool editing: false
     property var oldDir
@@ -53,15 +57,8 @@ Item {
         }
     }
 
-    Rectangle {
-        radius: Style.radius
-        width: parent.width
-        height: column.height
-        border.color: Style.colorPrimary
-        border.width: 1
-    }
-
     RowLayout {
+        id: row
         Item {
             width: 8
         }
@@ -88,7 +85,7 @@ Item {
                 Repeater {
                     anchors.fill: parent
                     model: root_dirs ? root_dirs.length : 0
-                    RowLayout {
+                    Row {
                         spacing: 10
                         VcaLabel {
                             text: "✘"
@@ -118,8 +115,9 @@ Item {
                                 onExited: parent.opacity = 1
                             }
                         }
-                        VcaLabel {
+                        VcaTextEdit {
                             text: root_dirs[index]
+                            color: Style.colorTertiary
                         }
                     }
                 }

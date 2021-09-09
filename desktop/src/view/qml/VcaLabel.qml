@@ -3,6 +3,6 @@ import QtQuick.Controls 2.2
 import "."
 
 Label {
-    font.family: Style.fontBold.name
+    font.family: Style.fontRegular.name
     font.pointSize: Style.fontSizeNormal
 }

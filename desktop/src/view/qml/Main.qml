@@ -9,6 +9,29 @@ Window {
     minimumHeight: 480
     title: vcaModel.appName()
 
+    VcaOutput {
+        id: result_count
+        endpoint: "/search"
+        node: "result_count"
+    }
+
+    VcaOutput {
+        id: result_files
+        endpoint: "/search"
+        node: "result_files"
+    }
+
+    VcaOutput {
+        id: result_dirs
+        endpoint: "/search"
+        node: "result_dirs"
+    }
+
+    TextEdit{
+        id: textEdit
+        visible: false
+    }
+
     ColumnLayout {
         anchors.fill: parent
         anchors.margins: 30
@@ -51,50 +74,22 @@ Window {
             }
         }
 
-        VcaSettings {
-            visible: settingsToggle.toggled
-            Layout.fillWidth: true
-        }
-
-        VcaOutput {
-            id: result_count
-            endpoint: "/search"
-            node: "result_count"
-        }
-
-        VcaOutput {
-            id: result_files
-            endpoint: "/search"
-            node: "result_files"
-        }
-
-        VcaOutput {
-            id: result_dirs
-            endpoint: "/search"
-            node: "result_dirs"
-        }
-
-        Item {
-            // filler item
-            Layout.fillHeight: true
-        }
-
-        TextEdit{
-            id: textEdit
-            visible: false
-        }
-
         ColumnLayout {
+
+            VcaSettings {
+                id: settings
+                visible: settingsToggle.toggled
+                Layout.fillWidth: true
+            }
+
             Repeater {
                 model: result_count.value
                 Row {
-                    Layout.alignment: Qt.AlignTop
                     id: currentRow
                     spacing: 10
                     property var path: vcaView.joinPaths(result_dirs.value[index], result_files.value[index])
-                    VcaLabel {
+                    VcaTextEdit {
                         text: result_files.value[index] ? result_files.value[index] : ""
-                        color: Style.colorPrimary
                     }
                     VcaLabel {
                         text: "↗"
@@ -128,10 +123,14 @@ Window {
                             onExited: parent.opacity = 1
                         }
                     }
-                    VcaLabel {
+                    VcaTextEdit {
                         text: result_dirs.value[index] ? result_dirs.value[index] : ""
+                        color: Style.colorTertiary
                     }
                 }
+            }
+            Item {
+                Layout.fillHeight: true
             }
         }
     }
