@@ -5,7 +5,7 @@ import Qt.labs.platform 1.1
 
 Rectangle {
     id: vcaSettings
-    height: row.height
+    height: row.height + column.height + column.spacing
     radius: Style.radius
     border.color: Style.colorPrimary
     border.width: 1
@@ -83,6 +83,7 @@ Rectangle {
 
             Column {
                 Repeater {
+                    id: repeater
                     anchors.fill: parent
                     model: root_dirs ? root_dirs.length : 0
                     Row {

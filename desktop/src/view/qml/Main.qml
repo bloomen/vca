@@ -82,51 +82,61 @@ Window {
                 Layout.fillWidth: true
             }
 
-            Repeater {
-                model: result_count.value
-                Row {
-                    id: currentRow
-                    spacing: 10
-                    property var path: vcaView.joinPaths(result_dirs.value[index], result_files.value[index])
-                    VcaTextEdit {
-                        text: result_files.value[index] ? result_files.value[index] : ""
-                    }
-                    VcaLabel {
-                        text: "↗"
-                        font.pointSize: Style.fontSizeNormal
-                        color: Style.colorPrimary
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: {
-                                vcaView.showFile(result_dirs.value[index], result_files.value[index]);
-                                parent.opacity = 1;
+            Item {
+                height: 8
+            }
+
+            ScrollView {
+                Layout.fillHeight: true
+                Layout.fillWidth: true
+                Column {
+                    Repeater {
+                        model: result_count.value
+                        delegate: Row {
+                            id: currentRow
+                            spacing: 10
+                            property var path: vcaView.joinPaths(result_dirs.value[index], result_files.value[index])
+                            VcaTextEdit {
+                                text: result_files.value[index] ? result_files.value[index] : ""
                             }
-                            onEntered: parent.opacity = 0.7
-                            onExited: parent.opacity = 1
-                        }
-                    }
-                    VcaLabel {
-                        text: "⎘"
-                        font.pointSize: Style.fontSizeNormal
-                        color: Style.colorPrimary
-                        MouseArea {
-                            anchors.fill: parent
-                            hoverEnabled: true
-                            onClicked: {
-                                textEdit.text = currentRow.path;
-                                textEdit.selectAll();
-                                textEdit.copy();
-                                parent.opacity = 1;
+                            VcaLabel {
+                                text: "↗"
+                                font.pointSize: Style.fontSizeNormal
+                                color: Style.colorPrimary
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onClicked: {
+                                        vcaView.showFile(result_dirs.value[index], result_files.value[index]);
+                                        parent.opacity = 1;
+                                    }
+                                    onEntered: parent.opacity = 0.7
+                                    onExited: parent.opacity = 1
+                                }
                             }
-                            onEntered: parent.opacity = 0.7
-                            onExited: parent.opacity = 1
+                            VcaLabel {
+                                text: "⎘"
+                                font.pointSize: Style.fontSizeNormal
+                                color: Style.colorPrimary
+                                MouseArea {
+                                    anchors.fill: parent
+                                    hoverEnabled: true
+                                    onClicked: {
+                                        textEdit.text = currentRow.path;
+                                        textEdit.selectAll();
+                                        textEdit.copy();
+                                        parent.opacity = 1;
+                                    }
+                                    onEntered: parent.opacity = 0.7
+                                    onExited: parent.opacity = 1
+                                }
+                            }
+                            VcaTextEdit {
+                                text: result_dirs.value[index] ? result_dirs.value[index] : ""
+                                color: Style.colorTertiary
+                            }
                         }
-                    }
-                    VcaTextEdit {
-                        text: result_dirs.value[index] ? result_dirs.value[index] : ""
-                        color: Style.colorTertiary
-                    }
+                    } // Repeater
                 }
             }
             Item {
