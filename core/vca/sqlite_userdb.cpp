@@ -1,6 +1,7 @@
 #include "sqlite_userdb.h"
 
 #include <mutex>
+#include <queue>
 #include <set>
 
 #include <SQLiteCpp/SQLiteCpp.h>
@@ -14,6 +15,50 @@ namespace vca
 
 namespace
 {
+
+class SearchCache
+{
+public:
+    const std::vector<SearchResult>*
+    get(const FileContents& contents) const
+    {
+        auto iter = m_cache.find(contents);
+        if (iter != m_cache.end())
+        {
+            return &iter->second;
+        }
+        return nullptr;
+    }
+
+    void
+    insert(FileContents contents, std::vector<SearchResult> results)
+    {
+        while (m_queue.size() >= m_max_size)
+        {
+            m_cache.erase(m_queue.front());
+            m_queue.pop();
+        }
+        auto pair = m_cache.emplace(std::move(contents), std::move(results));
+        if (pair.second)
+        {
+            m_queue.push(pair.first);
+        }
+    }
+
+    void
+    clear()
+    {
+        m_cache.clear();
+        decltype(m_queue) empty_queue;
+        m_queue.swap(empty_queue);
+    }
+
+private:
+    size_t m_max_size = 32;
+    std::map<FileContents, std::vector<SearchResult>> m_cache;
+    std::queue<std::map<FileContents, std::vector<SearchResult>>::iterator>
+        m_queue;
+};
 
 int
 toSQLiteOpenType(const UserDb::OpenType open_type)
@@ -81,6 +126,7 @@ struct SqliteUserDb::Impl
         return {};
     }
 
+    SearchCache cache;
     int files_id = 0;
     fs::path path;
     SQLite::Database db;
@@ -108,6 +154,7 @@ void
 SqliteUserDb::create(const std::set<fs::path>& root_dirs)
 {
     VCA_INFO << "Create user db";
+    m_impl->cache.clear();
     SQLite::Transaction transaction{m_impl->db};
 
     m_impl->db.exec("CREATE TABLE IF NOT EXISTS roots (id INTEGER PRIMARY KEY, "
@@ -142,6 +189,7 @@ SqliteUserDb::add_root_dir(const fs::path& root_dir)
         return;
     }
     VCA_INFO << __func__ << ": " << root_dir;
+    m_impl->cache.clear();
     SQLite::Transaction transaction{m_impl->db};
     m_impl->add_root_dir(root_dir);
     transaction.commit();
@@ -155,6 +203,7 @@ SqliteUserDb::remove_root_dir(const fs::path& root_dir)
         return;
     }
     VCA_INFO << __func__ << ": " << root_dir;
+    m_impl->cache.clear();
     SQLite::Transaction transaction{m_impl->db};
     m_impl->remove_root_dir(root_dir);
     transaction.commit();
@@ -164,6 +213,7 @@ void
 SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 {
     VCA_DEBUG << __func__ << ": " << path;
+    m_impl->cache.clear();
     const auto [p, roots_id] = m_impl->relative(path);
     SQLite::Transaction transaction{m_impl->db};
 
@@ -193,6 +243,7 @@ void
 SqliteUserDb::remove_file(const fs::path& path)
 {
     VCA_DEBUG << __func__ << ": " << path;
+    m_impl->cache.clear();
     const auto [p, roots_id] = m_impl->relative(path);
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement del_stm{m_impl->db, "DELETE FROM files WHERE path = ?"};
@@ -205,6 +256,7 @@ void
 SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
 {
     VCA_DEBUG << __func__ << ": " << old_path << " - " << path;
+    m_impl->cache.clear();
     const auto [old_p, old_roots_id] = m_impl->relative(old_path);
     const auto [p, roots_id] = m_impl->relative(path);
     SQLite::Transaction transaction{m_impl->db};
@@ -220,6 +272,12 @@ SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
 std::vector<SearchResult>
 SqliteUserDb::search(const FileContents& contents) const
 {
+    if (const auto results = m_impl->cache.get(contents))
+    {
+        VCA_DEBUG << __func__ << ": cache hit";
+        return *results;
+    }
+
     std::map<SearchResult, size_t> results_map;
     for (const auto& word : contents.words)
     {
@@ -250,6 +308,7 @@ SqliteUserDb::search(const FileContents& contents) const
         }
     }
 
+    m_impl->cache.insert(contents, results);
     return results;
 }
 
