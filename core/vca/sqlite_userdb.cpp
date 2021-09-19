@@ -1,7 +1,7 @@
 #include "sqlite_userdb.h"
 
+#include <list>
 #include <mutex>
-#include <queue>
 #include <set>
 
 #include <SQLiteCpp/SQLiteCpp.h>
@@ -31,17 +31,18 @@ public:
     }
 
     void
-    insert(FileContents contents, std::vector<SearchResult> results)
+    insert(const FileContents& contents,
+           const std::vector<SearchResult>& results)
     {
         while (m_queue.size() >= m_max_size)
         {
             m_cache.erase(m_queue.front());
-            m_queue.pop();
+            m_queue.pop_front();
         }
-        auto pair = m_cache.emplace(std::move(contents), std::move(results));
+        const auto pair = m_cache.emplace(contents, results);
         if (pair.second)
         {
-            m_queue.push(pair.first);
+            m_queue.push_back(pair.first);
         }
     }
 
@@ -49,14 +50,13 @@ public:
     clear()
     {
         m_cache.clear();
-        decltype(m_queue) empty_queue;
-        m_queue.swap(empty_queue);
+        m_queue.clear();
     }
 
 private:
     size_t m_max_size = 32;
     std::map<FileContents, std::vector<SearchResult>> m_cache;
-    std::queue<std::map<FileContents, std::vector<SearchResult>>::iterator>
+    std::list<std::map<FileContents, std::vector<SearchResult>>::iterator>
         m_queue;
 };
 

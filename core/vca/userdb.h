@@ -19,27 +19,19 @@ struct FileContents
     bool
     operator<(const FileContents& o) const
     {
-        if (words.empty() && o.words.empty())
-        {
-            return false;
-        }
         if (words.size() < o.words.size())
         {
             return true;
         }
-        else if (words.size() > o.words.size())
+        if (words.size() > o.words.size())
         {
             return false;
         }
-        else
+        for (size_t i = 0; i < words.size(); ++i)
         {
-
-            for (size_t i = 0; i < words.size(); ++i)
+            if (words[i] < o.words[i])
             {
-                if (words[i] < o.words[i])
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return false;
