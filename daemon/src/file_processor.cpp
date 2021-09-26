@@ -59,7 +59,7 @@ FileProcessor::process(const fs::path& file) const
 
     std::vector<std::string> result;
     result.reserve(words.size());
-    for (const auto w : words)
+    for (const auto& w : words)
     {
         result.emplace_back(wide_to_narrow(w));
     }

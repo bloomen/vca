@@ -128,6 +128,7 @@ struct SqliteUserDb::Impl
 
     SearchCache cache;
     int files_id = 0;
+    int words_id = 0;
     fs::path path;
     SQLite::Database db;
     int roots_id = 0;
@@ -157,19 +158,29 @@ SqliteUserDb::create(const std::set<fs::path>& root_dirs)
     m_impl->cache.clear();
     SQLite::Transaction transaction{m_impl->db};
 
-    m_impl->db.exec("CREATE TABLE IF NOT EXISTS roots (id INTEGER PRIMARY KEY, "
+    m_impl->db.exec("CREATE TABLE IF NOT EXISTS roots ("
+                    "id INTEGER PRIMARY KEY,"
                     "dir TEXT NOT NULL UNIQUE)");
 
-    m_impl->db.exec("CREATE TABLE IF NOT EXISTS files (id INTEGER PRIMARY KEY, "
-                    "roots_id INTEGER NOT NULL, "
-                    "path TEXT NOT NULL, FOREIGN KEY (roots_id) REFERENCES "
-                    "roots (id) ON DELETE CASCADE)");
+    m_impl->db.exec(
+        "CREATE TABLE IF NOT EXISTS files ("
+        "id INTEGER PRIMARY KEY,"
+        "roots_id INTEGER NOT NULL,"
+        "path TEXT NOT NULL, "
+        "FOREIGN KEY (roots_id) REFERENCES roots (id) ON DELETE CASCADE)");
 
-    m_impl->db.exec("CREATE TABLE IF NOT EXISTS words (files_id INTEGER "
-                    "NOT NULL, word TEXT NOT "
-                    "NULL, FOREIGN KEY (files_id) REFERENCES files (id) ON "
-                    "DELETE CASCADE)");
+    m_impl->db.exec("CREATE TABLE IF NOT EXISTS words ("
+                    "id INTEGER PRIMARY KEY, "
+                    "word TEXT NOT NULL)");
 
+    m_impl->db.exec(
+        "CREATE TABLE IF NOT EXISTS mappings ("
+        "files_id INTEGER NOT NULL,"
+        "words_id INTEGER NOT NULL,"
+        "FOREIGN KEY (files_id) REFERENCES files (id) ON DELETE CASCADE,"
+        "FOREIGN KEY (words_id) REFERENCES words (id) ON DELETE CASCADE)");
+
+    // keep the words
     m_impl->db.exec("DELETE FROM roots");
     m_impl->root_dirs.clear();
 
@@ -229,10 +240,29 @@ SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 
     for (const auto& word : contents.words)
     {
-        SQLite::Statement ins_word_stm{
-            m_impl->db, "INSERT INTO words (files_id, word) VALUES (?, ?)"};
-        SQLite::bind(ins_word_stm, m_impl->files_id, word);
-        ins_word_stm.exec();
+        SQLite::Statement sel_stm{m_impl->db,
+                                  "SELECT id FROM words where word = ?"};
+        SQLite::bind(sel_stm, word);
+        int words_id;
+        if (sel_stm.executeStep())
+        {
+            words_id = sel_stm.getColumn(0).getInt();
+        }
+        else
+        {
+            words_id = m_impl->words_id;
+            ++m_impl->words_id;
+            SQLite::Statement ins_word_stm{
+                m_impl->db, "INSERT INTO words (id, word) VALUES (?, ?)"};
+            SQLite::bind(ins_word_stm, words_id, word);
+            ins_word_stm.exec();
+        }
+
+        SQLite::Statement ins_mapping_stm{
+            m_impl->db,
+            "INSERT INTO mappings (files_id, words_id) VALUES (?, ?)"};
+        SQLite::bind(ins_mapping_stm, m_impl->files_id, words_id);
+        ins_mapping_stm.exec();
     }
 
     ++m_impl->files_id;
@@ -285,7 +315,8 @@ SqliteUserDb::search(const FileContents& contents) const
         SQLite::Statement query_stm{
             m_impl->db,
             "SELECT dir, path FROM files JOIN roots ON roots.id = "
-            "files.roots_id JOIN words ON files.id = words.files_id "
+            "files.roots_id JOIN mappings ON files.id = mappings.files_id "
+            "JOIN words ON mappings.words_id = words.id "
             "WHERE words.word LIKE ?"};
         SQLite::bind(query_stm, "%" + word + "%");
         while (query_stm.executeStep())
