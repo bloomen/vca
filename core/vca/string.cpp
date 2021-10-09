@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <codecvt>
 #include <map>
+#include <unordered_set>
 
 #include <boost/algorithm/string.hpp>
 #include <boost/spirit/include/qi_char_class.hpp>
@@ -221,10 +222,21 @@ std::vector<String>
 tokenize(String line)
 {
     replace_all(line, special_chars(), space_char());
+    replace_all(line, end_of_line_chars(), space_char());
 
     std::vector<String> words;
+    for (auto& c : line)
+    {
+        if (is_cjk(c))
+        {
+            words.emplace_back(String{1, c});
+            c = space_char();
+        }
+    }
+
     std::list<String> tokens;
     split(tokens, line, space_char());
+
     for (auto& t : tokens)
     {
         trim(t);
@@ -238,7 +250,39 @@ tokenize(String line)
         }
         words.emplace_back(std::move(t));
     }
+
     return words;
+}
+
+namespace
+{
+
+std::unordered_set<Char>
+make_cjk_set()
+{
+    std::unordered_set<Char> cjk;
+    for (Char c = 0x4e00; c <= 0x9fff; ++c) // chinese
+    {
+        cjk.emplace(c);
+    }
+    for (Char c = 0x3040; c <= 0x30ff; ++c) // japanese
+    {
+        cjk.emplace(c);
+    }
+    for (Char c = 0xac00; c <= 0xd7a3; ++c) // korean
+    {
+        cjk.emplace(c);
+    }
+    return cjk;
+}
+
+} // namespace
+
+bool
+is_cjk(const Char c)
+{
+    static const auto cjks = make_cjk_set();
+    return cjks.count(c) > 0;
 }
 
 } // namespace vca

@@ -74,4 +74,7 @@ xml_tag_content(const std::string& content, size_t max_byte_count);
 std::vector<String>
 tokenize(String line);
 
+bool
+is_cjk(Char c);
+
 } // namespace vca
