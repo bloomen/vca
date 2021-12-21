@@ -16,6 +16,27 @@
 namespace vca
 {
 
+#if defined(VCA_PLATFORM_WINDOWS) && _MSC_VER < 2000
+
+String
+narrow_to_wide(const std::string& narrow)
+{
+    std::wstring_convert<std::codecvt_utf8<__int32>, __int32> cvt;
+    auto r = cvt.from_bytes(narrow.data(), narrow.data() + narrow.size());
+    String s = reinterpret_cast<const Char*>(r.data());
+    return s;
+}
+
+std::string
+wide_to_narrow(const String& wide)
+{
+    std::wstring_convert<std::codecvt_utf8<__int32>, __int32> cvt;
+    auto p = reinterpret_cast<const int32_t*>(wide.data());
+    return cvt.to_bytes(p, p + wide.size());
+}
+
+#else
+
 String
 narrow_to_wide(const std::string& narrow)
 {
@@ -29,6 +50,8 @@ wide_to_narrow(const String& wide)
     std::wstring_convert<std::codecvt_utf8<Char>, Char> cvt;
     return cvt.to_bytes(wide);
 }
+
+#endif
 
 const std::unordered_set<Char>&
 special_chars()
