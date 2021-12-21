@@ -48,6 +48,6 @@ target_link_libraries(vca_desktop
     Qt5::Quick
     restclient-cpp
     served
-    sockpp-static
+#    sockpp-static
     vca_core
 )

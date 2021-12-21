@@ -4,7 +4,7 @@
 #include <mutex>
 #include <thread>
 
-#include <sockpp/unix_dgram_socket.h>
+//#include <sockpp/unix_dgram_socket.h>
 
 #include <vca/filesystem.h>
 #include <vca/utils.h>
@@ -29,7 +29,7 @@ public:
 
 private:
     fs::path m_client;
-    sockpp::socket_initializer sock_init;
+    //    sockpp::socket_initializer sock_init;
     std::string m_host;
     std::string m_port;
 };
