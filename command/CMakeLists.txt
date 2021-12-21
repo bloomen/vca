@@ -7,5 +7,7 @@ add_executable(vca_command
 )
 
 target_link_libraries(vca_command
+    restclient-cpp
+    served
     vca_core
 )

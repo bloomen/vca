@@ -8,14 +8,6 @@ if(vca_enable_asan AND vca_enable_tsan)
     message(FATAL_ERROR "vca_enable_asan and vca_enable_tsan cannot both be ON")
 endif()
 
-if(MSVC)
-list(APPEND CMAKE_PREFIX_PATH "C:\\local\\curl_x64-windows")
-list(APPEND CMAKE_PREFIX_PATH "C:\\local\\zlib_x64-windows")
-set(BOOST_ROOT "C:\\local\\boost_1_71_0")
-set(BOOST_LIBRARYDIR "C:\\local\\boost_1_71_0\\lib64-msvc-14.1")
-add_definitions(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
-endif()
-
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 set(CMAKE_CXX_EXTENSIONS OFF)
@@ -33,6 +25,11 @@ set(BUILD_TESTING OFF)
 set(CMAKE_DISABLE_TESTING ON)
 
 if(MSVC)
+    list(APPEND CMAKE_PREFIX_PATH "C:\\local\\curl_x64-windows")
+    list(APPEND CMAKE_PREFIX_PATH "C:\\local\\zlib_x64-windows")
+    set(BOOST_ROOT "C:\\local\\boost_1_71_0")
+    set(BOOST_LIBRARYDIR "C:\\local\\boost_1_71_0\\lib64-msvc-14.1")
+    add_definitions(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
     set(CompilerFlags
         CMAKE_CXX_FLAGS
         CMAKE_CXX_FLAGS_DEBUG
@@ -64,7 +61,7 @@ include_directories(
 )
 add_subdirectory(third_party/zlib)
 
-find_package(Boost 1.71.0 COMPONENTS date_time)
+find_package(Boost 1.71 REQUIRED COMPONENTS date_time)
 add_definitions(-DBOOST_ALL_NO_LIB)
 add_definitions(-DVCA_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 
@@ -83,6 +80,10 @@ include_directories(
     third_party/spdlog/include
     third_party/SQLiteCpp/include
     third_party/zip/src
+)
+
+link_directories(
+    ${Boost_LIBRARY_DIRS}
 )
 
 if(MSVC)
