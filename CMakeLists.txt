@@ -61,7 +61,7 @@ include_directories(
 )
 add_subdirectory(third_party/zlib)
 
-find_package(Boost 1.71 REQUIRED COMPONENTS date_time)
+find_package(Boost 1.71 COMPONENTS date_time)
 add_definitions(-DBOOST_ALL_NO_LIB)
 add_definitions(-DVCA_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 
