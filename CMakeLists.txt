@@ -87,7 +87,7 @@ link_directories(
 )
 
 if(MSVC)
-    add_compile_options(/W4 /bigobj /EHsc /wd4503 /wd4996 /wd4702 /wd4100 /wd4706 /wd26812 /wd4373)
+    add_compile_options(/utf-8 /W4 /bigobj /EHsc /wd4503 /wd4996 /wd4702 /wd4100 /wd4706 /wd26812 /wd4373)
     if(${MSVC_VERSION} GREATER_EQUAL 1929)
         if(vca_enable_asan)
             add_compile_options(/fsanitize=address)
