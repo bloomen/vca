@@ -62,7 +62,13 @@ struct Scanner
                 if (fs::is_regular_file(path))
                 {
                     vca::FileContents contents;
-                    contents.words = file_processor.process(path);
+                    try {
+                       contents.words = file_processor.process(path);
+                    }  catch (const std::exception& e) {
+                       // skip current file
+                       VCA_EXCEPTION(e) << e.what();
+                       continue;
+                    }
                     commands.push([this,
                                    path = std::move(path),
                                    contents = std::move(contents)] {

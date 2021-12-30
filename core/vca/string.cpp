@@ -206,7 +206,13 @@ XMLParser::next()
         return {};
     }
     const auto text = m_content.substr(start_index, end_index - start_index);
-    auto wide_text = narrow_to_wide(text);
+    vca::String wide_text;
+    try {
+        wide_text = narrow_to_wide(text);
+    }  catch (std::range_error &e) {
+        // return empty string if conversion failed (i.e. if binary data)
+       return wide_text;
+    }
     xml_unescape(wide_text);
     return wide_text;
 }
