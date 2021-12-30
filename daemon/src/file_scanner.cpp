@@ -62,18 +62,20 @@ struct Scanner
                 if (fs::is_regular_file(path))
                 {
                     vca::FileContents contents;
-                    try {
-                       contents.words = file_processor.process(path);
-                    }  catch (const std::exception& e) {
-                       // skip file
-                       VCA_EXCEPTION(e) << e.what();
-                       continue;
+                    try
+                    {
+                        contents.words = file_processor.process(path);
+                    }
+                    catch (const std::exception& e)
+                    {
+                        // skip file
+                        VCA_EXCEPTION(e) << e.what();
+                        continue;
                     }
                     commands.push([this,
                                    path = std::move(path),
-                                   contents = std::move(contents)] {
-                        user_db.update_file(path, contents);
-                    });
+                                   contents = std::move(contents)]
+                                  { user_db.update_file(path, contents); });
                 }
             }
             VCA_INFO << "Scanning finished: " << root_dir
