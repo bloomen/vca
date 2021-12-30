@@ -92,28 +92,36 @@ void
 to_lower_case(String& str)
 {
     const auto& u2l = upper_to_lower_map();
-    std::transform(str.begin(), str.end(), str.begin(), [&u2l](const Char c) {
-        const auto it = u2l.find(c);
-        if (it != u2l.end())
-        {
-            return it->second;
-        }
-        return c;
-    });
+    std::transform(str.begin(),
+                   str.end(),
+                   str.begin(),
+                   [&u2l](const Char c)
+                   {
+                       const auto it = u2l.find(c);
+                       if (it != u2l.end())
+                       {
+                           return it->second;
+                       }
+                       return c;
+                   });
 }
 
 void
 to_upper_case(String& str)
 {
     const auto& l2u = lower_to_upper_map();
-    std::transform(str.begin(), str.end(), str.begin(), [&l2u](const Char c) {
-        const auto it = l2u.find(c);
-        if (it != l2u.end())
-        {
-            return it->second;
-        }
-        return c;
-    });
+    std::transform(str.begin(),
+                   str.end(),
+                   str.begin(),
+                   [&l2u](const Char c)
+                   {
+                       const auto it = l2u.find(c);
+                       if (it != l2u.end())
+                       {
+                           return it->second;
+                       }
+                       return c;
+                   });
 }
 
 bool
@@ -206,7 +214,16 @@ XMLParser::next()
         return {};
     }
     const auto text = m_content.substr(start_index, end_index - start_index);
-    auto wide_text = narrow_to_wide(text);
+    vca::String wide_text;
+    try
+    {
+        wide_text = narrow_to_wide(text);
+    }
+    catch (std::range_error& e)
+    {
+        // return empty string if conversion failed (i.e. if binary data)
+        return wide_text;
+    }
     xml_unescape(wide_text);
     return wide_text;
 }
