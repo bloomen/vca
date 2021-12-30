@@ -65,7 +65,7 @@ struct Scanner
                     try {
                        contents.words = file_processor.process(path);
                     }  catch (const std::exception& e) {
-                       // skip current file
+                       // skip file
                        VCA_EXCEPTION(e) << e.what();
                        continue;
                     }
