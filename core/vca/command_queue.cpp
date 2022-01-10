@@ -1,6 +1,6 @@
 #include "command_queue.h"
 
-#include <concurrentqueue.h>
+#include <moodycamel/concurrentqueue.h>
 
 #include "logging.h"
 

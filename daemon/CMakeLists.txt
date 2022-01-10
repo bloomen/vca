@@ -26,11 +26,9 @@ add_library(vca_daemon_lib
 
 target_link_libraries(vca_daemon_lib
     efsw
-    gcl
-#    sockpp-static
     served
     vca_core
-    zip
+    ${CONAN_LIBS} # TODO: only use what's necessary
 )
 
 add_executable(vca_daemon
@@ -50,6 +48,6 @@ target_include_directories(vca_daemon_test
 )
 
 target_link_libraries(vca_daemon_test
-    gtest
+    ${CONAN_LIBS_GTEST}
     vca_daemon_lib
 )

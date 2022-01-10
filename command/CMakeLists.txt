@@ -10,4 +10,5 @@ target_link_libraries(vca_command
     restclient-cpp
     served
     vca_core
+    ${CONAN_LIBS} # TODO: only use what's necessary
 )

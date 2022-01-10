@@ -26,8 +26,7 @@
 #include "uds_client.h"
 
 #define VCA_REGISTER_QT_METATYPE(typeName)                                     \
-    qRegisterMetaType<typeName>();                                             \
-    qRegisterMetaTypeStreamOperators<typeName>(#typeName)
+    qRegisterMetaType<typeName>()
 
 int
 main(int argc, char** argv)

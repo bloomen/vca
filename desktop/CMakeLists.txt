@@ -6,7 +6,7 @@ if(CMAKE_VERSION VERSION_LESS "3.7.0")
     set(CMAKE_INCLUDE_CURRENT_DIR ON)
 endif()
 
-find_package(Qt5 COMPONENTS Qml REQUIRED Quick REQUIRED)
+find_package(Qt6 COMPONENTS Qml REQUIRED Quick REQUIRED)
 
 include_directories(
     ${PROJECT_SOURCE_DIR}/core
@@ -44,10 +44,8 @@ add_executable(vca_desktop
 )
 
 target_link_libraries(vca_desktop
-    Qt5::Qml
-    Qt5::Quick
     restclient-cpp
     served
-#    sockpp-static
     vca_core
+    ${CONAN_LIBS} # TODO: only use what's necessary
 )

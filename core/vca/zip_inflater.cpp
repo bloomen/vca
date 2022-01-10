@@ -1,6 +1,6 @@
 #include "zip_inflater.h"
 
-#include <zip.h>
+#include <zip/zip.h>
 
 #include "logging.h"
 
@@ -59,7 +59,7 @@ struct Buffer
 
 size_t
 on_extract(void* const arg,
-           const unsigned long long,
+           const uint64_t,
            const void* const data_void,
            const size_t size)
 {

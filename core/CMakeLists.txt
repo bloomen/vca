@@ -28,13 +28,13 @@ add_library(vca_core
 )
 
 target_link_libraries(vca_core
-    ${Boost_LIBRARIES}
-    nlohmann_json
+    ${CONAN_LIBS_BOOST_SYSTEM}
+    ${CONAN_LIBS_NLOHMANN_JSON}
+    ${CONAN_LIBS_SPDLOG}
+    ${CONAN_LIBS_SQLITE3}
+    ${CONAN_LIBS_SQLITECPP}
+    ${CONAN_LIBS_ZLIB}
     platform_folders
-    spdlog
-    sqlite3
-    SQLiteCpp
-    zlib
 )
 
 add_executable(vca_core_test
@@ -48,6 +48,6 @@ target_include_directories(vca_core_test
 )
 
 target_link_libraries(vca_core_test
-    gtest
+    ${CONAN_LIBS_GTEST}
     vca_core
 )
