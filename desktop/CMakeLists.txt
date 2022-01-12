@@ -1,13 +1,3 @@
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
-
-if(CMAKE_VERSION VERSION_LESS "3.7.0")
-    set(CMAKE_INCLUDE_CURRENT_DIR ON)
-endif()
-
-find_package(Qt6 COMPONENTS Qml REQUIRED Quick REQUIRED)
-
 include_directories(
     ${PROJECT_SOURCE_DIR}/core
     src
@@ -43,9 +33,15 @@ add_executable(vca_desktop
     src/view/View.cpp
 )
 
+target_include_directories(vca_desktop
+    PRIVATE ${PROJECT_SOURCE_DIR}/third_party/restclient-cpp/include
+    PRIVATE ${PROJECT_SOURCE_DIR}/third_party/served/src
+)
+
 target_link_libraries(vca_desktop
+    Qt6::Qml
+    Qt6::Quick
     restclient-cpp
     served
     vca_core
-    ${CONAN_LIBS} # TODO: only use what's necessary
 )

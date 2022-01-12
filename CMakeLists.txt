@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.13)
 project(vca)
 
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW)
+
 option(vca_enable_asan "Build vca with address sanitizer." OFF)
 option(vca_enable_tsan "Build vca with thread sanitizer." OFF)
 
@@ -17,16 +19,11 @@ set(SERVED_BUILD_SHARED OFF)
 set(SERVED_BUILD_STATIC ON)
 set(SERVED_BUILD_TESTS OFF)
 set(SERVED_BUILD_EXAMPLES OFF)
-set(SQLITECPP_RUN_CPPLINT OFF)
-set(SQLITE_ENABLE_COLUMN_METADATA)
 set(BUILD_TESTING OFF)
 set(CMAKE_DISABLE_TESTING ON)
-
-find_package(Threads REQUIRED)
-
-include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
 
 if(MSVC)
     add_definitions(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
@@ -43,26 +40,23 @@ if(MSVC)
      endforeach()
 endif()
 
+find_package(Threads REQUIRED)
+
+include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
+
+find_package(Boost 1.78 COMPONENTS system REQUIRED)
+find_package(concurrentqueue REQUIRED)
+find_package(GTest REQUIRED)
+find_package(nlohmann_json REQUIRED)
+find_package(Qt6 COMPONENTS Qml REQUIRED Quick REQUIRED)
+find_package(spdlog REQUIRED)
+find_package(SQLiteCpp REQUIRED)
+find_package(zip REQUIRED)
+
 add_subdirectory(third_party/efsw)
 add_subdirectory(third_party/PlatformFolders)
 add_subdirectory(third_party/restclient-cpp)
 add_subdirectory(third_party/served)
-
-include_directories(
-    ${CONAN_INCLUDE_DIRS_BOOST}
-    ${CONAN_INCLUDE_DIRS_CONCURRENTQUEUE}
-    ${CONAN_INCLUDE_DIRS_KUBA_ZIP}
-    ${CONAN_INCLUDE_DIRS_LIBCURL}
-    ${CONAN_INCLUDE_DIRS_NLOHMANN_JSON}
-    ${CONAN_INCLUDE_DIRS_SPDLOG}
-    ${CONAN_INCLUDE_DIRS_SQLITECPP}
-    ${CONAN_INCLUDE_DIRS_ZLIB}
-    ${CONAN_QT_ROOT}/include
-    third_party/efsw/include
-    third_party/PlatformFolders
-    third_party/restclient-cpp/include
-    third_party/served/src
-)
 
 add_definitions(-DVCA_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 

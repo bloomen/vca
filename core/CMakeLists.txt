@@ -27,14 +27,20 @@ add_library(vca_core
     vca/zip_inflater.cpp
 )
 
+target_include_directories(vca_core
+    PRIVATE ${PROJECT_SOURCE_DIR}/third_party/efsw/include
+    PRIVATE ${PROJECT_SOURCE_DIR}/third_party/PlatformFolders
+)
+
 target_link_libraries(vca_core
-    ${CONAN_LIBS_BOOST_SYSTEM}
-    ${CONAN_LIBS_NLOHMANN_JSON}
-    ${CONAN_LIBS_SPDLOG}
-    ${CONAN_LIBS_SQLITE3}
-    ${CONAN_LIBS_SQLITECPP}
-    ${CONAN_LIBS_ZLIB}
+    Boost::system
+    concurrentqueue::concurrentqueue
+    efsw
+    nlohmann_json::nlohmann_json
     platform_folders
+    spdlog::spdlog
+    SQLiteCpp::SQLiteCpp
+    zip::zip
 )
 
 add_executable(vca_core_test
@@ -48,6 +54,6 @@ target_include_directories(vca_core_test
 )
 
 target_link_libraries(vca_core_test
-    ${CONAN_LIBS_GTEST}
+    GTest::GTest
     vca_core
 )
