@@ -16,3 +16,4 @@ cmake_install.cmake
 /check_build*
 CMakeLists.txt.user
 core/vca/git.cpp
+/.idea
