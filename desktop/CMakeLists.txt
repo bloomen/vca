@@ -62,4 +62,9 @@ add_custom_command(TARGET vca_desktop POST_BUILD
     "${CONAN_QT_ROOT}/res"
     $<TARGET_FILE_DIR:vca_desktop>/../res)
 
+add_custom_command(TARGET vca_desktop POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CONAN_GLIB_ROOT}/bin"
+    $<TARGET_FILE_DIR:vca_desktop>)
+
 endif()
