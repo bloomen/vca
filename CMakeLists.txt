@@ -22,11 +22,22 @@ set(SERVED_BUILD_EXAMPLES OFF)
 set(BUILD_TESTING OFF)
 set(CMAKE_DISABLE_TESTING ON)
 
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Debug)
+endif()
+
 if(MSVC)
     add_definitions(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
 endif()
 
 find_package(Threads REQUIRED)
+
+include(${PROJECT_SOURCE_DIR}/cmake/conan.cmake)
+
+conan_cmake_autodetect(settings BUILD_TYPE ${CMAKE_BUILD_TYPE})
+conan_cmake_install(PATH_OR_REFERENCE ${PROJECT_SOURCE_DIR}
+                    REMOTE conancenter
+                    SETTINGS ${settings})
 
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
