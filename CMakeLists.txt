@@ -27,17 +27,6 @@ set(CMAKE_AUTOUIC ON)
 
 if(MSVC)
     add_definitions(-D_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS)
-    set(CompilerFlags
-        CMAKE_CXX_FLAGS
-        CMAKE_CXX_FLAGS_DEBUG
-        CMAKE_CXX_FLAGS_RELEASE
-        CMAKE_C_FLAGS
-        CMAKE_C_FLAGS_DEBUG
-        CMAKE_C_FLAGS_RELEASE
-     )
-     foreach(CompilerFlag ${CompilerFlags})
-        string(REPLACE "/MD" "/MT" ${CompilerFlag} "${${CompilerFlag}}")
-     endforeach()
 endif()
 
 find_package(Threads REQUIRED)
@@ -67,6 +56,7 @@ if(MSVC)
             add_compile_options(/fsanitize=address)
         endif()
     endif()
+    add_link_options(/ignore:4099)
 else()
     add_compile_options(-Wall -Wconversion -Wextra -Wpedantic)
     if(vca_enable_asan)

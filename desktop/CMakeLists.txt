@@ -45,3 +45,17 @@ target_link_libraries(vca_desktop
     served
     vca_core
 )
+
+if(MSVC)
+
+add_custom_command(TARGET vca_desktop POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CONAN_QT_ROOT}/bin"
+    $<TARGET_FILE_DIR:vca_desktop>)
+
+add_custom_command(TARGET vca_desktop POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CONAN_QT_ROOT}/res"
+    $<TARGET_FILE_DIR:vca_desktop>/../res)
+
+endif()
