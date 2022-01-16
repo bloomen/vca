@@ -9,8 +9,7 @@ Clone vca and its submodules:
 git clone --recursive git@github.com:bloomen/vca.git
 ```
 
-Note: `--build=missing` can be skipped from below commands when dependencies have already been built.
-
+Note: `conan install` can be skipped from below commands when dependencies have already been built for a given build type.
 
 Build on Linux:
 
