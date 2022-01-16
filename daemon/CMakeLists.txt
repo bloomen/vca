@@ -29,6 +29,7 @@ target_include_directories(vca_daemon_lib
 )
 
 target_link_libraries(vca_daemon_lib
+    opencv::opencv
     served
     vca_core
 )
