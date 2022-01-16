@@ -1,3 +1,7 @@
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
 include_directories(
     ${PROJECT_SOURCE_DIR}/core
     src
