@@ -10,6 +10,14 @@ TEST(string, to_lower_case_withEmptyString)
     ASSERT_EQ(str_exp, str);
 }
 
+TEST(string, to_lower_case_withEnglish)
+{
+    vca::String str = U"New Zealand";
+    vca::to_lower_case(str);
+    const vca::String str_exp = U"new zealand";
+    ASSERT_EQ(str_exp, str);
+}
+
 TEST(string, to_lower_case_withGerman)
 {
     vca::String str = U"Martin KÜHN";
@@ -26,11 +34,53 @@ TEST(string, to_lower_case_withChinese)
     ASSERT_EQ(str_exp, str);
 }
 
+TEST(string, to_lower_case_withJapanese)
+{
+    vca::String str = U"こんにちは";
+    vca::to_lower_case(str);
+    const vca::String str_exp = U"こんにちは";
+    ASSERT_EQ(str_exp, str);
+}
+
+TEST(string, to_lower_case_withKorean)
+{
+    vca::String str = U"안녕하세요";
+    vca::to_lower_case(str);
+    const vca::String str_exp = U"안녕하세요";
+    ASSERT_EQ(str_exp, str);
+}
+
+TEST(string, to_lower_case_withNumbers)
+{
+    vca::String str = U"0 1 2 3 4 5 6 7 8 9 .";
+    const vca::String str_exp = str;
+    vca::to_lower_case(str);
+    ASSERT_EQ(str_exp, str);
+}
+
+TEST(string, to_lower_case_withSymobols)
+{
+    vca::String str =
+        U"_-‐–—⹀⸗,;:!¡?¿‽..…·’\"@«»()[]{}⟨⟩<>"
+        U"+±÷×<=>|/\\$%^&*~≈†‡•©⁒";
+    const vca::String str_exp = str;
+    vca::to_lower_case(str);
+    ASSERT_EQ(str_exp, str);
+}
+
 TEST(string, to_upper_case_withEmptyString)
 {
     vca::String str;
     vca::to_upper_case(str);
     const vca::String str_exp;
+    ASSERT_EQ(str_exp, str);
+}
+
+TEST(string, to_upper_case_withEnglish)
+{
+    vca::String str = U"New Zealand";
+    vca::to_upper_case(str);
+    const vca::String str_exp = U"NEW ZEALAND";
     ASSERT_EQ(str_exp, str);
 }
 
@@ -47,6 +97,40 @@ TEST(string, to_upper_case_withChinese)
     vca::String str = U"你好";
     vca::to_upper_case(str);
     const vca::String str_exp = U"你好";
+    ASSERT_EQ(str_exp, str);
+}
+
+TEST(string, to_upper_case_withJapanese)
+{
+    vca::String str = U"こんにちは";
+    vca::to_upper_case(str);
+    const vca::String str_exp = U"こんにちは";
+    ASSERT_EQ(str_exp, str);
+}
+
+TEST(string, to_upper_case_withKorean)
+{
+    vca::String str = U"안녕하세요";
+    vca::to_upper_case(str);
+    const vca::String str_exp = U"안녕하세요";
+    ASSERT_EQ(str_exp, str);
+}
+
+TEST(string, to_upper_case_withNumbers)
+{
+    vca::String str = U"0 1 2 3 4 5 6 7 8 9 .";
+    const vca::String str_exp = str;
+    vca::to_upper_case(str);
+    ASSERT_EQ(str_exp, str);
+}
+
+TEST(string, to_upper_case_withSymobols)
+{
+    vca::String str =
+        U"_-‐–—⹀⸗,;:!¡?¿‽..…·’\"@«»()[]{}⟨⟩<>"
+        U"+±÷×<=>|/\\$%^&*~≈†‡•©⁒";
+    const vca::String str_exp = str;
+    vca::to_upper_case(str);
     ASSERT_EQ(str_exp, str);
 }
 
