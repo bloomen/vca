@@ -1,5 +1,6 @@
 Prerequisites:
 
+* Python3
 * Conan: `pip install conan`
 
 Clone vca and its submodules:
@@ -17,3 +18,8 @@ cmake -DCMAKE_BUILD_TYPE=Release ..
 make -j
 ```
 
+Configure for Visual Studio:
+```
+conan install --build=missing ..
+cmake -G "Visual Studio 16 2019" ..
+```
