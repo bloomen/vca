@@ -20,6 +20,7 @@ make -j
 
 Configure for Visual Studio:
 ```
+mkdir build && cd build
 conan install --build=missing ..
 cmake -G "Visual Studio 16 2019" ..
 ```
