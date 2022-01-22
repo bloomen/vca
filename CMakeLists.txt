@@ -32,7 +32,7 @@ endif()
 
 find_package(Threads REQUIRED)
 
-include(${PROJECT_SOURCE_DIR}/cmake/conan.cmake)
+include(third_party/conan.cmake/conan.cmake)
 
 conan_cmake_autodetect(settings BUILD_TYPE ${CMAKE_BUILD_TYPE})
 conan_cmake_install(PATH_OR_REFERENCE ${PROJECT_SOURCE_DIR}
