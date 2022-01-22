@@ -16,12 +16,12 @@ NodeBase::NodeBase(Model& model,
     , mValue{defaultValue}
     , mHandler{handler}
     , mKey{std::move(key)}
-    , mType{defaultValue.userType()}
+    , mType{defaultValue.metaType()}
     , mDefaultValue{std::move(defaultValue)}
     , mActionable{actionable}
     , mPersistent{persistent}
 {
-    Q_ASSERT(QVariant::Type::Invalid != mType);
+    Q_ASSERT(mType.isValid());
 }
 
 Handler&
@@ -36,7 +36,7 @@ NodeBase::getKey() const
     return mKey;
 }
 
-int
+QMetaType
 NodeBase::getType() const
 {
     return mType;
@@ -57,7 +57,7 @@ NodeBase::getValueUnsafe() const
 void
 NodeBase::setValueUnsafe(QVariant value, const UpdateType updateType)
 {
-    Q_ASSERT(value.userType() == mType);
+    Q_ASSERT(value.metaType() == mType);
     if (mValue != value)
     {
         mModel.trackValueChange(*this, value);

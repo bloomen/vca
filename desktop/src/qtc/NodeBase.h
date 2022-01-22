@@ -37,7 +37,7 @@ public:
     const QString&
     getKey() const;
 
-    int
+    QMetaType
     getType() const;
 
     const QVariant&
@@ -74,7 +74,7 @@ private:
     QVariant mValue;
     Handler& mHandler;
     QString mKey;
-    int mType;
+    QMetaType mType;
     QVariant mDefaultValue;
     bool mActionable;
     bool mPersistent;

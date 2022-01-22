@@ -117,7 +117,7 @@ View::joinPaths(const QString& path1, const QString& path2) const
 }
 
 void
-View::showFile(const QString& dir, const QString& file) const
+View::showFile(const QString& dir, const QString&) const
 {
     QDesktopServices::openUrl(QUrl::fromLocalFile(dir));
 }

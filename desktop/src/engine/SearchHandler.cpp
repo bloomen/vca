@@ -74,7 +74,7 @@ SearchHandler::connect()
             }
         }
 
-        result_count += result_dirs.size();
+        result_count += static_cast<int>(result_dirs.size());
         m_result_dirs.setValue(std::move(result_dirs));
         m_result_files.setValue(std::move(result_files));
         m_result_exts.setValue(std::move(result_exts));

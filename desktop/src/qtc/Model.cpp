@@ -25,7 +25,7 @@ limitActions(std::deque<Action>& actions)
 QVariant
 makeQmlValue(const QVariant& value)
 {
-    if (value.canConvert(QVariant::List))
+    if (value.canConvert<QList<QVariant>>())
     {
         return value.value<QList<QVariant>>();
     }
