@@ -5,15 +5,19 @@
 #include <map>
 #include <unordered_set>
 
+#ifdef VCA_PLATFORM_WINDOWS
 #pragma warning(push)
 #pragma warning(disable : 4389)
 #pragma warning(disable : 4459)
+#endif
 #include <boost/algorithm/string.hpp>
 #include <boost/spirit/include/qi_char_class.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
 #include <boost/spirit/include/qi_operator.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
+#ifdef VCA_PLATFORM_WINDOWS
 #pragma warning(pop)
+#endif
 
 #include "case_mappings.h"
 

@@ -61,13 +61,17 @@ public:
     VCA_DEFAULT_COPY(VcaErrorThrower)
     VCA_DEFAULT_MOVE(VcaErrorThrower)
 
+#ifdef VCA_PLATFORM_WINDOWS
 #pragma warning(push)
 #pragma warning(disable : 4722)
+#endif
     ~VcaErrorThrower() noexcept(false)
     {
         throw VcaError{m_msg};
     }
+#ifdef VCA_PLATFORM_WINDOWS
 #pragma warning(pop)
+#endif
 
     template <typename T>
     VcaErrorThrower&

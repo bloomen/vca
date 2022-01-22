@@ -3,8 +3,6 @@
 #include <algorithm>
 #include <memory>
 
-#include "platform.h"
-
 #ifdef VCA_PLATFORM_UNIX
 #include <cxxabi.h>
 #endif

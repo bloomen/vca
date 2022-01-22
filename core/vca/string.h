@@ -5,8 +5,6 @@
 #include <unordered_set>
 #include <vector>
 
-#include "platform.h"
-
 namespace vca
 {
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include "platform.h"
-
 #ifdef VCA_COMPILER_GCC
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
