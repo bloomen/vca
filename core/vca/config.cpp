@@ -22,6 +22,8 @@ namespace
 struct Keys
 {
     constexpr static const char* const root_dirs = "root_dirs";
+    constexpr static const char* const host = "host";
+    constexpr static const char* const port = "port";
 };
 
 } // namespace
@@ -258,6 +260,52 @@ void
 UserConfig::remove_observer(Observer& observer)
 {
     m_impl->observers.erase(&observer);
+}
+
+const std::string&
+AppConfig::host() const
+{
+    return m_host;
+}
+
+void
+AppConfig::set_port(const int port)
+{
+    m_port = port;
+}
+
+int
+AppConfig::port() const
+{
+    return m_port;
+}
+
+std::string
+AppConfig::url() const
+{
+    return "http://" + m_host + ":" + std::to_string(m_port);
+}
+
+void
+AppConfig::write(const fs::path& filename) const
+{
+    json j;
+    j[Keys::host] = m_host;
+    j[Keys::port] = m_port;
+    std::ofstream{filename} << j;
+}
+
+AppConfig
+AppConfig::read(const fs::path& filename)
+{
+    std::ifstream file{filename};
+    VCA_CHECK(file);
+    auto j = json::parse(file);
+    VCA_CHECK(!file.bad());
+    AppConfig cfg;
+    cfg.m_host = j[Keys::host];
+    cfg.m_port = j[Keys::port];
+    return cfg;
 }
 
 } // namespace vca

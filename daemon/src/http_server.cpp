@@ -9,32 +9,31 @@ namespace vca
 {
 
 HttpServer::HttpServer(vca::CommandQueue& commands,
+                       AppConfig& app_config,
                        UserConfig& user_config,
-                       const vca::UserDb& user_db,
-                       std::string host,
-                       int port)
+                       const vca::UserDb& user_db)
     : m_commands{commands}
     , m_user_config{user_config}
     , m_user_db{user_db}
-    , m_host{std::move(host)}
-    , m_port{port}
 {
     m_mux.handle("/c")
         .get([this](auto&... p) { get_config(p...); })
         .post([this](auto&... p) { set_config(p...); });
     m_mux.handle("/s").get([this](auto&... p) { search(p...); });
+    auto port = app_config.port();
     int retry = 0;
     while (!m_server)
     {
         try
         {
             m_server = std::make_unique<served::net::server>(
-                m_host, std::to_string(m_port), m_mux, false);
+                app_config.host(), std::to_string(port), m_mux, false);
+            app_config.set_port(port);
         }
         catch (const boost::system::system_error&)
         {
             ++retry;
-            ++m_port;
+            ++port;
             if (retry >= 100)
             {
                 throw;
@@ -42,19 +41,7 @@ HttpServer::HttpServer(vca::CommandQueue& commands,
         }
     }
     m_server->run(std::thread::hardware_concurrency(), false);
-    VCA_INFO << "Serving on: " << m_host << ":" << m_port;
-}
-
-const std::string&
-HttpServer::host() const
-{
-    return m_host;
-}
-
-int
-HttpServer::port() const
-{
-    return m_port;
+    VCA_INFO << "Serving on: " << app_config.host() << ":" << app_config.port();
 }
 
 HttpServer::~HttpServer()

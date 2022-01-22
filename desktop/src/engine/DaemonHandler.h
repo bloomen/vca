@@ -9,7 +9,7 @@ class DaemonHandler : public qtc::Handler
 {
 public:
     DaemonHandler(const std::string& host,
-                  const std::string& port,
+                  int port,
                   qtc::Model& model,
                   qtc::ThreadPool& threadPool,
                   qtc::CommandQueue& mainQueue);

@@ -74,8 +74,9 @@ struct Scanner
                     }
                     commands.push([this,
                                    path = std::move(path),
-                                   contents = std::move(contents)]
-                                  { user_db.update_file(path, contents); });
+                                   contents = std::move(contents)] {
+                        user_db.update_file(path, contents);
+                    });
                 }
             }
             VCA_INFO << "Scanning finished: " << root_dir

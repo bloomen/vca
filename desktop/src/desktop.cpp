@@ -1,14 +1,14 @@
 #include <csignal>
 #include <memory>
 
-#include <QtCore/QDir>
 #include <QtCore/QStandardPaths>
 #include <QtCore/QTimer>
-#include <QtGui/QFontDatabase>
 #include <QtGui/QGuiApplication>
 #include <QtQml/QQmlApplicationEngine>
 #include <QtQml/QQmlContext>
 
+#include <vca/config.h>
+#include <vca/file_lock.h>
 #include <vca/filesystem.h>
 #include <vca/logging.h>
 
@@ -23,17 +23,9 @@
 
 #include <view/View.h>
 
-#include "uds_client.h"
-
-#define VCA_REGISTER_QT_METATYPE(typeName)                                     \
-    qRegisterMetaType<typeName>()
-
 int
 main(int argc, char** argv)
 {
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-    QCoreApplication::setAttribute(Qt::AA_UseHighDpiPixmaps);
-
     const auto work_dir = vca::user_config_dir() / "findle";
     fs::create_directories(work_dir);
 
@@ -46,24 +38,34 @@ main(int argc, char** argv)
     QGuiApplication app{argc, argv};
     app.setApplicationName("Findle");
 
-    VCA_REGISTER_QT_METATYPE(QList<bool>);
-    VCA_REGISTER_QT_METATYPE(QList<double>);
-    VCA_REGISTER_QT_METATYPE(QList<qint32>);
-    VCA_REGISTER_QT_METATYPE(QList<quint32>);
-    VCA_REGISTER_QT_METATYPE(QList<qint64>);
-    VCA_REGISTER_QT_METATYPE(QList<quint64>);
-    VCA_REGISTER_QT_METATYPE(QList<QString>);
+    qRegisterMetaType<QList<bool>>();
+    qRegisterMetaType<QList<double>>();
+    qRegisterMetaType<QList<qint32>>();
+    qRegisterMetaType<QList<quint32>>();
+    qRegisterMetaType<QList<qint64>>();
+    qRegisterMetaType<QList<quint64>>();
+    qRegisterMetaType<QList<QString>>();
 
     qtc::Model model{"findle", "Findle"};
     qtc::ThreadPool threadPool{std::thread::hardware_concurrency()};
 
     qtc::CommandQueue mainQueue;
 
-    vca::UdsClient uds_client{work_dir / "findle.sock",
-                              work_dir / "findled.sock"};
+    vca::AppConfig app_config;
+    const auto app_config_path = work_dir / "app.json";
+    while (!fs::exists(app_config_path))
+    {
+        VCA_INFO << "Waiting for: " << app_config_path;
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+    }
+
+    {
+        vca::FileGuard app_config_lock{app_config_path};
+        app_config = vca::AppConfig::read(app_config_path);
+    }
 
     model.addHandler(std::make_unique<vca::DaemonHandler>(
-        uds_client.host(), uds_client.port(), model, threadPool, mainQueue));
+        app_config.host(), app_config.port(), model, threadPool, mainQueue));
     model.addHandler(
         std::make_unique<vca::SearchHandler>(model, threadPool, mainQueue));
 

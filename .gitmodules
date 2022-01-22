@@ -10,3 +10,6 @@
 [submodule "third_party/restclient-cpp"]
 	path = third_party/restclient-cpp
 	url = git@github.com:bloomen/restclient-cpp.git
+[submodule "third_party/Format.cmake"]
+	path = third_party/Format.cmake
+	url = https://github.com/TheLartians/Format.cmake

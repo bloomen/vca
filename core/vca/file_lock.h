@@ -1,6 +1,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 
 #include "filesystem.h"
 #include "utils.h"
@@ -27,6 +28,20 @@ public:
 private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;
+};
+
+class FileGuard
+{
+public:
+    explicit FileGuard(const fs::path& path)
+        : m_lock{path}
+        , m_guard{m_lock}
+    {
+    }
+
+private:
+    vca::FileLock m_lock;
+    std::lock_guard<vca::FileLock> m_guard;
 };
 
 } // namespace vca

@@ -9,8 +9,6 @@ include_directories(
 
 add_executable(vca_desktop
     src/desktop.cpp
-    src/uds_client.h
-    src/uds_client.cpp
     src/engine/DaemonHandler.h
     src/engine/DaemonHandler.cpp
     src/engine/SearchHandler.h

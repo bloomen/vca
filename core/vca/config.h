@@ -55,6 +55,24 @@ public:
 
     VCA_DELETE_COPY(AppConfig)
     VCA_DEFAULT_MOVE(AppConfig)
+
+    const std::string&
+    host() const;
+    void
+    set_port(int port);
+    int
+    port() const;
+    std::string
+    url() const;
+
+    void
+    write(const fs::path& filename) const;
+    static AppConfig
+    read(const fs::path& filename);
+
+private:
+    std::string m_host{"127.0.0.1"};
+    int m_port{7777};
 };
 
 } // namespace vca

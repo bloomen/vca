@@ -8,12 +8,13 @@
 #include <spdlog/spdlog.h>
 
 #include <vca/config.h>
+#include <vca/file_lock.h>
 #include <vca/filesystem.h>
+#include <vca/json.h>
 #include <vca/logging.h>
 #include <vca/string.h>
 #include <vca/time.h>
 #include <vca/utils.h>
-#include <vca/json.h>
 
 using json = nlohmann::json;
 
@@ -22,7 +23,7 @@ main(const int, char**)
 {
     try
     {
-        const auto work_dir = vca::user_config_dir() / "vca";
+        const auto work_dir = vca::user_config_dir() / "findle";
         fs::create_directories(work_dir);
 
         vca::init_logging();
@@ -30,6 +31,19 @@ main(const int, char**)
         auto cmdline = spdlog::stdout_logger_mt("cmdline_logger");
         cmdline->set_formatter(std::make_unique<spdlog::pattern_formatter>(
             "%v", spdlog::pattern_time_type::local, ""));
+
+        vca::AppConfig app_config;
+        const auto app_config_path = work_dir / "app.json";
+        while (!fs::exists(app_config_path))
+        {
+            VCA_INFO << "Waiting for: " << app_config_path;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+        }
+
+        {
+            vca::FileGuard app_config_lock{app_config_path};
+            app_config = vca::AppConfig::read(app_config_path);
+        }
 
         std::string input;
         for (;;)
@@ -67,7 +81,8 @@ main(const int, char**)
 
                 VCA_INFO << "Searching ...";
                 vca::Timer timer;
-                const auto query = "http://localhost:7777/s?v=" + served::query_escape(value);
+                const auto query =
+                    app_config.url() + "/s?v=" + served::query_escape(value);
                 VCA_INFO << "Query: " << query;
                 const auto response = RestClient::get(query);
                 if (response.code != 200)
@@ -80,7 +95,10 @@ main(const int, char**)
 
                 for (const auto& result : j["results"])
                 {
-                    cmdline->info((fs::u8path(result["d"].get<std::string>()) / fs::u8path(result["f"].get<std::string>())).u8string() + "\n");
+                    cmdline->info((fs::u8path(result["d"].get<std::string>()) /
+                                   fs::u8path(result["f"].get<std::string>()))
+                                      .u8string() +
+                                  "\n");
                 }
             }
             else

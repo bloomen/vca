@@ -14,15 +14,9 @@ class HttpServer
 {
 public:
     HttpServer(vca::CommandQueue& commands,
+               AppConfig& app_config,
                UserConfig& user_config,
-               const vca::UserDb& user_db,
-               std::string host,
-               int port);
-
-    const std::string&
-    host() const;
-    int
-    port() const;
+               const vca::UserDb& user_db);
 
     VCA_DELETE_COPY(HttpServer)
     VCA_DELETE_MOVE(HttpServer)
@@ -40,8 +34,6 @@ private:
     vca::CommandQueue& m_commands;
     UserConfig& m_user_config;
     const vca::UserDb& m_user_db;
-    std::string m_host;
-    int m_port;
     served::multiplexer m_mux;
     std::unique_ptr<served::net::server> m_server;
 };

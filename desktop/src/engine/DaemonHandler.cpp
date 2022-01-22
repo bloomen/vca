@@ -10,7 +10,7 @@ namespace vca
 {
 
 DaemonHandler::DaemonHandler(const std::string& host,
-                             const std::string& port,
+                             const int port,
                              qtc::Model& model,
                              qtc::ThreadPool& threadPool,
                              qtc::CommandQueue& mainQueue)
@@ -21,7 +21,7 @@ DaemonHandler::DaemonHandler(const std::string& host,
     hosts.append(QString::fromStdString(host));
     m_daemon_hosts.setValue(std::move(hosts));
     QList<QString> ports;
-    ports.append(QString::fromStdString(port));
+    ports.append(QString::fromStdString(std::to_string(port)));
     m_daemon_ports.setValue(std::move(ports));
 }
 

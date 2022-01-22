@@ -52,6 +52,7 @@ find_package(SQLiteCpp REQUIRED)
 find_package(zip REQUIRED)
 
 add_subdirectory(third_party/efsw)
+add_subdirectory(third_party/Format.cmake)
 add_subdirectory(third_party/PlatformFolders)
 add_subdirectory(third_party/restclient-cpp)
 add_subdirectory(third_party/served)

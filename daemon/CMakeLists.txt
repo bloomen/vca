@@ -16,8 +16,6 @@ add_library(vca_daemon_lib
     src/tokenizer.h
     src/txt_tokenizer.h
     src/txt_tokenizer.cpp
-    src/uds_server.h
-    src/uds_server.cpp
     src/xml_tokenizer.h
     src/xml_tokenizer.cpp
     src/zipxml_tokenizer.h
