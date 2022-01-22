@@ -86,7 +86,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         }
     }
 
-    bool
+    static bool
     valid_root_dir(const fs::path& path)
     {
         if (!fs::exists(path))
@@ -115,12 +115,12 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         root_dirs.clear();
         for (const auto& dir : j[Keys::root_dirs])
         {
-            auto path = fs::u8path(dir.get<std::string>());
-            if (!valid_root_dir(path))
+            auto p = fs::u8path(dir.get<std::string>());
+            if (!valid_root_dir(p))
             {
                 continue;
             }
-            root_dirs.emplace(std::move(path));
+            root_dirs.emplace(std::move(p));
         }
         normalize_root_dirs();
     }

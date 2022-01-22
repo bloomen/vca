@@ -112,17 +112,16 @@ struct SqliteUserDb::Impl
     }
 
     std::pair<fs::path, int>
-    relative(const fs::path& path) const
+    relative(const fs::path& p) const
     {
         for (const auto& [dir, id] : root_dirs)
         {
-            if (is_parent_of(dir, path))
+            if (is_parent_of(dir, p))
             {
-                auto p = fs::relative(path, dir);
-                return std::make_pair(std::move(p), id);
+                return std::make_pair(fs::relative(p, dir), id);
             }
         }
-        VCA_CHECK(false) << "No root_dir found for: " << path;
+        VCA_CHECK(false) << "No root_dir found for: " << p;
         return {};
     }
 

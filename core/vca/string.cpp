@@ -5,11 +5,15 @@
 #include <map>
 #include <unordered_set>
 
+#pragma warning(push)
+#pragma warning(disable : 4389)
+#pragma warning(disable : 4459)
 #include <boost/algorithm/string.hpp>
 #include <boost/spirit/include/qi_char_class.hpp>
 #include <boost/spirit/include/qi_numeric.hpp>
 #include <boost/spirit/include/qi_operator.hpp>
 #include <boost/spirit/include/qi_parse.hpp>
+#pragma warning(pop)
 
 #include "case_mappings.h"
 
@@ -211,7 +215,7 @@ XMLParser::next()
     {
         wide_text = narrow_to_wide(text);
     }
-    catch (std::range_error& e)
+    catch (const std::range_error&)
     {
         // return empty string if conversion failed (i.e. if binary data)
         return wide_text;

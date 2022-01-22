@@ -60,7 +60,7 @@ add_subdirectory(third_party/served)
 add_definitions(-DVCA_SOURCE_DIR="${PROJECT_SOURCE_DIR}")
 
 if(MSVC)
-    add_compile_options(/utf-8 /W4 /bigobj /EHsc /wd4503 /wd4996 /wd4702 /wd4100 /wd4706 /wd26812 /wd4373)
+    add_compile_options(/utf-8 /WX /W4 /bigobj /EHsc /wd4503 /wd4996 /wd4702 /wd4100 /wd4706 /wd26812 /wd4373)
     if(${MSVC_VERSION} GREATER_EQUAL 1929)
         if(vca_enable_asan)
             add_compile_options(/fsanitize=address)
@@ -83,3 +83,16 @@ add_subdirectory(core)
 add_subdirectory(command)
 add_subdirectory(daemon)
 add_subdirectory(desktop)
+
+set_target_properties(
+BeginMessage
+check-clang-format
+check-cmake-format
+check-format
+clang-format
+cmake-format
+fix-clang-format
+fix-cmake-format
+fix-format
+format
+PROPERTIES EXCLUDE_FROM_ALL 1 EXCLUDE_FROM_DEFAULT_BUILD 1)

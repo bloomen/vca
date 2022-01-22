@@ -3,6 +3,7 @@ Prerequisites:
 * CMake
 * Python3
 * Conan: `pip install conan`
+* clang-format 10
 
 Clone vca and its submodules:
 ```
