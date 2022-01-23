@@ -29,12 +29,14 @@ StatusHandler::~StatusHandler()
     }
 }
 
-void StatusHandler::connect()
+void
+StatusHandler::connect()
 {
-    m_thread = std::thread{[this]{ worker(); }};
+    m_thread = std::thread{[this] { worker(); }};
 }
 
-void StatusHandler::worker()
+void
+StatusHandler::worker()
 {
     const auto& daemon_handler =
         static_cast<DaemonHandler&>(getHandler("/daemon"));
