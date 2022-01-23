@@ -42,6 +42,9 @@ public:
     std::vector<SearchResult>
     search(const FileContents& contents) const override;
 
+    std::chrono::time_point<std::chrono::system_clock>
+    last_file_update() const override;
+
 private:
     struct Impl;
     std::unique_ptr<Impl> m_impl;

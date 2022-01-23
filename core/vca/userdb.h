@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include <set>
 #include <vector>
 
@@ -85,6 +86,9 @@ public:
 
     virtual std::vector<SearchResult>
     search(const FileContents& contents) const = 0;
+
+    virtual std::chrono::time_point<std::chrono::system_clock>
+    last_file_update() const = 0;
 };
 
 } // namespace vca

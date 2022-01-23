@@ -8,6 +8,8 @@ add_executable(vca_desktop
     src/engine/DaemonHandler.cpp
     src/engine/SearchHandler.h
     src/engine/SearchHandler.cpp
+    src/engine/StatusHandler.h
+    src/engine/StatusHandler.cpp
     src/qtc/Action.h
     src/qtc/CommandQueue.h
     src/qtc/CommandQueue.cpp

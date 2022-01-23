@@ -20,6 +20,7 @@ HttpServer::HttpServer(vca::CommandQueue& commands,
         .get([this](auto&... p) { get_config(p...); })
         .post([this](auto&... p) { set_config(p...); });
     m_mux.handle("/s").get([this](auto&... p) { search(p...); });
+    m_mux.handle("/t").get([this](auto&... p) { status(p...); });
     auto port = app_config.port();
     int retry = 0;
     while (!m_server)
@@ -103,6 +104,21 @@ HttpServer::search(served::response& res, const served::request& req)
     }
     j["results"] = j_results;
 
+    std::ostringstream os;
+    os << j;
+    res << os.str();
+    res.set_status(200);
+}
+
+void
+HttpServer::status(served::response& res, const served::request&)
+{
+    auto future =
+        m_commands.push([this] { return m_user_db.last_file_update(); });
+    const auto last_file_update = future.get();
+    json j;
+    j["indexing"] = (std::chrono::system_clock::now() - last_file_update) <
+        std::chrono::seconds{2};
     std::ostringstream os;
     os << j;
     res << os.str();

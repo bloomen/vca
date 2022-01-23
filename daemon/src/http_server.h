@@ -30,6 +30,8 @@ private:
     set_config(served::response& res, const served::request& req);
     void
     search(served::response& res, const served::request& req);
+    void
+    status(served::response& res, const served::request& req);
 
     vca::CommandQueue& m_commands;
     UserConfig& m_user_config;

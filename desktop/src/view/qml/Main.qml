@@ -10,6 +10,12 @@ Window {
     title: vcaModel.appName()
 
     VcaOutput {
+        id: indexing
+        endpoint: "/status"
+        node: "indexing"
+    }
+
+    VcaOutput {
         id: result_count
         endpoint: "/search"
         node: "result_count"
@@ -37,10 +43,34 @@ Window {
         anchors.margins: 30
         spacing: 20
 
-        VcaLabel {
-            Layout.alignment: Qt.AlignHCenter
-            text: qsTr("Find Anything!")
-            color: Style.colorPrimary
+        RowLayout {
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            VcaLabel {
+                Layout.alignment: Qt.AlignHCenter
+                text: qsTr("Find Anything!")
+                color: Style.colorPrimary
+            }
+
+            Item {
+                Layout.fillWidth: true
+            }
+
+            VcaLabel {
+                Layout.alignment: Qt.AlignRight
+                text: "⬤"
+                // TODO: Make it blink when indexing?
+                color: indexing.value ? Style.colorPrimary : "white"
+            }
+
+            Item {
+                Layout.preferredWidth: 2
+            }
         }
 
         RowLayout {

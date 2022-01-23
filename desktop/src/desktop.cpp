@@ -20,6 +20,7 @@
 
 #include <engine/DaemonHandler.h>
 #include <engine/SearchHandler.h>
+#include <engine/StatusHandler.h>
 
 #include <view/View.h>
 
@@ -68,6 +69,8 @@ main(int argc, char** argv)
         app_config.host(), app_config.port(), model, threadPool, mainQueue));
     model.addHandler(
         std::make_unique<vca::SearchHandler>(model, threadPool, mainQueue));
+    model.addHandler(
+        std::make_unique<vca::StatusHandler>(model, threadPool, mainQueue));
 
     model.connectHandlers();
 

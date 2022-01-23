@@ -132,6 +132,8 @@ struct SqliteUserDb::Impl
     SQLite::Database db;
     int roots_id = 0;
     std::map<fs::path, int> root_dirs;
+    std::chrono::time_point<std::chrono::system_clock> last_file_update =
+        std::chrono::system_clock::now();
 };
 
 SqliteUserDb::SqliteUserDb(fs::path path, const OpenType open_type)
@@ -222,6 +224,7 @@ SqliteUserDb::remove_root_dir(const fs::path& root_dir)
 void
 SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 {
+    m_impl->last_file_update = std::chrono::system_clock::now();
     VCA_DEBUG << __func__ << ": " << path;
     m_impl->cache.clear();
     const auto [p, roots_id] = m_impl->relative(path);
@@ -271,6 +274,7 @@ SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 void
 SqliteUserDb::remove_file(const fs::path& path)
 {
+    m_impl->last_file_update = std::chrono::system_clock::now();
     VCA_DEBUG << __func__ << ": " << path;
     m_impl->cache.clear();
     const auto [p, roots_id] = m_impl->relative(path);
@@ -284,6 +288,7 @@ SqliteUserDb::remove_file(const fs::path& path)
 void
 SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
 {
+    m_impl->last_file_update = std::chrono::system_clock::now();
     VCA_DEBUG << __func__ << ": " << old_path << " - " << path;
     m_impl->cache.clear();
     const auto [old_p, old_roots_id] = m_impl->relative(old_path);
@@ -340,6 +345,12 @@ SqliteUserDb::search(const FileContents& contents) const
 
     m_impl->cache.insert(contents, results);
     return results;
+}
+
+std::chrono::time_point<std::chrono::system_clock>
+SqliteUserDb::last_file_update() const
+{
+    return m_impl->last_file_update;
 }
 
 } // namespace vca
