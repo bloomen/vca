@@ -2,11 +2,6 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-include_directories(
-    ${PROJECT_SOURCE_DIR}/core
-    src
-)
-
 add_executable(vca_desktop
     src/desktop.cpp
     src/engine/DaemonHandler.h
@@ -36,6 +31,8 @@ add_executable(vca_desktop
 )
 
 target_include_directories(vca_desktop
+    PRIVATE ${PROJECT_SOURCE_DIR}/core
+    PRIVATE src
     PRIVATE ${PROJECT_SOURCE_DIR}/third_party/restclient-cpp/include
     PRIVATE ${PROJECT_SOURCE_DIR}/third_party/served/src
 )

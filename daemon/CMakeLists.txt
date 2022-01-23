@@ -1,7 +1,3 @@
-include_directories(
-    ${PROJECT_SOURCE_DIR}/core
-)
-
 add_library(vca_daemon_lib
     src/file_processor.h
     src/file_processor.cpp
@@ -23,6 +19,7 @@ add_library(vca_daemon_lib
 )
 
 target_include_directories(vca_daemon_lib
+    PUBLIC ${PROJECT_SOURCE_DIR}/core
     PUBLIC ${PROJECT_SOURCE_DIR}/third_party/served/src
 )
 
