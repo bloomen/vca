@@ -19,7 +19,9 @@ QtObject {
     readonly property real opacityDimmed: 0.85
     readonly property real opacityDisabled: 0.6
 
-    readonly property color colorBackground: rgba(211, 211, 211, 1)
+    readonly property color colorBackground: rgba(255, 255, 255, 1)
+    readonly property color colorDisabled: rgba(211, 211, 211, 1)
+    readonly property color colorAlert: rgba(50, 205, 50, 1)
 
     readonly property color colorPrimary: rgba(128, 0, 128, 1)
     readonly property color colorSecondary: rgba(224, 255, 255, 1)

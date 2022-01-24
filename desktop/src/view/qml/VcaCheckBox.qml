@@ -24,7 +24,7 @@ Rectangle {
             return Style.textColorNormal
         }
         else {
-            return Style.colorBackground
+            return Style.colorDisabled
         }
     }
 

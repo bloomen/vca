@@ -8,6 +8,13 @@ Window {
     minimumWidth: 640
     minimumHeight: 480
     title: vcaModel.appName()
+    color: Style.colorBackground
+
+    VcaOutput {
+        id: connected
+        endpoint: "/status"
+        node: "connected"
+    }
 
     VcaOutput {
         id: indexing
@@ -62,10 +69,24 @@ Window {
             }
 
             VcaLabel {
+                id: statusLabel
                 Layout.alignment: Qt.AlignRight
                 text: "⬤"
-                // TODO: Make it blink when indexing?
-                color: indexing.value ? Style.colorPrimary : "white"
+                color: {
+                    if (!connected.value) {
+                        return Style.colorDisabled;
+                    }
+                    return Style.colorAlert;
+                }
+                SequentialAnimation {
+                    running: connected.value && indexing.value
+                    loops: Animation.Infinite
+                    NumberAnimation { target: statusLabel; property: "opacity"; from: 0; to: 1; duration: 1000 }
+                    NumberAnimation { target: statusLabel; property: "opacity"; from: 1; to: 0; duration: 1000 }
+                    onStopped: {
+                        statusLabel.opacity = 1;
+                    }
+                }
             }
 
             Item {

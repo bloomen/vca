@@ -18,7 +18,8 @@ public:
 
     ~StatusHandler();
 
-    qtc::Node<bool>& m_indexing = addNode("indexing", true, false, false);
+    qtc::Node<bool>& m_connected = addNode("connected", false, false, false);
+    qtc::Node<bool>& m_indexing = addNode("indexing", false, false, false);
 
     void
     connect() override;
@@ -27,7 +28,7 @@ private:
     void
     worker();
 
-    std::mutex m_indexing_mutex;
+    std::mutex m_model_mutex;
     std::atomic<bool> m_done{false};
     std::thread m_thread;
 };

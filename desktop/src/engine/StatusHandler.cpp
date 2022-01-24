@@ -45,6 +45,7 @@ StatusHandler::worker()
     {
         const auto hosts = daemon_handler.m_daemon_hosts.getValue();
         const auto ports = daemon_handler.m_daemon_ports.getValue();
+        bool connected = false;
         bool indexing = false;
         for (int i = 0; i < daemon_handler.m_daemon_count.getValue(); ++i)
         {
@@ -56,17 +57,21 @@ StatusHandler::worker()
             const auto query = "http://" + hosts[i].toStdString() + ":" +
                 ports[i].toStdString() + "/t";
             const auto response = RestClient::get(query);
-            if (response.code != 200)
+            connected = response.code == 200;
+            if (!connected)
             {
-                VCA_ERROR << "Received error code: " << response.code;
-                return;
+                indexing = false;
+                VCA_ERROR << "Received error code: " << response.code
+                          << " from: " << hosts[i].toStdString();
+                break;
             }
             json j = json::parse(response.body);
             indexing = j["indexing"];
         }
 
         {
-            std::lock_guard lock{m_indexing_mutex};
+            std::lock_guard lock{m_model_mutex};
+            m_connected.setValue(connected);
             m_indexing.setValue(indexing);
         }
 
