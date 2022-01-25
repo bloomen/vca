@@ -21,6 +21,12 @@ public:
         addNode("result_files", QList<QString>{}, false, false);
     qtc::Node<QList<QString>>& m_result_exts =
         addNode("result_exts", QList<QString>{}, false, false);
+    qtc::Node<QList<QString>>& m_dir_exclusions =
+        addNode("dir_exclusions", QList<QString>{}, true, true);
+    qtc::Node<QList<QString>>& m_file_exclusions =
+        addNode("file_exclusions", QList<QString>{}, true, true);
+    qtc::Node<QList<QString>>& m_ext_exclusions =
+        addNode("ext_exclusions", QList<QString>{}, true, true);
 
     void
     connect() override;

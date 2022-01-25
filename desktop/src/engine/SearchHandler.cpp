@@ -36,6 +36,10 @@ SearchHandler::connect()
             return;
         }
 
+        const auto dir_exclusions = m_dir_exclusions.getValue();
+        const auto file_exclusions = m_file_exclusions.getValue();
+        const auto ext_exclusions = m_ext_exclusions.getValue();
+
         const auto& daemon_handler =
             static_cast<DaemonHandler&>(getHandler("/daemon"));
 
@@ -65,12 +69,39 @@ SearchHandler::connect()
 
             for (const auto& result : j["results"])
             {
-                result_dirs.append(
-                    QString::fromUtf8(result["d"].get<std::string>().c_str()));
-                result_files.append(
-                    QString::fromUtf8(result["f"].get<std::string>().c_str()));
-                result_exts.append(
-                    QString::fromUtf8(result["e"].get<std::string>().c_str()));
+                auto directory =
+                    QString::fromUtf8(result["d"].get<std::string>().c_str());
+                for (const auto& ex : dir_exclusions)
+                {
+                    if (directory.contains(ex, Qt::CaseInsensitive))
+                    {
+                        continue;
+                    }
+                }
+
+                auto filename =
+                    QString::fromUtf8(result["f"].get<std::string>().c_str());
+                for (const auto& ex : file_exclusions)
+                {
+                    if (directory.contains(ex, Qt::CaseInsensitive))
+                    {
+                        continue;
+                    }
+                }
+
+                auto extension =
+                    QString::fromUtf8(result["e"].get<std::string>().c_str());
+                for (const auto& ex : ext_exclusions)
+                {
+                    if (extension.contains(ex, Qt::CaseInsensitive))
+                    {
+                        continue;
+                    }
+                }
+
+                result_dirs.append(std::move(directory));
+                result_files.append(std::move(filename));
+                result_exts.append(std::move(extension));
             }
         }
 
