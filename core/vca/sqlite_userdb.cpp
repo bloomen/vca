@@ -337,10 +337,7 @@ SqliteUserDb::search(const FileContents& contents) const
     std::vector<SearchResult> results;
     for (const auto& pair : results_map)
     {
-        if (pair.second == contents.words.size())
-        {
-            results.emplace_back(pair.first);
-        }
+        results.emplace_back(pair.first);
     }
 
     m_impl->cache.insert(contents, results);
