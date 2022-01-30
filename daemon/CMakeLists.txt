@@ -50,3 +50,17 @@ target_link_libraries(vca_daemon_test
     GTest::GTest
     vca_daemon_lib
 )
+
+if(MSVC)
+
+add_custom_command(TARGET vca_daemon POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CONAN_PODOFO_ROOT}/bin"
+    $<TARGET_FILE_DIR:vca_daemon>)
+
+add_custom_command(TARGET vca_daemon_test POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${CONAN_PODOFO_ROOT}/bin"
+    $<TARGET_FILE_DIR:vca_daemon_test>)
+
+endif()
