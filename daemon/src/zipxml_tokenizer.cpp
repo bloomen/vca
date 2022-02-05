@@ -10,7 +10,7 @@ namespace vca
 namespace
 {
 
-constexpr size_t g_max_byte_count = 8192;
+constexpr size_t g_max_byte_count = 81920;
 
 }
 

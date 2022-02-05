@@ -1,5 +1,6 @@
 #include "zip_inflater.h"
 
+#include <regex>
 #include <zip/zip.h>
 
 #include "logging.h"
@@ -9,47 +10,6 @@ namespace vca
 
 namespace
 {
-
-struct ZipDeleter
-{
-    void
-    operator()(zip_t* file) const
-    {
-        if (file)
-        {
-            zip_close(file);
-        }
-    }
-};
-
-class ZipFile
-{
-public:
-    ZipFile(const fs::path& file, const std::string& entry)
-        : m_file{zip_open(file.u8string().c_str(), 0, 'r'), ZipDeleter{}}
-    {
-        VCA_CHECK(m_file) << "Could not open zip file: " << file;
-        VCA_CHECK(!zip_entry_open(m_file.get(), entry.c_str()))
-            << "Could not open zip entry in: " << file;
-    }
-
-    ~ZipFile()
-    {
-        zip_entry_close(m_file.get());
-    }
-
-    VCA_DELETE_COPY(ZipFile)
-    VCA_DELETE_MOVE(ZipFile)
-
-    zip_t*
-    handle() const
-    {
-        return m_file.get();
-    }
-
-private:
-    std::unique_ptr<zip_t, ZipDeleter> m_file;
-};
 
 struct Buffer
 {
@@ -73,6 +33,58 @@ on_extract(void* const arg,
     return size;
 }
 
+struct ZipDeleter
+{
+    void
+    operator()(zip_t* file) const
+    {
+        if (file)
+        {
+            zip_close(file);
+        }
+    }
+};
+
+class ZipFile
+{
+public:
+    ZipFile(const fs::path& file, const std::string& entry)
+        : m_file{zip_open(file.u8string().c_str(), 0, 'r'), ZipDeleter{}}
+        , m_regex{entry}
+    {
+        VCA_CHECK(m_file) << "Could not open zip file: " << file;
+        m_entry_count = static_cast<int>(zip_entries_total(m_file.get()));
+    }
+
+    bool
+    process_next_entry(Buffer& buffer)
+    {
+        if (m_current_entry >= m_entry_count)
+        {
+            return false;
+        }
+        VCA_CHECK(!zip_entry_openbyindex(m_file.get(), m_current_entry))
+            << "Could not open zip entry at: " << m_current_entry;
+        const std::string name = zip_entry_name(m_file.get());
+        if (std::regex_match(name, m_regex))
+        {
+            zip_entry_extract(m_file.get(), on_extract, &buffer);
+        }
+        zip_entry_close(m_file.get());
+        ++m_current_entry;
+        return true;
+    }
+
+    VCA_DELETE_COPY(ZipFile)
+    VCA_DELETE_MOVE(ZipFile)
+
+private:
+    std::unique_ptr<zip_t, ZipDeleter> m_file;
+    std::regex m_regex;
+    int m_entry_count = 0;
+    int m_current_entry = 0;
+};
+
 } // namespace
 
 struct ZipInflater::Impl
@@ -83,7 +95,9 @@ struct ZipInflater::Impl
         : zip_file{file, entry}
     {
         buffer.max_byte_count = max_byte_count;
-        zip_entry_extract(zip_file.handle(), on_extract, &buffer);
+        while (buffer.data.size() <= max_byte_count &&
+               zip_file.process_next_entry(buffer))
+            ;
     }
 
     ZipFile zip_file;

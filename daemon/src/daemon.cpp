@@ -72,6 +72,9 @@ main(const int, char**)
         file_processor.add_tokenizer(
             U".xlsx",
             std::make_unique<vca::ZipxmlTokenizer>("xl/sharedStrings.xml"));
+        file_processor.add_tokenizer(U".pptx",
+                                     std::make_unique<vca::ZipxmlTokenizer>(
+                                         "ppt/slides/slide[0-9]\\d*.xml"));
         file_processor.add_tokenizer(U".pdf",
                                      std::make_unique<vca::PdfTokenizer>());
 
