@@ -75,6 +75,12 @@ main(const int, char**)
         file_processor.add_tokenizer(U".pptx",
                                      std::make_unique<vca::ZipxmlTokenizer>(
                                          "ppt/slides/slide[0-9]\\d*.xml"));
+        file_processor.add_tokenizer(
+            U".odt", std::make_unique<vca::ZipxmlTokenizer>("content.xml"));
+        file_processor.add_tokenizer(
+            U".ods", std::make_unique<vca::ZipxmlTokenizer>("content.xml"));
+        file_processor.add_tokenizer(
+            U".odp", std::make_unique<vca::ZipxmlTokenizer>("content.xml"));
         file_processor.add_tokenizer(U".pdf",
                                      std::make_unique<vca::PdfTokenizer>());
 
