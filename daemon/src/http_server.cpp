@@ -62,6 +62,7 @@ void
 HttpServer::set_config(served::response& res, const served::request& req)
 {
     const auto json = req.body();
+    // TODO: add check for root dirs existing
     m_user_config.set_json(json);
     res.set_status(200);
 }
