@@ -27,10 +27,10 @@
 int
 main(int argc, char** argv)
 {
-    const auto work_dir = vca::user_config_dir() / "findle";
-    fs::create_directories(work_dir);
+    const auto work_dir = vca::user_config_dir() / vca::Path{"findle"};
+    vca::create_directories(work_dir);
 
-    vca::init_logging(work_dir / "logs" / "findle.log");
+    vca::init_logging(work_dir / vca::Path{"logs"} / vca::Path{"findle.log"});
     vca::set_log_level(vca::Logger::Level::Debug);
 
     VCA_INFO << "Starting findle";
@@ -53,8 +53,8 @@ main(int argc, char** argv)
     qtc::CommandQueue mainQueue;
 
     vca::AppConfig app_config;
-    const auto app_config_path = work_dir / "app.json";
-    while (!fs::exists(app_config_path))
+    const auto app_config_path = work_dir / vca::Path{"app.json"};
+    while (!app_config_path.exists())
     {
         VCA_INFO << "Waiting for: " << app_config_path;
         std::this_thread::sleep_for(std::chrono::seconds(1));

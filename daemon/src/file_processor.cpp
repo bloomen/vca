@@ -42,10 +42,10 @@ FileProcessor::add_tokenizer(String ext, std::unique_ptr<Tokenizer> tokenizer)
 }
 
 std::vector<std::string>
-FileProcessor::process(const fs::path& file) const
+FileProcessor::process(const Path& file) const
 {
-    const auto stem = file.filename().stem().u32string();
-    auto ext = file.extension().u32string();
+    const auto stem = file.filename().stem().to_wide();
+    auto ext = file.extension().to_wide();
     to_lower_case(ext);
 
     auto words = tokenize_filename(stem, ext);

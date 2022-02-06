@@ -23,7 +23,7 @@ public:
     add_tokenizer(String ext, std::unique_ptr<Tokenizer> tokenizer);
 
     std::vector<std::string>
-    process(const fs::path& file) const;
+    process(const Path& file) const;
 
 private:
     const Tokenizer*

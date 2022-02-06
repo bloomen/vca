@@ -20,7 +20,7 @@ ZipxmlTokenizer::ZipxmlTokenizer(std::string entry)
 }
 
 std::vector<String>
-ZipxmlTokenizer::extract(const fs::path& file) const
+ZipxmlTokenizer::extract(const Path& file) const
 {
     std::string content;
     try

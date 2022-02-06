@@ -11,7 +11,7 @@ public:
     explicit ZipxmlTokenizer(std::string entry);
 
     std::vector<String>
-    extract(const fs::path& file) const override;
+    extract(const Path& file) const override;
 
 private:
     std::string m_entry;

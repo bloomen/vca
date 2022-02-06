@@ -11,33 +11,33 @@ namespace vca
 class SqliteUserDb : public UserDb
 {
 public:
-    explicit SqliteUserDb(fs::path path, OpenType open_type);
+    explicit SqliteUserDb(Path path, OpenType open_type);
 
     VCA_DELETE_COPY(SqliteUserDb)
     VCA_DEFAULT_MOVE(SqliteUserDb)
 
     ~SqliteUserDb();
 
-    const fs::path&
+    const Path&
     path() const override;
 
     void
-    create(const std::set<fs::path>& root_dir) override;
+    create(const std::set<Path>& root_dir) override;
 
     void
-    add_root_dir(const fs::path& root_dir) override;
+    add_root_dir(const Path& root_dir) override;
 
     void
-    remove_root_dir(const fs::path& root_dir) override;
+    remove_root_dir(const Path& root_dir) override;
 
     void
-    update_file(const fs::path& path, const FileContents& contents) override;
+    update_file(const Path& path, const FileContents& contents) override;
 
     void
-    remove_file(const fs::path& path) override;
+    remove_file(const Path& path) override;
 
     void
-    move_file(const fs::path& old_path, const fs::path& path) override;
+    move_file(const Path& old_path, const Path& path) override;
 
     std::vector<SearchResult>
     search(const FileContents& contents) const override;

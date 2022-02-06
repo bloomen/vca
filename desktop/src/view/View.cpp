@@ -111,8 +111,8 @@ QString
 View::joinPaths(const QString& path1, const QString& path2) const
 {
     return QString::fromUtf8(
-        (fs::u8path(path1.toStdString()) / fs::u8path(path2.toStdString()))
-            .u8string()
+        (Path{path1.toStdString()} / Path{path2.toStdString()})
+            .to_narrow()
             .c_str());
 }
 

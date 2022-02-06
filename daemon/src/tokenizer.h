@@ -14,7 +14,7 @@ public:
     virtual ~Tokenizer() = default;
 
     virtual std::vector<String>
-    extract(const fs::path& file) const = 0;
+    extract(const Path& file) const = 0;
 };
 
 } // namespace vca

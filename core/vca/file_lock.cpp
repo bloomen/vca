@@ -9,15 +9,15 @@ namespace vca
 
 struct FileLock::Impl
 {
-    explicit Impl(const fs::path& path)
+    explicit Impl(const Path& path)
         : file_lock{make_file(path).c_str()}
     {
     }
 
     std::string
-    make_file(const fs::path& path)
+    make_file(const Path& path)
     {
-        const auto f = path.u8string() + ".lock";
+        const auto f = path.to_narrow() + ".lock";
         std::ofstream{f};
         return f;
     }
@@ -25,7 +25,7 @@ struct FileLock::Impl
     boost::interprocess::file_lock file_lock;
 };
 
-FileLock::FileLock(const fs::path& file)
+FileLock::FileLock(const Path& file)
     : m_impl{std::make_unique<Impl>(file)}
 {
 }

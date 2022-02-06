@@ -11,7 +11,7 @@ public:
     explicit TxtTokenizer(bool xml_unescape = false);
 
     std::vector<String>
-    extract(const fs::path& file) const override;
+    extract(const Path& file) const override;
 
 private:
     bool m_xml_unescape;

@@ -9,7 +9,7 @@ class XmlTokenizer : public Tokenizer
 {
 public:
     std::vector<String>
-    extract(const fs::path& file) const override;
+    extract(const Path& file) const override;
 };
 
 } // namespace vca

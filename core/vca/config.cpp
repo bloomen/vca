@@ -30,12 +30,12 @@ struct Keys
 
 struct UserConfig::Impl : public efsw::FileWatchListener
 {
-    Impl(CommandQueue& commands, UserConfig& user_config, fs::path path)
+    Impl(CommandQueue& commands, UserConfig& user_config, Path path)
         : commands{commands}
         , user_config{user_config}
         , path{make_path(std::move(path))}
     {
-        if (fs::exists(this->path))
+        if (this->path.exists())
         {
             read();
         }
@@ -44,8 +44,8 @@ struct UserConfig::Impl : public efsw::FileWatchListener
             populate();
             write();
         }
-        watch = file_watcher.addWatch(
-            this->path.parent_path().u8string(), this, true);
+        watch =
+            file_watcher.addWatch(this->path.parent().to_narrow(), this, true);
         VCA_CHECK(watch > 0);
         file_watcher.watch();
     }
@@ -55,24 +55,24 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         file_watcher.removeWatch(watch);
     }
 
-    static fs::path
-    make_path(fs::path path)
+    static Path
+    make_path(Path path)
     {
-        fs::create_directories(path.parent_path());
+        create_directories(path.parent());
         return path;
     }
 
     void
     normalize_root_dirs()
     {
-        std::set<fs::path> trash;
+        std::set<Path> trash;
         for (const auto& dir : root_dirs)
         {
             for (const auto& dir_ref : root_dirs)
             {
                 if (dir != dir_ref)
                 {
-                    if (is_parent_of(dir_ref, dir))
+                    if (dir_ref.is_parent_of(dir))
                     {
                         VCA_ERROR << dir << " is a child dir of: " << dir_ref;
                         trash.emplace(dir);
@@ -87,9 +87,9 @@ struct UserConfig::Impl : public efsw::FileWatchListener
     }
 
     static bool
-    valid_root_dir(const fs::path& path)
+    valid_root_dir(const Path& path)
     {
-        if (!fs::exists(path))
+        if (!path.exists())
         {
             VCA_ERROR << "root_dir does not exist: " << path;
             return false;
@@ -107,7 +107,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
     {
         json j;
         {
-            std::ifstream file{path};
+            auto file = make_ifstream(path);
             VCA_CHECK(file);
             j = json::parse(file);
             VCA_CHECK(!file.bad());
@@ -115,7 +115,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         root_dirs.clear();
         for (const auto& dir : j[Keys::root_dirs])
         {
-            auto p = fs::u8path(dir.get<std::string>());
+            Path p{dir.get<std::string>()};
             if (!valid_root_dir(p))
             {
                 continue;
@@ -129,9 +129,9 @@ struct UserConfig::Impl : public efsw::FileWatchListener
     populate()
     {
         auto dir = user_documents_dir();
-        if (!fs::exists(dir))
+        if (!dir.exists())
         {
-            dir = dir.parent_path();
+            dir = dir.parent();
             VCA_CHECK(valid_root_dir(dir));
         }
         root_dirs.emplace(std::move(dir));
@@ -144,10 +144,10 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         auto dirs = json::array();
         for (const auto& dir : root_dirs)
         {
-            dirs.push_back(dir.u8string());
+            dirs.push_back(dir.to_narrow());
         }
         j[Keys::root_dirs] = dirs;
-        std::ofstream{path} << j;
+        make_ofstream(path) << j;
     }
 
     // called from file watcher thread
@@ -164,7 +164,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         case efsw::Actions::Modified:
         {
             commands.push([this, filename] {
-                if (fs::u8path(filename) != path.filename())
+                if (Path{filename} != path.filename())
                 {
                     return;
                 }
@@ -180,7 +180,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         case efsw::Actions::Delete:
         {
             commands.push([this, filename] {
-                if (fs::u8path(filename) != path.filename())
+                if (Path{filename} != path.filename())
                 {
                     return;
                 }
@@ -193,7 +193,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         case efsw::Actions::Moved:
         {
             commands.push([this, filename, old_filename] {
-                if (fs::u8path(old_filename) != path.filename())
+                if (Path{old_filename} != path.filename())
                 {
                     return;
                 }
@@ -210,14 +210,14 @@ struct UserConfig::Impl : public efsw::FileWatchListener
 
     CommandQueue& commands;
     UserConfig& user_config;
-    fs::path path;
-    std::set<fs::path> root_dirs;
+    Path path;
+    std::set<Path> root_dirs;
     std::set<UserConfig::Observer*> observers;
     efsw::FileWatcher file_watcher;
     efsw::WatchID watch;
 };
 
-UserConfig::UserConfig(CommandQueue& commands, fs::path path)
+UserConfig::UserConfig(CommandQueue& commands, Path path)
     : m_impl{std::make_unique<Impl>(commands, *this, std::move(path))}
 {
 }
@@ -227,7 +227,7 @@ UserConfig::~UserConfig() = default;
 std::string
 UserConfig::as_json() const
 {
-    std::ifstream file{m_impl->path};
+    auto file = make_ifstream(m_impl->path);
     VCA_CHECK(file);
     auto j = json::parse(file); // ensure it's valid json
     VCA_CHECK(!file.bad());
@@ -241,10 +241,10 @@ UserConfig::set_json(const std::string& json)
 {
     auto j = json::parse(json); // ensure it's valid json
     (void)j;
-    std::ofstream{m_impl->path} << json;
+    make_ofstream(m_impl->path) << json;
 }
 
-const std::set<fs::path>&
+const std::set<Path>&
 UserConfig::root_dirs() const
 {
     return m_impl->root_dirs;
@@ -287,18 +287,18 @@ AppConfig::url() const
 }
 
 void
-AppConfig::write(const fs::path& filename) const
+AppConfig::write(const Path& filename) const
 {
     json j;
     j[Keys::host] = m_host;
     j[Keys::port] = m_port;
-    std::ofstream{filename} << j;
+    make_ofstream(filename) << j;
 }
 
 AppConfig
-AppConfig::read(const fs::path& filename)
+AppConfig::read(const Path& filename)
 {
-    std::ifstream file{filename};
+    auto file = make_ifstream(filename);
     VCA_CHECK(file);
     auto j = json::parse(file);
     VCA_CHECK(!file.bad());

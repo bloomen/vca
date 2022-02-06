@@ -42,8 +42,8 @@ log_message(const char* const logger_name,
 Logger::Logger(const Level level, const char* const file, const int line)
     : m_level{level}
 {
-    m_os << "[" << fs::relative(file, VCA_SOURCE_DIR).u8string() << ":" << line
-         << "] ";
+    m_os << "[" << relative(Path{file}, Path{VCA_SOURCE_DIR}).to_narrow() << ":"
+         << line << "] ";
 }
 
 Logger::~Logger()
@@ -54,7 +54,7 @@ Logger::~Logger()
 }
 
 void
-init_logging(const fs::path& filename)
+init_logging(const std::optional<Path>& filename)
 {
     const auto level = spdlog::level::debug;
     const auto pattern = "%l [%Y:%m:%dT%H:%M:%S.%f] [%t] %v";
@@ -62,11 +62,11 @@ init_logging(const fs::path& filename)
         spdlog::stdout_logger_mt("vca_logging_console_logger");
     console_logger->set_level(level);
     console_logger->set_pattern(pattern);
-    if (!filename.empty())
+    if (filename)
     {
-        fs::create_directories(filename.parent_path());
+        create_directories(filename->parent());
         auto file_logger = spdlog::rotating_logger_mt(
-            "vca_logging_file_logger", filename.u8string(), 1048576 * 5, 3);
+            "vca_logging_file_logger", filename->to_narrow(), 1048576 * 5, 3);
         file_logger->set_level(level);
         file_logger->set_pattern(pattern);
     }

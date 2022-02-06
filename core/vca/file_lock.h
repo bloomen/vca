@@ -12,7 +12,7 @@ namespace vca
 class FileLock
 {
 public:
-    explicit FileLock(const fs::path& path);
+    explicit FileLock(const Path& path);
 
     VCA_DELETE_COPY(FileLock)
     VCA_DEFAULT_MOVE(FileLock)
@@ -33,7 +33,7 @@ private:
 class FileGuard
 {
 public:
-    explicit FileGuard(const fs::path& path)
+    explicit FileGuard(const Path& path)
         : m_lock{path}
         , m_guard{m_lock}
     {

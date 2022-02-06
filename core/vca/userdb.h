@@ -41,8 +41,8 @@ struct FileContents
 
 struct SearchResult
 {
-    fs::path dir;
-    fs::path file;
+    Path dir;
+    Path file;
     std::string ext;
 
     bool
@@ -63,26 +63,26 @@ public:
 
     virtual ~UserDb() = default;
 
-    virtual const fs::path&
+    virtual const Path&
     path() const = 0;
 
     virtual void
-    create(const std::set<fs::path>& root_dirs) = 0;
+    create(const std::set<Path>& root_dirs) = 0;
 
     virtual void
-    add_root_dir(const fs::path& root_dir) = 0;
+    add_root_dir(const Path& root_dir) = 0;
 
     virtual void
-    remove_root_dir(const fs::path& root_dir) = 0;
+    remove_root_dir(const Path& root_dir) = 0;
 
     virtual void
-    update_file(const fs::path& path, const FileContents& contents) = 0;
+    update_file(const Path& path, const FileContents& contents) = 0;
 
     virtual void
-    remove_file(const fs::path& path) = 0;
+    remove_file(const Path& path) = 0;
 
     virtual void
-    move_file(const fs::path& old_path, const fs::path& path) = 0;
+    move_file(const Path& old_path, const Path& path) = 0;
 
     virtual std::vector<SearchResult>
     search(const FileContents& contents) const = 0;
