@@ -16,19 +16,7 @@ using json = nlohmann::json;
 namespace vca
 {
 
-namespace
-{
-
-struct Keys
-{
-    constexpr static const char* const root_dirs = "root_dirs";
-    constexpr static const char* const host = "host";
-    constexpr static const char* const port = "port";
-};
-
-} // namespace
-
-struct UserConfig::Impl : public efsw::FileWatchListener
+    struct UserConfig::Impl : public efsw::FileWatchListener
 {
     Impl(CommandQueue& commands, UserConfig& user_config, fs::path path)
         : commands{commands}
@@ -113,7 +101,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
             VCA_CHECK(!file.bad());
         }
         root_dirs.clear();
-        for (const auto& dir : j[Keys::root_dirs])
+        for (const auto& dir : j[ConfigKeys::root_dirs])
         {
             auto p = fs::u8path(dir.get<std::string>());
             if (!valid_root_dir(p))
@@ -146,7 +134,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         {
             dirs.push_back(dir.u8string());
         }
-        j[Keys::root_dirs] = dirs;
+        j[ConfigKeys::root_dirs] = dirs;
         std::ofstream{path} << j;
     }
 
@@ -290,8 +278,8 @@ void
 AppConfig::write(const fs::path& filename) const
 {
     json j;
-    j[Keys::host] = m_host;
-    j[Keys::port] = m_port;
+    j[ConfigKeys::host] = m_host;
+    j[ConfigKeys::port] = m_port;
     std::ofstream{filename} << j;
 }
 
@@ -303,8 +291,8 @@ AppConfig::read(const fs::path& filename)
     auto j = json::parse(file);
     VCA_CHECK(!file.bad());
     AppConfig cfg;
-    cfg.m_host = j[Keys::host];
-    cfg.m_port = j[Keys::port];
+    cfg.m_host = j[ConfigKeys::host];
+    cfg.m_port = j[ConfigKeys::port];
     return cfg;
 }
 

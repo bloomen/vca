@@ -10,6 +10,13 @@
 namespace vca
 {
 
+struct ConfigKeys
+{
+    constexpr static const char* const root_dirs = "root_dirs";
+    constexpr static const char* const host = "host";
+    constexpr static const char* const port = "port";
+};
+
 class UserConfig
 {
 public:

@@ -1,5 +1,7 @@
 #include "http_server.h"
 
+#include <vca/config.h>
+#include <vca/filesystem.h>
 #include <vca/json.h>
 #include <vca/logging.h>
 
@@ -61,9 +63,24 @@ HttpServer::get_config(served::response& res, const served::request&)
 void
 HttpServer::set_config(served::response& res, const served::request& req)
 {
-    const auto json = req.body();
-    // TODO: add check for root dirs existing
-    m_user_config.set_json(json);
+    const auto json_str = req.body();
+    // check if dir exists
+    auto j = json::parse(json_str);
+    std::ostringstream os;
+    for (const auto& it : j[ConfigKeys::root_dirs])
+    {
+        auto p = native_path(it);
+        if (!fs::exists(p))
+        {
+            os << "Error - path does not exist: " << p;
+        }
+        else if (!fs::is_directory(p))
+        {
+            os << "Error - path is not a directory: " << p;
+        }
+    }
+    m_user_config.set_json(json_str);
+    res << os.str();
     res.set_status(200);
 }
 
