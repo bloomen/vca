@@ -62,7 +62,6 @@ void
 HttpServer::set_config(served::response& res, const served::request& req)
 {
     const auto json = req.body();
-    // check if dir exists
     m_user_config.set_json(json);
     res.set_status(200);
 }
