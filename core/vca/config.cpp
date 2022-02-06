@@ -115,13 +115,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         root_dirs.clear();
         for (const auto& dir : j[Keys::root_dirs])
         {
-            
-#ifdef _WIN32
-            // add long path for Windows
-            auto p = fs::u8path(R"(\\?\)" + dir.get<std::string>());
-#else 
-            auto p = fs::u8path(dir.get<std::string>());
-#endif
+            auto p = native_path(fs::u8path(dir.get<std::string>()));
             if (!valid_root_dir(p))
             {
                 continue;
