@@ -14,12 +14,12 @@ class Path
 public:
     Path() = default;
 
-    Path(const std::filesystem::path& p)
+    explicit Path(const std::filesystem::path& p)
         : m_path{p}
     {
     }
 
-    Path(std::filesystem::path&& p)
+    explicit Path(std::filesystem::path&& p)
         : m_path{std::move(p)}
     {
     }
@@ -191,7 +191,7 @@ create_directories(const Path& p)
 inline Path
 relative(const Path& p1, const Path& p2)
 {
-    return std::filesystem::relative(p1.m_path, p2.m_path);
+    return Path{std::filesystem::relative(p1.m_path, p2.m_path)};
 }
 
 inline void
