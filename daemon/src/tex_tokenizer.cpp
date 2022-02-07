@@ -32,7 +32,40 @@ TexTokenizer::extract(const fs::path& file) const
         }
     }
 
-    return tokenize(std::move(one_line));
+    std::string text;
+    bool is_text = true;
+    for (auto c = data.begin(); c != data.end(); ++c)
+    {
+        if (is_text)
+        {
+            if (*c == '\\')
+            {
+                is_text = false;
+            }
+        }
+        else
+        {
+            if (*c == ' ' || *c == '{' || *c == ']')
+            {
+                is_text = true;
+                continue;
+            }
+        }
+
+        if (is_text)
+        {
+            if (*c == '{' || *c == '}' || *c == '[' || *c == ']')
+            {
+                text += ' ';
+            }
+            else if (*c != '$')
+            {
+                text += *c;
+            }
+        }
+    }
+
+    return tokenize(narrow_to_wide(text));
 }
 
 } // namespace vca
