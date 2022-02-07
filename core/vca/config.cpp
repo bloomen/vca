@@ -115,7 +115,7 @@ struct UserConfig::Impl : public efsw::FileWatchListener
         root_dirs.clear();
         for (const auto& dir : j[Keys::root_dirs])
         {
-            auto p = fs::u8path(dir.get<std::string>());
+            auto p = native_path(fs::u8path(dir.get<std::string>()));
             if (!valid_root_dir(p))
             {
                 continue;
