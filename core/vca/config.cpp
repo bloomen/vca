@@ -16,7 +16,7 @@ using json = nlohmann::json;
 namespace vca
 {
 
-    struct UserConfig::Impl : public efsw::FileWatchListener
+struct UserConfig::Impl : public efsw::FileWatchListener
 {
     Impl(CommandQueue& commands, UserConfig& user_config, fs::path path)
         : commands{commands}
