@@ -17,9 +17,9 @@ struct FileLock::Impl
     std::string
     make_file(const Path& path)
     {
-        const auto f = path.to_narrow() + ".lock";
-        std::ofstream{f};
-        return f;
+        const auto f = Path{path.to_narrow() + ".lock"};
+        make_ofstream(f);
+        return f.to_narrow();
     }
 
     boost::interprocess::file_lock file_lock;
