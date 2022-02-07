@@ -4,6 +4,7 @@
 #include <fstream>
 #include <vector>
 
+#include "platform.h"
 #include "string.h"
 
 namespace vca
@@ -226,5 +227,53 @@ user_documents_dir();
 
 std::string
 read_text(std::istream& f, size_t max_byte_count);
+
+inline Path
+native_path(const Path& path)
+{
+#ifdef VCA_PLATFORM_LINUX
+    constexpr auto prefix = R"(\\?\)";
+    constexpr auto prefix_size = 4;
+    const auto str = path.to_narrow();
+    if (str.size() >= prefix_size &&
+        std::equal(str.begin(),
+                   str.begin() + prefix_size,
+                   prefix,
+                   prefix + prefix_size))
+    {
+        return path;
+    }
+    else
+    {
+        return Path{prefix + str};
+    }
+#else
+    return path;
+#endif
+}
+
+inline Path
+display_path(const Path& path)
+{
+#ifdef VCA_PLATFORM_LINUX
+    constexpr auto prefix = R"(\\?\)";
+    constexpr auto prefix_size = 4;
+    const auto str = path.to_narrow();
+    if (str.size() >= prefix_size &&
+        std::equal(str.begin(),
+                   str.begin() + prefix_size,
+                   prefix,
+                   prefix + prefix_size))
+    {
+        return Path{str.substr(prefix_size)};
+    }
+    else
+    {
+        return path;
+    }
+#else
+    return path;
+#endif
+}
 
 } // namespace vca

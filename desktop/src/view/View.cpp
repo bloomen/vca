@@ -68,7 +68,8 @@ View::addHostDirectory(const QString& host,
     const auto query =
         "http://" + host.toStdString() + ":" + port.toStdString() + "/c";
     VCA_INFO << "POST: " << query;
-    j["root_dirs"].push_back(pathFromUrl(url).toStdString());
+    auto url_path = Path{pathFromUrl(url).toStdString()}.canonical();
+    j["root_dirs"].push_back(url_path.to_narrow());
     std::ostringstream os;
     os << j;
     const auto response = RestClient::post(query, "application/json", os.str());
