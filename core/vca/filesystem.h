@@ -40,7 +40,7 @@ native_path(const fs::path& path)
     }
     else
     {
-        return prefix + str;
+        return fs::u8path(prefix + str);
     }
 #else
     return path;
@@ -60,7 +60,7 @@ display_path(const fs::path& path)
                    prefix,
                    prefix + prefix_size))
     {
-        return str.substr(prefix_size);
+        return fs::u8path(str.substr(prefix_size));
     }
     else
     {
