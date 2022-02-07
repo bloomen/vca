@@ -6,6 +6,7 @@
 
 #include <restclient-cpp/restclient.h>
 
+#include <vca/config.h>
 #include <vca/filesystem.h>
 #include <vca/json.h>
 #include <vca/logging.h>
@@ -52,7 +53,7 @@ View::getHostDirectories(const QString& host, const QString& port) const
 {
     auto j = fetchConfig(host, port);
     QList<QString> result_dirs;
-    for (const auto dir : j["root_dirs"])
+    for (const auto dir : j[ConfigKeys::root_dirs])
     {
         result_dirs.append(QString::fromUtf8(dir.get<std::string>().c_str()));
     }
@@ -69,7 +70,7 @@ View::addHostDirectory(const QString& host,
         "http://" + host.toStdString() + ":" + port.toStdString() + "/c";
     VCA_INFO << "POST: " << query;
     auto url_path = fs::u8path(pathFromUrl(url).toStdString());
-    j["root_dirs"].push_back(fs::canonical(url_path).u8string());
+    j[ConfigKeys::root_dirs].push_back(fs::canonical(url_path).u8string());
     std::ostringstream os;
     os << j;
     const auto response = RestClient::post(query, "application/json", os.str());
@@ -90,11 +91,11 @@ View::removeHostDirectory(const QString& host,
         "http://" + host.toStdString() + ":" + port.toStdString() + "/c";
     VCA_INFO << "POST: " << query;
     size_t index = 0;
-    for (const auto d : j["root_dirs"])
+    for (const auto d : j[ConfigKeys::root_dirs])
     {
         if (d == dir_std)
         {
-            j["root_dirs"].erase(index);
+            j[ConfigKeys::root_dirs].erase(index);
             break;
         }
         ++index;
