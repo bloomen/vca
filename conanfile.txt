@@ -1,6 +1,7 @@
 [requires]
 boost/1.78.0
 concurrentqueue/1.0.3
+cryptopp/8.5.0
 podofo/0.9.7
 kuba-zip/0.2.0
 libcurl/7.80.0
