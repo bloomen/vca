@@ -10,6 +10,8 @@ add_library(vca_daemon_lib
     src/pdf_tokenizer.h
     src/pdf_tokenizer.cpp
     src/tokenizer.h
+    src/tex_tokenizer.h
+    src/tex_tokenizer.cpp
     src/txt_tokenizer.h
     src/txt_tokenizer.cpp
     src/xml_tokenizer.h
