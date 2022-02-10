@@ -16,11 +16,11 @@ constexpr size_t g_max_byte_count = 8192;
 }
 
 std::vector<String>
-XmlTokenizer::extract(const fs::path& file) const
+XmlTokenizer::extract(const Path& file) const
 {
     std::string content;
     {
-        std::ifstream f{file, std::ios_base::binary};
+        auto f = make_ifstream(file, std::ios_base::binary);
         try
         {
             content = read_text(f, g_max_byte_count * 2);

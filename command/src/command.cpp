@@ -23,8 +23,8 @@ main(const int, char**)
 {
     try
     {
-        const auto work_dir = vca::user_config_dir() / "findle";
-        fs::create_directories(work_dir);
+        const auto work_dir = vca::user_config_dir() / vca::Path{"findle"};
+        vca::create_directories(work_dir);
 
         vca::init_logging();
 
@@ -33,8 +33,8 @@ main(const int, char**)
             "%v", spdlog::pattern_time_type::local, ""));
 
         vca::AppConfig app_config;
-        const auto app_config_path = work_dir / "app.json";
-        while (!fs::exists(app_config_path))
+        const auto app_config_path = work_dir / vca::Path{"app.json"};
+        while (!app_config_path.exists())
         {
             VCA_INFO << "Waiting for: " << app_config_path;
             std::this_thread::sleep_for(std::chrono::seconds(1));
@@ -95,9 +95,9 @@ main(const int, char**)
 
                 for (const auto& result : j["results"])
                 {
-                    cmdline->info((fs::u8path(result["d"].get<std::string>()) /
-                                   fs::u8path(result["f"].get<std::string>()))
-                                      .u8string() +
+                    cmdline->info((vca::Path{result["d"].get<std::string>()} /
+                                   vca::Path{result["f"].get<std::string>()})
+                                      .to_narrow() +
                                   "\n");
                 }
             }

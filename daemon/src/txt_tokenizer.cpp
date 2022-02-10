@@ -21,11 +21,11 @@ TxtTokenizer::TxtTokenizer(const bool xml_unescape)
 }
 
 std::vector<String>
-TxtTokenizer::extract(const fs::path& file) const
+TxtTokenizer::extract(const Path& file) const
 {
     String one_line;
     {
-        std::ifstream f{file, std::ios_base::binary};
+        auto f = make_ifstream(file, std::ios_base::binary);
         try
         {
             one_line = narrow_to_wide(read_text(f, g_max_byte_count * 2));

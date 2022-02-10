@@ -77,48 +77,48 @@ toSQLiteOpenType(const UserDb::OpenType open_type)
 
 struct SqliteUserDb::Impl
 {
-    explicit Impl(fs::path path, const UserDb::OpenType open_type)
+    explicit Impl(Path path, const UserDb::OpenType open_type)
         : path{make_path(std::move(path))}
-        , db{this->path.u8string(), toSQLiteOpenType(open_type)}
+        , db{this->path.to_narrow(), toSQLiteOpenType(open_type)}
     {
         VCA_CHECK(db.getHandle());
     }
 
-    static fs::path
-    make_path(fs::path path)
+    static Path
+    make_path(Path path)
     {
-        fs::create_directories(path.parent_path());
+        create_directories(path.parent());
         return path;
     }
 
     void
-    add_root_dir(const fs::path& dir)
+    add_root_dir(const Path& dir)
     {
         SQLite::Statement ins_dir_stm{
             db, "INSERT INTO roots (id, dir) VALUES (?, ?)"};
-        SQLite::bind(ins_dir_stm, roots_id, dir.u8string());
+        SQLite::bind(ins_dir_stm, roots_id, dir.to_narrow());
         ins_dir_stm.exec();
         root_dirs.emplace(dir, roots_id);
         ++roots_id;
     }
 
     void
-    remove_root_dir(const fs::path& dir)
+    remove_root_dir(const Path& dir)
     {
         SQLite::Statement del_dir_stm{db, "DELETE FROM roots WHERE dir = ?"};
-        SQLite::bind(del_dir_stm, dir.u8string());
+        SQLite::bind(del_dir_stm, dir.to_narrow());
         del_dir_stm.exec();
         root_dirs.erase(dir);
     }
 
-    std::pair<fs::path, int>
-    relative(const fs::path& p) const
+    std::pair<Path, int>
+    relative(const Path& p) const
     {
         for (const auto& [dir, id] : root_dirs)
         {
-            if (is_parent_of(dir, p))
+            if (dir.is_parent_of(p))
             {
-                return std::make_pair(fs::relative(p, dir), id);
+                return std::make_pair(vca::relative(p, dir), id);
             }
         }
         VCA_CHECK(false) << "No root_dir found for: " << p;
@@ -128,15 +128,15 @@ struct SqliteUserDb::Impl
     SearchCache cache;
     int files_id = 0;
     int words_id = 0;
-    fs::path path;
+    Path path;
     SQLite::Database db;
     int roots_id = 0;
-    std::map<fs::path, int> root_dirs;
+    std::map<Path, int> root_dirs;
     std::chrono::time_point<std::chrono::system_clock> last_file_update =
         std::chrono::system_clock::now();
 };
 
-SqliteUserDb::SqliteUserDb(fs::path path, const OpenType open_type)
+SqliteUserDb::SqliteUserDb(Path path, const OpenType open_type)
     : m_impl{std::make_unique<Impl>(std::move(path), open_type)}
 {
     m_impl->db.exec("PRAGMA foreign_keys = ON");
@@ -146,14 +146,14 @@ SqliteUserDb::SqliteUserDb(fs::path path, const OpenType open_type)
 
 SqliteUserDb::~SqliteUserDb() = default;
 
-const fs::path&
+const Path&
 SqliteUserDb::path() const
 {
     return m_impl->path;
 }
 
 void
-SqliteUserDb::create(const std::set<fs::path>& root_dirs)
+SqliteUserDb::create(const std::set<Path>& root_dirs)
 {
     VCA_INFO << "Create user db";
     m_impl->cache.clear();
@@ -194,7 +194,7 @@ SqliteUserDb::create(const std::set<fs::path>& root_dirs)
 }
 
 void
-SqliteUserDb::add_root_dir(const fs::path& root_dir)
+SqliteUserDb::add_root_dir(const Path& root_dir)
 {
     if (m_impl->root_dirs.count(root_dir) > 0)
     {
@@ -208,7 +208,7 @@ SqliteUserDb::add_root_dir(const fs::path& root_dir)
 }
 
 void
-SqliteUserDb::remove_root_dir(const fs::path& root_dir)
+SqliteUserDb::remove_root_dir(const Path& root_dir)
 {
     if (m_impl->root_dirs.count(root_dir) == 0)
     {
@@ -222,7 +222,7 @@ SqliteUserDb::remove_root_dir(const fs::path& root_dir)
 }
 
 void
-SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
+SqliteUserDb::update_file(const Path& path, const FileContents& contents)
 {
     m_impl->last_file_update = std::chrono::system_clock::now();
     VCA_DEBUG << __func__ << ": " << path;
@@ -232,12 +232,12 @@ SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 
     SQLite::Statement del_stm{
         m_impl->db, "DELETE FROM files WHERE path = ? AND roots_id = ?"};
-    SQLite::bind(del_stm, p.u8string(), roots_id);
+    SQLite::bind(del_stm, p.to_narrow(), roots_id);
     del_stm.exec();
 
     SQLite::Statement ins_stm{
         m_impl->db, "INSERT INTO files (id, roots_id, path) VALUES (?, ?, ?)"};
-    SQLite::bind(ins_stm, m_impl->files_id, roots_id, p.u8string());
+    SQLite::bind(ins_stm, m_impl->files_id, roots_id, p.to_narrow());
     ins_stm.exec();
 
     for (const auto& word : contents.words)
@@ -272,7 +272,7 @@ SqliteUserDb::update_file(const fs::path& path, const FileContents& contents)
 }
 
 void
-SqliteUserDb::remove_file(const fs::path& path)
+SqliteUserDb::remove_file(const Path& path)
 {
     m_impl->last_file_update = std::chrono::system_clock::now();
     VCA_DEBUG << __func__ << ": " << path;
@@ -280,13 +280,13 @@ SqliteUserDb::remove_file(const fs::path& path)
     const auto [p, roots_id] = m_impl->relative(path);
     SQLite::Transaction transaction{m_impl->db};
     SQLite::Statement del_stm{m_impl->db, "DELETE FROM files WHERE path = ?"};
-    SQLite::bind(del_stm, p.u8string());
+    SQLite::bind(del_stm, p.to_narrow());
     del_stm.exec();
     transaction.commit();
 }
 
 void
-SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
+SqliteUserDb::move_file(const Path& old_path, const Path& path)
 {
     m_impl->last_file_update = std::chrono::system_clock::now();
     VCA_DEBUG << __func__ << ": " << old_path << " - " << path;
@@ -297,7 +297,7 @@ SqliteUserDb::move_file(const fs::path& old_path, const fs::path& path)
 
     SQLite::Statement up_stm{
         m_impl->db, "UPDATE files SET roots_id = ?, path = ? WHERE path = ?"};
-    SQLite::bind(up_stm, roots_id, p.u8string(), old_p.u8string());
+    SQLite::bind(up_stm, roots_id, p.to_narrow(), old_p.to_narrow());
     up_stm.exec();
 
     transaction.commit();
@@ -325,11 +325,11 @@ SqliteUserDb::search(const FileContents& contents) const
         SQLite::bind(query_stm, "%" + word + "%");
         while (query_stm.executeStep())
         {
-            const auto root_dir = fs::u8path(query_stm.getColumn(0).getText());
-            const auto path = fs::u8path(query_stm.getColumn(1).getText());
+            const Path root_dir{query_stm.getColumn(0).getText()};
+            const Path path{query_stm.getColumn(1).getText()};
             const auto p = root_dir / path;
             SearchResult result{
-                p.parent_path(), p.filename(), p.extension().u8string()};
+                p.parent(), p.filename(), p.extension().to_narrow()};
             results_map[std::move(result)]++;
         }
     }

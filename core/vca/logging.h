@@ -1,5 +1,6 @@
 #pragma once
 
+#include <optional>
 #include <sstream>
 
 #include "filesystem.h"
@@ -47,7 +48,7 @@ private:
 };
 
 void
-init_logging(const fs::path& filename = {});
+init_logging(const std::optional<Path>& filename = {});
 
 void
 set_log_level(Logger::Level level);

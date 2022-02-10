@@ -17,7 +17,7 @@ struct Scanner
 {
 
     Scanner(CommandQueue& commands,
-            fs::path root_dir,
+            Path root_dir,
             UserDb& user_db,
             const FileProcessor& file_processor)
         : commands{commands}
@@ -25,7 +25,7 @@ struct Scanner
         , user_db{user_db}
         , file_processor{file_processor}
     {
-        VCA_CHECK(fs::exists(this->root_dir))
+        VCA_CHECK(this->root_dir.exists())
             << "root_dir does not exist: " << this->root_dir;
         thread = std::thread{[this] { scan(); }};
     }
@@ -45,21 +45,21 @@ struct Scanner
     {
         try
         {
-            if (!fs::exists(root_dir))
+            if (!root_dir.exists())
             {
                 VCA_ERROR << "root_dir does not exist: " << root_dir;
                 return;
             }
             VCA_INFO << "Scanning: " << root_dir;
             Timer timer;
-            for (const auto& p : fs::recursive_directory_iterator{root_dir})
+            for (const auto& p : make_rec_dir_iterator(root_dir))
             {
                 if (done)
                 {
                     break;
                 }
-                auto path = p.path();
-                if (fs::is_regular_file(path))
+                auto path = Path{p.path()};
+                if (path.is_file())
                 {
                     vca::FileContents contents;
                     try
@@ -93,7 +93,7 @@ struct Scanner
     }
 
     CommandQueue& commands;
-    fs::path root_dir;
+    Path root_dir;
     UserDb& user_db;
     const FileProcessor& file_processor;
     std::atomic<bool> done{false};
@@ -126,7 +126,7 @@ struct FileScanner::Impl : public UserConfig::Observer
     user_config_changed(const UserConfig&) override
     {
         // find dirs that don't need scanning anymore
-        std::set<fs::path> trash;
+        std::set<Path> trash;
         for (const auto& [dir, s] : scanners)
         {
             if (user_config.root_dirs().find(dir) ==
@@ -164,7 +164,7 @@ struct FileScanner::Impl : public UserConfig::Observer
     UserDb& user_db;
     const FileProcessor& file_processor;
     UserConfig& user_config;
-    std::map<fs::path, std::unique_ptr<Scanner>> scanners;
+    std::map<Path, std::unique_ptr<Scanner>> scanners;
 }; // namespace vca
 
 FileScanner::FileScanner(CommandQueue& commands,

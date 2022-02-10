@@ -11,30 +11,26 @@
 namespace vca
 {
 
-fs::path
-user_config_dir()
-{
-    return fs::u8path(sago::getConfigHome());
-}
-
-fs::path
-user_documents_dir()
-{
-    return fs::u8path(sago::getDocumentsFolder());
-}
-
 bool
-is_parent_of(const fs::path& parent, const fs::path& child)
+Path::is_parent_of(const Path& a_child) const
 {
-    VCA_CHECK(parent.is_absolute());
-    VCA_CHECK(child.is_absolute());
-    if (parent == child)
+    if (*this == a_child)
     {
         return false;
     }
-    auto parent_it = parent.begin();
-    auto child_it = child.begin();
-    while (parent_it != parent.end() && child_it != child.end())
+    auto parent = *this;
+    if (!parent.is_absolute())
+    {
+        parent = parent.absolute();
+    }
+    auto child = a_child;
+    if (!child.is_absolute())
+    {
+        child = child.absolute();
+    }
+    auto parent_it = parent.m_path.begin();
+    auto child_it = child.m_path.begin();
+    while (parent_it != parent.m_path.end() && child_it != child.m_path.end())
     {
         if (*parent_it != *child_it)
         {
@@ -43,7 +39,19 @@ is_parent_of(const fs::path& parent, const fs::path& child)
         ++parent_it;
         ++child_it;
     }
-    return child_it != child.end();
+    return child_it != child.m_path.end();
+}
+
+Path
+user_config_dir()
+{
+    return Path{sago::getConfigHome()};
+}
+
+Path
+user_documents_dir()
+{
+    return Path{sago::getDocumentsFolder()};
 }
 
 std::string
@@ -57,16 +65,15 @@ read_text(std::istream& f, const size_t max_byte_count)
     return data;
 }
 
-Fingerprint::Fingerprint(const fs::path& f)
+Fingerprint::Fingerprint(const Path& f)
 {
-    VCA_CHECK(fs::is_regular_file(f));
-    const auto size = std::filesystem::file_size(f);
+    VCA_CHECK(f.is_file());
     // std::filesystem doesn't have a file_time to time_t conversion :(
-    const auto last_write_time =
-        static_cast<uint64_t>(boost::filesystem::last_write_time(f.u8string()));
-    std::ifstream file{f, std::ios_base::binary};
+    const auto last_write_time = static_cast<uint64_t>(
+        boost::filesystem::last_write_time(f.to_narrow()));
+    auto file = make_ifstream(f, std::ios_base::binary);
     VCA_CHECK(file.good());
-    *this = create(file, size, last_write_time);
+    *this = create(file, f.size(), last_write_time);
 }
 
 Fingerprint

@@ -16,11 +16,11 @@ constexpr size_t g_max_byte_count = 81920;
 }
 
 std::vector<String>
-TexTokenizer::extract(const fs::path& file) const
+TexTokenizer::extract(const Path& file) const
 {
     std::string data;
     {
-        std::ifstream f{file};
+        auto f = make_ifstream(file);
         try
         {
             data = read_text(f, g_max_byte_count);

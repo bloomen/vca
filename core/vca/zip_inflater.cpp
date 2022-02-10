@@ -48,8 +48,8 @@ struct ZipDeleter
 class ZipFile
 {
 public:
-    ZipFile(const fs::path& file, const std::string& entry)
-        : m_file{zip_open(file.u8string().c_str(), 0, 'r'), ZipDeleter{}}
+    ZipFile(const Path& file, const std::string& entry)
+        : m_file{zip_open(file.to_narrow().c_str(), 0, 'r'), ZipDeleter{}}
         , m_regex{entry}
     {
         VCA_CHECK(m_file) << "Could not open zip file: " << file;
@@ -89,7 +89,7 @@ private:
 
 struct ZipInflater::Impl
 {
-    Impl(const fs::path& file,
+    Impl(const Path& file,
          const size_t max_byte_count,
          const std::string& entry)
         : zip_file{file, entry}
@@ -104,7 +104,7 @@ struct ZipInflater::Impl
     Buffer buffer;
 };
 
-ZipInflater::ZipInflater(const fs::path& file,
+ZipInflater::ZipInflater(const Path& file,
                          const size_t max_byte_count,
                          const std::string& entry)
     : m_impl{std::make_unique<Impl>(file, max_byte_count, entry)}

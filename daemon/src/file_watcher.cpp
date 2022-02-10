@@ -15,7 +15,7 @@ namespace
 struct Watcher : efsw::FileWatchListener
 {
     Watcher(CommandQueue& commands,
-            fs::path root_dir,
+            Path root_dir,
             UserDb& user_db,
             const FileProcessor& file_processor)
         : commands{commands}
@@ -23,10 +23,10 @@ struct Watcher : efsw::FileWatchListener
         , user_db{user_db}
         , file_processor{file_processor}
     {
-        VCA_CHECK(fs::exists(this->root_dir))
+        VCA_CHECK(this->root_dir.exists())
             << "root_dir does not exist: " << this->root_dir;
         VCA_INFO << "Adding watch for: " << this->root_dir;
-        watch = file_watcher.addWatch(this->root_dir.u8string(), this, true);
+        watch = file_watcher.addWatch(this->root_dir.to_narrow(), this, true);
         VCA_CHECK(watch > 0);
         file_watcher.watch();
     }
@@ -44,13 +44,13 @@ struct Watcher : efsw::FileWatchListener
                      const efsw::Action action,
                      const std::string old_filename = "")
     {
-        const auto path = fs::u8path(dir) / fs::u8path(filename);
+        const auto path = Path{dir} / Path{filename};
         switch (action)
         {
         case efsw::Actions::Add:
         case efsw::Actions::Modified:
         {
-            if (fs::is_regular_file(path))
+            if (path.is_file())
             {
                 vca::FileContents contents;
                 contents.words = file_processor.process(path);
@@ -62,7 +62,7 @@ struct Watcher : efsw::FileWatchListener
         }
         case efsw::Actions::Delete:
         {
-            if (fs::is_regular_file(path))
+            if (path.is_file())
             {
                 commands.push([this, path] { user_db.remove_file(path); });
             }
@@ -70,10 +70,10 @@ struct Watcher : efsw::FileWatchListener
         }
         case efsw::Actions::Moved:
         {
-            auto old_path = fs::u8path(dir) / fs::u8path(old_filename);
-            if (fs::is_regular_file(old_path))
+            auto old_path = Path{dir} / Path{old_filename};
+            if (old_path.is_file())
             {
-                if (fs::is_regular_file(path))
+                if (path.is_file())
                 {
                     commands.push([this, path, old_path = std::move(old_path)] {
                         user_db.move_file(old_path, path);
@@ -94,7 +94,7 @@ struct Watcher : efsw::FileWatchListener
     }
 
     CommandQueue& commands;
-    fs::path root_dir;
+    Path root_dir;
     UserDb& user_db;
     const FileProcessor& file_processor;
     efsw::FileWatcher file_watcher;
@@ -127,7 +127,7 @@ struct FileWatcher::Impl final : UserConfig::Observer
     user_config_changed(const UserConfig&) override
     {
         // find dirs that don't need watching anymore
-        std::set<fs::path> trash;
+        std::set<Path> trash;
         for (const auto& [dir, s] : watchers)
         {
             if (user_config.root_dirs().find(dir) ==
@@ -165,7 +165,7 @@ struct FileWatcher::Impl final : UserConfig::Observer
     UserConfig& user_config;
     UserDb& user_db;
     const FileProcessor& file_processor;
-    std::map<fs::path, std::unique_ptr<Watcher>> watchers;
+    std::map<Path, std::unique_ptr<Watcher>> watchers;
 }; // namespace vca
 
 FileWatcher::FileWatcher(CommandQueue& commands,

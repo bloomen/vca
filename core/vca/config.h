@@ -21,7 +21,7 @@ public:
         user_config_changed(const UserConfig& user_config) = 0;
     };
 
-    explicit UserConfig(CommandQueue& commands, fs::path path);
+    explicit UserConfig(CommandQueue& commands, Path path);
 
     VCA_DELETE_COPY(UserConfig)
     VCA_DEFAULT_MOVE(UserConfig)
@@ -34,7 +34,7 @@ public:
     void
     set_json(const std::string& json);
 
-    const std::set<fs::path>&
+    const std::set<Path>&
     root_dirs() const;
 
     void
@@ -66,9 +66,9 @@ public:
     url() const;
 
     void
-    write(const fs::path& filename) const;
+    write(const Path& filename) const;
     static AppConfig
-    read(const fs::path& filename);
+    read(const Path& filename);
 
 private:
     std::string m_host{"127.0.0.1"};

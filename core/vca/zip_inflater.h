@@ -11,7 +11,7 @@ namespace vca
 class ZipInflater
 {
 public:
-    ZipInflater(const fs::path& file,
+    ZipInflater(const Path& file,
                 size_t max_byte_count,
                 const std::string& entry);
 

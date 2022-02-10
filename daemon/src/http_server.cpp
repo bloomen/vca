@@ -98,8 +98,8 @@ HttpServer::search(served::response& res, const served::request& req)
     for (const auto r : results)
     {
         auto j_r = json::object();
-        j_r["d"] = display_path(r.dir).u8string();
-        j_r["f"] = r.file.u8string();
+        j_r["d"] = display_path(r.dir).to_narrow();
+        j_r["f"] = r.file.to_narrow();
         j_r["e"] = r.ext;
         j_results.push_back(std::move(j_r));
     }

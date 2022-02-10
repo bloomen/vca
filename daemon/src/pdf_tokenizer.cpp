@@ -37,11 +37,11 @@ get_utf8(PdfFont* font, const PdfString& str)
 }
 
 std::list<std::string>
-extract_text(const fs::path& path)
+extract_text(const Path& path)
 {
     size_t byte_count = 0;
     std::list<std::string> words;
-    PdfMemDocument doc{path.u8string().c_str()};
+    PdfMemDocument doc{path.to_narrow().c_str()};
     const auto n = doc.GetPageCount();
     for (int i = 0; i < n; i++)
     {
@@ -221,7 +221,7 @@ extract_text(const fs::path& path)
 } // namespace
 
 std::vector<String>
-PdfTokenizer::extract(const fs::path& file) const
+PdfTokenizer::extract(const Path& file) const
 {
     auto words = extract_text(file);
     for (auto w = words.begin(); w != words.end(); ++w)

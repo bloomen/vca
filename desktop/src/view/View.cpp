@@ -68,8 +68,8 @@ View::addHostDirectory(const QString& host,
     const auto query =
         "http://" + host.toStdString() + ":" + port.toStdString() + "/c";
     VCA_INFO << "POST: " << query;
-    auto url_path = fs::u8path(pathFromUrl(url).toStdString());
-    j["root_dirs"].push_back(fs::canonical(url_path).u8string());
+    auto url_path = Path{pathFromUrl(url).toStdString()}.canonical();
+    j["root_dirs"].push_back(url_path.to_narrow());
     std::ostringstream os;
     os << j;
     const auto response = RestClient::post(query, "application/json", os.str());
@@ -112,8 +112,8 @@ QString
 View::joinPaths(const QString& path1, const QString& path2) const
 {
     return QString::fromUtf8(
-        (fs::u8path(path1.toStdString()) / fs::u8path(path2.toStdString()))
-            .u8string()
+        (Path{path1.toStdString()} / Path{path2.toStdString()})
+            .to_narrow()
             .c_str());
 }
 
