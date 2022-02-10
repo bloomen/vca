@@ -105,6 +105,12 @@ public:
     bool
     is_parent_of(const Path& child) const;
 
+    size_t
+    size() const
+    {
+        return std::filesystem::file_size(m_path);
+    }
+
     Path
     parent() const
     {
@@ -232,7 +238,7 @@ read_text(std::istream& f, size_t max_byte_count);
 inline Path
 native_path(const Path& path)
 {
-#ifdef VCA_PLATFORM_LINUX
+#ifdef VCA_PLATFORM_WINDOWS
     constexpr auto prefix = R"(\\?\)";
     constexpr auto prefix_size = 4;
     const auto str = path.to_narrow();
@@ -256,7 +262,7 @@ native_path(const Path& path)
 inline Path
 display_path(const Path& path)
 {
-#ifdef VCA_PLATFORM_LINUX
+#ifdef VCA_PLATFORM_WINDOWS
     constexpr auto prefix = R"(\\?\)";
     constexpr auto prefix_size = 4;
     const auto str = path.to_narrow();
@@ -282,7 +288,7 @@ class Fingerprint
 {
 public:
     Fingerprint() = default;
-    explicit Fingerprint(const fs::path& f);
+    explicit Fingerprint(const Path& f);
 
     static Fingerprint
     create(std::ifstream& is, uint64_t size, uint64_t last_write_time);

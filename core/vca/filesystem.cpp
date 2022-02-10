@@ -65,16 +65,15 @@ read_text(std::istream& f, const size_t max_byte_count)
     return data;
 }
 
-Fingerprint::Fingerprint(const fs::path& f)
+Fingerprint::Fingerprint(const Path& f)
 {
-    VCA_CHECK(fs::is_regular_file(f));
-    const auto size = std::filesystem::file_size(f);
+    VCA_CHECK(f.is_file());
     // std::filesystem doesn't have a file_time to time_t conversion :(
-    const auto last_write_time =
-        static_cast<uint64_t>(boost::filesystem::last_write_time(f.u8string()));
-    std::ifstream file{f, std::ios_base::binary};
+    const auto last_write_time = static_cast<uint64_t>(
+        boost::filesystem::last_write_time(f.to_narrow()));
+    auto file = make_ifstream(f, std::ios_base::binary);
     VCA_CHECK(file.good());
-    *this = create(file, size, last_write_time);
+    *this = create(file, f.size(), last_write_time);
 }
 
 Fingerprint
