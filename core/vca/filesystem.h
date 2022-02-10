@@ -1,5 +1,6 @@
 #pragma once
 
+#include <array>
 #include <filesystem>
 #include <fstream>
 #include <vector>
@@ -275,5 +276,33 @@ display_path(const Path& path)
     return path;
 #endif
 }
+
+// TODO: write unit tests
+class Fingerprint
+{
+public:
+    Fingerprint() = default;
+    explicit Fingerprint(const fs::path& f);
+
+    static Fingerprint
+    create(std::ifstream& is, uint64_t size, uint64_t last_write_time);
+
+    void
+    serialize(std::ostream& os) const;
+
+    static Fingerprint
+    deserialize(std::istream& is);
+
+private:
+    friend bool
+    operator==(const Fingerprint& l, const Fingerprint& r);
+
+    uint64_t m_size{};
+    uint64_t m_last_write_time{};
+    std::array<int32_t, 4> m_crc{};
+};
+
+bool
+operator==(const Fingerprint& l, const Fingerprint& r);
 
 } // namespace vca

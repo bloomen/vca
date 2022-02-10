@@ -33,8 +33,10 @@ target_include_directories(vca_core
 )
 
 target_link_libraries(vca_core
+    Boost::filesystem
     Boost::system
     concurrentqueue::concurrentqueue
+    cryptopp::cryptopp
     efsw
     nlohmann_json::nlohmann_json
     platform_folders

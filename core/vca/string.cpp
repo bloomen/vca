@@ -24,6 +24,13 @@
 namespace vca
 {
 
+namespace
+{
+
+constexpr size_t g_max_word_length = 32;
+
+}
+
 #if defined(VCA_PLATFORM_WINDOWS) && _MSC_VER < 2000
 
 String
@@ -281,6 +288,10 @@ tokenize(String line)
     {
         trim(t);
         if (t.size() <= 1)
+        {
+            continue;
+        }
+        if (t.size() > g_max_word_length)
         {
             continue;
         }

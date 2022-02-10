@@ -20,6 +20,7 @@
 #include "file_watcher.h"
 #include "http_server.h"
 #include "pdf_tokenizer.h"
+#include "tex_tokenizer.h"
 #include "txt_tokenizer.h"
 #include "xml_tokenizer.h"
 #include "zipxml_tokenizer.h"
@@ -64,10 +65,6 @@ main(const int, char**)
         vca::FileProcessor file_processor{app_config};
         file_processor.set_default_tokenizer(
             std::make_unique<vca::TxtTokenizer>());
-        file_processor.add_tokenizer(U".xml",
-                                     std::make_unique<vca::TxtTokenizer>(true));
-        file_processor.add_tokenizer(U".svg",
-                                     std::make_unique<vca::XmlTokenizer>());
         file_processor.add_tokenizer(
             U".docx",
             std::make_unique<vca::ZipxmlTokenizer>("word/document.xml"));
@@ -85,6 +82,14 @@ main(const int, char**)
             U".odp", std::make_unique<vca::ZipxmlTokenizer>("content.xml"));
         file_processor.add_tokenizer(U".pdf",
                                      std::make_unique<vca::PdfTokenizer>());
+        file_processor.add_tokenizer(U".rtf",
+                                     std::make_unique<vca::TexTokenizer>());
+        file_processor.add_tokenizer(U".svg",
+                                     std::make_unique<vca::XmlTokenizer>());
+        file_processor.add_tokenizer(U".tex",
+                                     std::make_unique<vca::TexTokenizer>());
+        file_processor.add_tokenizer(U".xml",
+                                     std::make_unique<vca::TxtTokenizer>(true));
 
         vca::FileWatcher file_watcher{
             commands, user_config, user_db, file_processor};

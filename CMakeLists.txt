@@ -41,8 +41,9 @@ conan_cmake_install(PATH_OR_REFERENCE ${PROJECT_SOURCE_DIR}
 
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
-find_package(Boost 1.78 COMPONENTS system REQUIRED)
+find_package(Boost 1.78 COMPONENTS filesystem REQUIRED system REQUIRED)
 find_package(concurrentqueue REQUIRED)
+find_package(cryptopp REQUIRED)
 find_package(GTest REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(OpenCV REQUIRED)
