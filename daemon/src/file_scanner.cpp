@@ -72,6 +72,7 @@ struct Scanner
                         VCA_EXCEPTION(e) << e.what();
                         continue;
                     }
+                    path.compute_fingerprint();
                     commands.push([this,
                                    path = std::move(path),
                                    contents = std::move(contents)] {

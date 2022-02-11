@@ -11,61 +11,8 @@
 namespace vca
 {
 
-bool
-Path::is_parent_of(const Path& a_child) const
-{
-    if (*this == a_child)
-    {
-        return false;
-    }
-    auto parent = *this;
-    if (!parent.is_absolute())
-    {
-        parent = parent.absolute();
-    }
-    auto child = a_child;
-    if (!child.is_absolute())
-    {
-        child = child.absolute();
-    }
-    auto parent_it = parent.m_path.begin();
-    auto child_it = child.m_path.begin();
-    while (parent_it != parent.m_path.end() && child_it != child.m_path.end())
-    {
-        if (*parent_it != *child_it)
-        {
-            return false;
-        }
-        ++parent_it;
-        ++child_it;
-    }
-    return child_it != child.m_path.end();
-}
-
-Path
-user_config_dir()
-{
-    return Path{sago::getConfigHome()};
-}
-
-Path
-user_documents_dir()
-{
-    return Path{sago::getDocumentsFolder()};
-}
-
-std::string
-read_text(std::istream& f, const size_t max_byte_count)
-{
-    VCA_CHECK(f.good());
-    std::string data(max_byte_count, 0);
-    f.read(data.data(), data.size());
-    const auto byte_count = f.gcount();
-    data.resize(byte_count);
-    return data;
-}
-
-Fingerprint::Fingerprint(const Path& f)
+Fingerprint
+Fingerprint::from_path(const Path& f)
 {
     VCA_CHECK(f.is_file());
     // std::filesystem doesn't have a file_time to time_t conversion :(
@@ -73,11 +20,13 @@ Fingerprint::Fingerprint(const Path& f)
         boost::filesystem::last_write_time(f.to_narrow()));
     auto file = make_ifstream(f, std::ios_base::binary);
     VCA_CHECK(file.good());
-    *this = create(file, f.size(), last_write_time);
+    return from_stream(file, f.size(), last_write_time);
 }
 
 Fingerprint
-Fingerprint::create(std::ifstream& is, uint64_t size, uint64_t last_write_time)
+Fingerprint::from_stream(std::ifstream& is,
+                         uint64_t size,
+                         uint64_t last_write_time)
 {
     Fingerprint fp;
     fp.m_size = size;
@@ -138,23 +87,22 @@ Fingerprint::create(std::ifstream& is, uint64_t size, uint64_t last_write_time)
     return fp;
 }
 
-void
-Fingerprint::serialize(std::ostream& os) const
+std::vector<unsigned char>
+Fingerprint::serialize() const
 {
-    os.write(reinterpret_cast<const char*>(&m_size), sizeof(m_size));
-    os.write(reinterpret_cast<const char*>(&m_last_write_time),
-             sizeof(m_last_write_time));
-    os.write(reinterpret_cast<const char*>(&m_crc), sizeof(m_crc));
+    std::vector<unsigned char> d(sizeof(Fingerprint));
+    std::memcpy(d.data(),
+                reinterpret_cast<const unsigned char*>(this),
+                sizeof(Fingerprint));
+    return d;
 }
 
 Fingerprint
-Fingerprint::deserialize(std::istream& is)
+Fingerprint::deserialize(const std::vector<unsigned char>& d)
 {
     Fingerprint fp;
-    is.read(reinterpret_cast<char*>(&fp.m_size), sizeof(fp.m_size));
-    is.read(reinterpret_cast<char*>(&fp.m_last_write_time),
-            sizeof(fp.m_last_write_time));
-    is.read(reinterpret_cast<char*>(&fp.m_crc), sizeof(fp.m_crc));
+    std::memcpy(
+        reinterpret_cast<unsigned char*>(&fp), d.data(), sizeof(Fingerprint));
     return fp;
 }
 
@@ -174,6 +122,60 @@ operator==(const Fingerprint& l, const Fingerprint& r)
         return false;
     }
     return true;
+}
+
+bool
+Path::is_parent_of(const Path& a_child) const
+{
+    if (*this == a_child)
+    {
+        return false;
+    }
+    auto parent = *this;
+    if (!parent.is_absolute())
+    {
+        parent = parent.absolute();
+    }
+    auto child = a_child;
+    if (!child.is_absolute())
+    {
+        child = child.absolute();
+    }
+    auto parent_it = parent.m_path.begin();
+    auto child_it = child.m_path.begin();
+    while (parent_it != parent.m_path.end() && child_it != child.m_path.end())
+    {
+        if (*parent_it != *child_it)
+        {
+            return false;
+        }
+        ++parent_it;
+        ++child_it;
+    }
+    return child_it != child.m_path.end();
+}
+
+Path
+user_config_dir()
+{
+    return Path{sago::getConfigHome()};
+}
+
+Path
+user_documents_dir()
+{
+    return Path{sago::getDocumentsFolder()};
+}
+
+std::string
+read_text(std::istream& f, const size_t max_byte_count)
+{
+    VCA_CHECK(f.good());
+    std::string data(max_byte_count, 0);
+    f.read(data.data(), data.size());
+    const auto byte_count = f.gcount();
+    data.resize(byte_count);
+    return data;
 }
 
 } // namespace vca

@@ -44,7 +44,7 @@ struct Watcher : efsw::FileWatchListener
                      const efsw::Action action,
                      const std::string old_filename = "")
     {
-        const auto path = Path{dir} / Path{filename};
+        auto path = Path{dir} / Path{filename};
         switch (action)
         {
         case efsw::Actions::Add:
@@ -54,7 +54,10 @@ struct Watcher : efsw::FileWatchListener
             {
                 vca::FileContents contents;
                 contents.words = file_processor.process(path);
-                commands.push([this, path, contents = std::move(contents)] {
+                path.compute_fingerprint();
+                commands.push([this,
+                               path = std::move(path),
+                               contents = std::move(contents)] {
                     user_db.update_file(path, contents);
                 });
             }
@@ -64,7 +67,9 @@ struct Watcher : efsw::FileWatchListener
         {
             if (path.is_file())
             {
-                commands.push([this, path] { user_db.remove_file(path); });
+                commands.push([this, path = std::move(path)] {
+                    user_db.remove_file(path);
+                });
             }
             break;
         }
@@ -75,7 +80,9 @@ struct Watcher : efsw::FileWatchListener
             {
                 if (path.is_file())
                 {
-                    commands.push([this, path, old_path = std::move(old_path)] {
+                    commands.push([this,
+                                   path = std::move(path),
+                                   old_path = std::move(old_path)] {
                         user_db.move_file(old_path, path);
                     });
                 }

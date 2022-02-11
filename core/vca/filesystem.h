@@ -3,6 +3,7 @@
 #include <array>
 #include <filesystem>
 #include <fstream>
+#include <type_traits>
 #include <vector>
 
 #include "platform.h"
@@ -10,6 +11,36 @@
 
 namespace vca
 {
+
+class Path;
+
+// TODO: write unit tests
+class Fingerprint
+{
+public:
+    static Fingerprint
+    from_path(const Path& f);
+
+    static Fingerprint
+    from_stream(std::ifstream& is, uint64_t size, uint64_t last_write_time);
+
+    std::vector<unsigned char>
+    serialize() const;
+
+    static Fingerprint
+    deserialize(const std::vector<unsigned char>& data);
+
+private:
+    friend bool
+    operator==(const Fingerprint& l, const Fingerprint& r);
+
+    uint64_t m_size{};
+    uint64_t m_last_write_time{};
+    std::array<int32_t, 4> m_crc{};
+};
+
+bool
+operator==(const Fingerprint& l, const Fingerprint& r);
 
 class Path
 {
@@ -135,6 +166,18 @@ public:
         return Path{m_path.extension()};
     }
 
+    void
+    compute_fingerprint()
+    {
+        *m_fingerprint = Fingerprint::from_path(*this);
+    }
+
+    const std::optional<Fingerprint>&
+    fingerprint() const
+    {
+        return m_fingerprint;
+    }
+
 private:
     friend inline bool
     operator==(const Path& l, const Path& r);
@@ -161,6 +204,7 @@ private:
     make_ofstream(const Path& p, std::ios_base::openmode mode);
 
     std::filesystem::path m_path;
+    std::optional<Fingerprint> m_fingerprint;
 };
 
 inline Path
@@ -282,33 +326,5 @@ display_path(const Path& path)
     return path;
 #endif
 }
-
-// TODO: write unit tests
-class Fingerprint
-{
-public:
-    Fingerprint() = default;
-    explicit Fingerprint(const Path& f);
-
-    static Fingerprint
-    create(std::ifstream& is, uint64_t size, uint64_t last_write_time);
-
-    void
-    serialize(std::ostream& os) const;
-
-    static Fingerprint
-    deserialize(std::istream& is);
-
-private:
-    friend bool
-    operator==(const Fingerprint& l, const Fingerprint& r);
-
-    uint64_t m_size{};
-    uint64_t m_last_write_time{};
-    std::array<int32_t, 4> m_crc{};
-};
-
-bool
-operator==(const Fingerprint& l, const Fingerprint& r);
 
 } // namespace vca

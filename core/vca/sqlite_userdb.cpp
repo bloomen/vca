@@ -3,10 +3,12 @@
 #include <list>
 #include <mutex>
 #include <set>
+#include <sstream>
 
 #include <SQLiteCpp/SQLiteCpp.h>
 #include <SQLiteCpp/VariadicBind.h>
 
+#include "filesystem.h"
 #include "logging.h"
 #include "utils.h"
 
@@ -168,6 +170,7 @@ SqliteUserDb::create(const std::set<Path>& root_dirs)
         "id INTEGER PRIMARY KEY,"
         "roots_id INTEGER NOT NULL,"
         "path TEXT NOT NULL, "
+        "fingerprint BLOB NOT NULL, "
         "FOREIGN KEY (roots_id) REFERENCES roots (id) ON DELETE CASCADE)");
 
     m_impl->db.exec("CREATE TABLE IF NOT EXISTS words ("
@@ -235,9 +238,13 @@ SqliteUserDb::update_file(const Path& path, const FileContents& contents)
     SQLite::bind(del_stm, p.to_narrow(), roots_id);
     del_stm.exec();
 
-    SQLite::Statement ins_stm{
-        m_impl->db, "INSERT INTO files (id, roots_id, path) VALUES (?, ?, ?)"};
+    const auto fingerprint = path.fingerprint()->serialize();
+
+    SQLite::Statement ins_stm{m_impl->db,
+                              "INSERT INTO files (id, roots_id, path, "
+                              "fingerprint) VALUES (?, ?, ?, ?)"};
     SQLite::bind(ins_stm, m_impl->files_id, roots_id, p.to_narrow());
+    ins_stm.bind(4, fingerprint.data(), static_cast<int>(fingerprint.size()));
     ins_stm.exec();
 
     for (const auto& word : contents.words)
