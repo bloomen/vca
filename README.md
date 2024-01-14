@@ -1,3 +1,8 @@
+VCA
+---
+
+A prototype for file indexing and discovery.
+
 Prerequisites:
 
 * CMake
